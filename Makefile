@@ -1,7 +1,7 @@
 # Compiler
 CC = /usr/local/opt/llvm/bin/clang++
 # OPTS = -c -Wall -Werror -pedantic -std=c++17
-OPTS = -c -Wall -pedantic -std=c++17
+OPTS = -c -Wall -pedantic -std=c++17 -I./lib/eigen -flto
 
 # Project name
 PROJECT = aerocore
@@ -19,7 +19,7 @@ OBJDIR = obj
 SRCDIR = src
 
 # Libraries
-LIBS = -lSDL2
+LIBS = -lSDL2 -lSDL2_gfx
 
 # Files and folders
 SRCS    = $(shell find $(SRCDIR) -name '*.cpp')
