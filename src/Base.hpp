@@ -1,42 +1,30 @@
 #pragma once
 
+#include <cmath>
+#include <iostream>
+
 #ifdef DODEBUG
-#define DEBUG(x)                                                        \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ \
+#define DEBUG(x)                                                               \
+    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__        \
                << "]\t" << x << std::endl)
 #else
 #define DEBUG(x)
 #endif
 
-enum class EntityType {
-    Player,
-    Bullet,
-    Enemy
-};
+enum class EntityType { Player, Bullet, Enemy };
+
+enum class Alliance { Friend, Foe, Neutral };
 
 struct Position {
     float x = 0;
     float y = 0;
 };
 
-struct PixelCoordinates {
-    int x;
-    int y;
+struct DisappearsOffScreen {
+    const bool instantly;
 };
-
-// std::pair<int,int>
-// toPixelCoordinates(const Position& pos, const size_t windowWidth)
-// {
-//     int wOtwo = windowWidth / 2;
-//     int dx = 
-// 
-//     return std::make_pair(wOtwo + pos.)
-// }
 
 struct Velocity {
-    float x;
-    float y;
-};
-
-struct FiringRate {
+    float x = 0.0;
+    float y = 0.0;
 };
