@@ -29,30 +29,20 @@ struct ColoredSprite : public Sprite {
     virtual ~ColoredSprite(void) {}
 };
 
-class SquareSprite final : public ColoredSprite {
+class SquareSprite final : public ColoredSprite
+{
 private:
     const float width;
 
 public:
-    SquareSprite(const float width_) : width(width_) {}
-
-    void draw(GraphicsContext* GC, const Position& pos) const final {
-        auto pc = GC->toPixelCoords(pos);
-
-        const int x = pc.first;
-        const int y = pc.second;
-        const int hw = GC->toPixelSpan(width / 2.0);
-
-        DEBUG("position: " << pos.x << " " << pos.y);
-        DEBUG("pixel_coords: " << pc.first << " " << pc.second);
-
-        boxRGBA(GC->renderer, x - hw, y - hw, x + hw, y + hw, rgba.r, rgba.g,
-                rgba.b, 255);
+    SquareSprite(const float width_)
+        : width(width_)
+    {
     }
 
-    BoundingSurface* buildBoundingSurface(void) const final {
-        return new BoundingBox(width / 2.0);
-    }
+    void draw(GraphicsContext* GC, const Position& pos) const final;
+
+    BoundingSurface* buildBoundingSurface(void) const final { return boundingSquare(width / 2.0); }
 
     ~SquareSprite() {}
 };
