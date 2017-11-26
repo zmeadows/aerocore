@@ -4,14 +4,8 @@
 
 int main(int argc, char** argv)
 {
-
-    bool quit = false;
-
     Aerocore game;
-
-    while (!quit) {
-        quit = game.tick();
-    }
-
+    while (!game.tick())
+        continue;
     return EXIT_SUCCESS;
 }
