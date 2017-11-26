@@ -4,9 +4,8 @@
 #include <iostream>
 
 #ifdef DODEBUG
-#define DEBUG(x)                                                               \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__        \
-               << "]\t" << x << std::endl)
+#define DEBUG(x)                                                                                             \
+    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "]\t" << x << std::endl)
 #else
 #define DEBUG(x)
 #endif
@@ -20,11 +19,14 @@ struct Position {
     float y = 0;
 };
 
-struct DisappearsOffScreen {
-    const bool instantly;
-};
-
 struct Velocity {
     float x = 0.0;
     float y = 0.0;
 };
+
+struct Acceleration {
+    float x = 0.0;
+    float y = 0.0;
+};
+
+enum class OffscreenBehavior { DiesInstantly, Wraps };
