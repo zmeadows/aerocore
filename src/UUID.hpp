@@ -17,11 +17,7 @@ public:
 
     inline bool operator==(const UUID& rhs) { return m_ID == rhs.m_ID; }
     inline bool operator!=(const UUID& rhs) { return m_ID != rhs.m_ID; }
-    inline friend bool operator<(const UUID& a, const UUID& b) {
-        return a.m_ID < b.m_ID;
-    }
-
-    inline friend std::ostream& operator<<(std::ostream& os, const UUID& stui);
+    inline friend bool operator<(const UUID& a, const UUID& b) { return a.m_ID < b.m_ID; }
 
     static const UUID playerUUID;
 
@@ -30,14 +26,4 @@ private:
     const rep m_ID;
 };
 
-UUID::rep UUID::m_nextID = 0;
-const UUID UUID::playerUUID;
-
-std::ostream& operator<<(std::ostream& os, const UUID& stui) {
-    std::ios_base::fmtflags oldFlags(os.flags());
-    os << std::hex << stui.m_ID;
-    os.flags(oldFlags);
-    return os;
-}
-
-class UUIDSet {};
+std::ostream& operator<<(std::ostream& os, const UUID& stui);
