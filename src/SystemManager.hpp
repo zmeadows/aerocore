@@ -6,49 +6,18 @@
 
 class MovementSystem final : public System {
 public:
-    void run(float dt) final {
-        for (const UUID& uuid : m_followed) {
-            auto pos = CM->get<Position>(uuid);
-            auto const vel = CM->get<Velocity>(uuid);
-            pos->x += dt * vel->x;
-            pos->y += dt * vel->y;
-        }
-    }
+    void run(float dt) final;
 
     MovementSystem(ComponentManager* const CM_) : System("Movement", CM_) {
-        CM->subscribe<Position, Velocity>(this);
+        CM->subscribe<Position, Velocity, Acceleration>(this);
     }
 };
 
 class CollisionSystem final : public System {
+    bool areColliding(const UUID& uuidA, const UUID& uuidB);
+
 public:
-    void run(float dt) final {
-        std::set<std::pair<UUID, UUID>> collisions;
-
-        for (std::set<UUID>::const_iterator uuidA = m_followed.begin();
-             uuidA != m_followed.end(); ++uuidA) {
-
-            for (std::set<UUID>::const_iterator uuidB = next(uuidA);
-                 uuidB != m_followed.end(); ++uuidB) {
-
-                const auto allA = CM->get<Alliance>(*uuidA);
-                const auto allB = CM->get<Alliance>(*uuidB);
-
-                if (*allA != *allB) {
-
-                    const auto bsA = CM->get<BoundingSurface>(*uuidA);
-                    const auto posA = CM->get<Position>(*uuidA);
-                    const auto bsB = CM->get<BoundingSurface>(*uuidB);
-                    const auto posB = CM->get<Position>(*uuidB);
-
-                    if (overlaps(bsA, posA, bsB, posB)) {
-                        collisions.insert(std::minmax(*uuidA, *uuidB));
-                        DEBUG("COLLIDED");
-                    }
-                }
-            }
-        }
-    }
+    void run(float dt) final;
 
     CollisionSystem(ComponentManager* const CM_) : System("Collision", CM_) {
         CM->subscribe<Position, BoundingSurface, Alliance>(this);
@@ -65,8 +34,7 @@ public:
         }
     }
 
-    DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)
-        : System("Draw", CM_), GC(GC_) {
+    DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_) : System("Draw", CM_), GC(GC_) {
         CM->subscribe<Sprite, Position>(this);
     }
 };
@@ -80,8 +48,7 @@ private:
 public:
     SystemManager(ComponentManager* const CM, GraphicsContext* const GC)
         : m_movement(std::make_unique<MovementSystem>(CM)),
-          m_collision(std::make_unique<CollisionSystem>(CM)),
-          m_draw(std::make_unique<DrawSystem>(CM, GC)) {}
+          m_collision(std::make_unique<CollisionSystem>(CM)), m_draw(std::make_unique<DrawSystem>(CM, GC)) {}
 
     SystemManager(const SystemManager&) = delete;
     SystemManager(SystemManager&&) = delete;
