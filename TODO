@@ -1,0 +1,21 @@
+##############
+#### TODO ####
+##############
+
+Create UUIDSet class
+
+Set up QuadTree (as soon as notice any slowdown from O(n^2) collision detection currently)
+
+##############
+#### DONE ####
+##############
+
+Flush out details of time per frame.
+    - lock frame rate at some fixed value (35?)
+    - have motion/collisions/whatever not depend on this value directly, but on a timestep determined by the framerate.
+    - create Timer class
+
+Create GraphicsContext class that contains:
+  - integer pixel coordinates vs. continous game grid coordinates utility functions
+  - all SDL pointers necessary (renderer/window/surface/etc)
+  - window/screen width/height constants
