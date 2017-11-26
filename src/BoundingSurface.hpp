@@ -11,128 +11,68 @@
 
 using namespace Eigen;
 
+struct AxisProjection {
+    float min;
+    float max;
+};
+
 class SurfaceNormalSet {
 private:
     std::vector<Vector2f> normals;
 
 public:
-    inline size_t size(void) const { return normals.size(); }
-
-    void add(const Vector2f& vec) {
-        static const float tol = 1e-3;
-
-        for (const auto& ov : normals) {
-            const float angle =
-                std::atan2(vec.y(), vec.x()) - std::atan2f(ov.y(), ov.x());
-            if (std::abs(angle) < tol || std::abs(M_PI - std::abs(angle)) < tol)
-                return;
-        }
-
-        normals.push_back(vec);
-    }
-
-    void add(const SurfaceNormalSet& rhs) {
-        for (size_t i = 0; i < rhs.normals.size(); i++) {
-            this->add(rhs.normals[i]);
-        }
-    }
-
-    std::vector<Vector2f>::const_iterator begin(void) const {
-        return normals.begin();
-    }
-
-    std::vector<Vector2f>::const_iterator end(void) const {
-        return normals.end();
-    }
-
-    SurfaceNormalSet(const std::vector<Vector2f>& vertices) {
-        const size_t numVertices = vertices.size();
-
-        for (size_t i = 0; i < numVertices; i++) {
-            Vector2f ov = vertices[(i + 1) % numVertices] - vertices[i];
-            std::swap(ov.x(), ov.y());
-            if (ov.x() != 0.0)
-                ov.x() *= -1.0;
-            add(ov.normalized());
-        }
-    }
-
-    SurfaceNormalSet(const SurfaceNormalSet& rhs) {
-        for (size_t i = 0; i < rhs.normals.size(); i++) {
-            this->add(rhs.normals[i]);
-        }
-    }
-
+    SurfaceNormalSet(const std::vector<Vector2f>& vertices);
+    SurfaceNormalSet(const SurfaceNormalSet& rhs);
     SurfaceNormalSet(void) {}
+
+    void add(const Vector2f& vec);
+    void add(const SurfaceNormalSet& rhs);
+    void add(const SurfaceNormalSet* rhs);
+
+    std::vector<Vector2f>::const_iterator begin(void) const;
+    std::vector<Vector2f>::const_iterator end(void) const;
+
+    inline size_t size(void) const { return normals.size(); }
 };
 
 struct BoundingSurface {
+    virtual AxisProjection projectOn(const Vector2f& axis, const Position& pos) const = 0;
+    virtual const SurfaceNormalSet* getSurfaceNormals(void) const = 0;
+
+    virtual ~BoundingSurface() {}
+};
+
+struct PolygonalBoundingSurface final : BoundingSurface {
     std::vector<Vector2f> vertices;
     SurfaceNormalSet normals;
 
-    BoundingSurface(const std::vector<Vector2f>& vertices_)
-        : vertices(vertices_), normals(vertices) {}
+    PolygonalBoundingSurface(void) = delete;
+    PolygonalBoundingSurface& operator=(const PolygonalBoundingSurface&) = delete;
+    PolygonalBoundingSurface& operator=(PolygonalBoundingSurface&&) = delete;
 
-    virtual ~BoundingSurface(void) {}
+    PolygonalBoundingSurface(PolygonalBoundingSurface&&) = delete;
+
+    PolygonalBoundingSurface(std::vector<Vector2f>&& vertices_) : normals(vertices_) {
+        std::swap(vertices, vertices_);
+    }
+
+    const SurfaceNormalSet* getSurfaceNormals(void) const final { return &normals; }
+
+    AxisProjection projectOn(const Vector2f& axis, const Position& pos) const final;
+
+    ~PolygonalBoundingSurface(void) {}
 };
 
-bool isSeparatingAxis(const Vector2f& axisCandidate,
-                      const std::vector<Vector2f>& verticesA,
-                      const Vector2f& positionA,
-                      const std::vector<Vector2f>& verticesB,
-                      const Vector2f& positionB) {
+bool overlaps(const BoundingSurface* bsA,
+              const Position* posA,
+              const BoundingSurface* bsB,
+              const Position* posB);
 
-    float minProjectionA = std::numeric_limits<float>::max();
-    float minProjectionB = std::numeric_limits<float>::max();
-    float maxProjectionA = std::numeric_limits<float>::lowest();
-    float maxProjectionB = std::numeric_limits<float>::lowest();
-
-    for (const Vector2f& vtx : verticesA) {
-        const float projection = (vtx + positionA).dot(axisCandidate);
-        minProjectionA = std::min(projection, minProjectionA);
-        maxProjectionA = std::max(projection, maxProjectionA);
-    }
-
-    for (const Vector2f& vtx : verticesB) {
-        const float projection = (vtx + positionB).dot(axisCandidate);
-        minProjectionB = std::min(projection, minProjectionB);
-        maxProjectionB = std::max(projection, maxProjectionB);
-    }
-
-    return !(maxProjectionA >= minProjectionB &&
-             maxProjectionB >= minProjectionA);
+inline BoundingSurface* boundingBox(const float halfWidth, const float halfHeight) {
+    return new PolygonalBoundingSurface({{-halfWidth, -halfHeight},
+                                         {halfWidth, -halfHeight},
+                                         {halfWidth, halfHeight},
+                                         {-halfWidth, halfHeight}});
 }
 
-struct BoundingBox final : BoundingSurface {
-    BoundingBox(const float halfWidth)
-        : BoundingSurface({{-halfWidth, -halfWidth},
-                           {halfWidth, -halfWidth},
-                           {halfWidth, halfWidth},
-                           {-halfWidth, halfWidth}}) {}
-};
-
-bool overlaps(const BoundingSurface* bsA, const Position* posA,
-              const BoundingSurface* bsB, const Position* posB) {
-
-    const Vector2f positionVectorA(posA->x, posA->y);
-    const Vector2f positionVectorB(posB->x, posB->y);
-
-    DEBUG("overlaps: positionA: " << positionVectorA.x() << " "
-                                  << positionVectorA.y());
-    DEBUG("overlaps: positionB: " << positionVectorB.x() << " "
-                                  << positionVectorB.y());
-
-    SurfaceNormalSet combinedSurfaceNormals;
-    combinedSurfaceNormals.add(bsA->normals);
-    combinedSurfaceNormals.add(bsB->normals);
-
-    DEBUG("overlaps: combined normals size: " << combinedSurfaceNormals.size());
-
-    for (const auto& axis : combinedSurfaceNormals) {
-        if (isSeparatingAxis(axis, bsA->vertices, positionVectorA,
-                             bsB->vertices, positionVectorB))
-            return false;
-    }
-
-    return true;
-}
+inline BoundingSurface* boundingSquare(const float halfWidth) { return boundingBox(halfWidth, halfWidth); }
