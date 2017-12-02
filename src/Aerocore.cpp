@@ -1,16 +1,11 @@
 #include "Aerocore.hpp"
 
-#include <SDL2/SDL.h>
-// #include "Base.hpp"
-// #include "BoundingSurface.hpp"
 #include "ComponentManager.hpp"
 #include "Generator.hpp"
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
-// #include "Sprite.hpp"
-// #include "System.hpp"
 #include "SystemManager.hpp"
-// #include "UUID.hpp"
+#include <SDL2/SDL.h>
 
 Aerocore::Aerocore(void)
     : GC(std::make_unique<GraphicsContext>())
@@ -28,12 +23,16 @@ bool Aerocore::tick(void)
 
     static Uint64 t1 = 0, t0 = 0;
 
-    SDL_SetRenderDrawColor(GC->renderer, 175, 175, 175, 0);
+    SDL_SetRenderDrawColor(GC->renderer, 10, 10, 10, 0);
     SDL_RenderClear(GC->renderer);
     t1 = SDL_GetPerformanceCounter();
     SM->runSystems((float)(t1 - t0) / SDL_GetPerformanceFrequency());
     t0 = SDL_GetPerformanceCounter();
     SDL_RenderPresent(GC->renderer);
+
+    if (!quitting) {
+        quitting = !CM->has<Position>(UUID::playerUUID);
+    }
 
     return quitting;
 }
