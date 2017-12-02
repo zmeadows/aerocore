@@ -14,6 +14,6 @@ struct GraphicsContext {
     SDL_Renderer* renderer;
     SDL_Window* window;
 
-    int toPixelSpan(const float gridSpan) const;
-    std::pair<int, int> toPixelCoords(const Position& pos) const;
+    Sint16 toScreenSpan(const float gridSpan) const;
+    ScreenCoordinates toScreenCoordinates(const Position& pos) const;
 };
