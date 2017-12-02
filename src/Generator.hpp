@@ -4,27 +4,36 @@
 #include "ComponentManager.hpp"
 
 template <EntityType EType>
-UUID generate(ComponentManager* const CM) {
+UUID generate(ComponentManager* const CM)
+{
     UUID newUUID;
     return newUUID;
 }
 
 template <>
-inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
+inline UUID generate<EntityType::Player>(ComponentManager* const CM)
+{
     CM->add<Position>(UUID::playerUUID, {0, 0});
+    CM->add<Rotation>(UUID::playerUUID, Rotation());
     CM->add<Velocity>(UUID::playerUUID, {0, 0});
     CM->add<Acceleration>(UUID::playerUUID, {0, 0});
     CM->add<Alliance>(UUID::playerUUID, Alliance::Friend);
 
-    CM->add<Sprite>(UUID::playerUUID, new SquareSprite(10.0));
-    auto const spr = CM->get<Sprite>(UUID::playerUUID);
+    auto spr = new IsoTriangleSprite(7.0, 12.0);
+    spr->rgba.r = 255;
+    spr->rgba.g = 255;
+    spr->rgba.b = 255;
+    spr->rgba.a = 255;
+
+    CM->add<Sprite>(UUID::playerUUID, spr);
     CM->add<BoundingSurface>(UUID::playerUUID, spr->buildBoundingSurface());
 
     return UUID::playerUUID;
 }
 
 template <>
-inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
+inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
+{
     UUID bulletUUID;
 
     auto bulletSprite = new SquareSprite(2);
@@ -34,6 +43,7 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     CM->add<Sprite>(bulletUUID, bulletSprite);
 
     CM->add<Position>(bulletUUID, Position());
+    CM->add<Rotation>(bulletUUID, Rotation());
     CM->add<Velocity>(bulletUUID, {0, 150});
     CM->add<Acceleration>(bulletUUID, {0, 0});
 
@@ -43,9 +53,11 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
 }
 
 template <>
-inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
+inline UUID generate<EntityType::Enemy>(ComponentManager* const CM)
+{
     UUID enemyUUID;
     CM->add<Position>(enemyUUID, {75, 0});
+    CM->add<Rotation>(enemyUUID, Rotation());
     CM->add<Velocity>(enemyUUID, {0, 0});
     CM->add<Acceleration>(enemyUUID, {0, 0});
 
