@@ -4,45 +4,63 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 
 #include "BoundingSurface.hpp"
+#include "Geometry.hpp"
 #include "GraphicsContext.hpp"
 
 struct Sprite {
-    virtual void draw(GraphicsContext* GC, const Position& pos) const = 0;
+    virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
     virtual BoundingSurface* buildBoundingSurface(void) const = 0;
-
     virtual ~Sprite(void) {}
 };
 
-struct RGBA {
-    uint_fast8_t r = 0;
-    uint_fast8_t g = 0;
-    uint_fast8_t b = 0;
-    uint_fast8_t a = 0;
-};
-
-struct ColoredSprite : public Sprite {
+struct SimplePolygonSprite : public Sprite {
     RGBA rgba;
 
-    virtual void draw(GraphicsContext* GC, const Position& pos) const = 0;
-    virtual BoundingSurface* buildBoundingSurface(void) const = 0;
+    virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
 
-    virtual ~ColoredSprite(void) {}
+    virtual const PolygonShape& getPolygon(void) const = 0;
+    virtual PolygonShape& getPolygon(void) = 0;
+
+    BoundingSurface* buildBoundingSurface(void) const final
+    {
+        return new PolygonalBoundingSurface(getPolygon());
+    }
+
+    virtual ~SimplePolygonSprite(void) {}
 };
 
-class SquareSprite final : public ColoredSprite
+class SquareSprite final : public SimplePolygonSprite
 {
-private:
-    const float width;
+    SquareShape square;
 
 public:
-    SquareSprite(const float width_)
-        : width(width_)
+    SquareSprite(const float width)
+        : square(width)
     {
     }
 
-    void draw(GraphicsContext* GC, const Position& pos) const final;
+    const PolygonShape& getPolygon(void) const final { return square; }
+    PolygonShape& getPolygon(void) final { return square; }
 
-    BoundingSurface* buildBoundingSurface(void) const final { return boundingSquare(width / 2.0); }
+    void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const final;
 
     ~SquareSprite() {}
+};
+
+class IsoTriangleSprite final : public SimplePolygonSprite
+{
+    IsoTriangleShape triangle;
+
+public:
+    IsoTriangleSprite(float baseWidth, float height)
+        : triangle(baseWidth, height)
+    {
+    }
+
+    const PolygonShape& getPolygon(void) const final { return triangle; }
+    PolygonShape& getPolygon(void) final { return triangle; }
+
+    void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const final;
+
+    ~IsoTriangleSprite() {}
 };
