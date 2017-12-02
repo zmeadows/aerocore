@@ -111,7 +111,8 @@ private:
         assert(compMap.find(uuid.unwrap()) == compMap.end());
 
         compMap.emplace(uuid.unwrap(), ComponentPtr(static_cast<void*>(data), [](void* ptr) -> void {
-                            delete static_cast<TyComponent*>(ptr);
+                            TyComponent* tptr = static_cast<TyComponent*>(ptr);
+                            delete tptr;
                         }));
 
         alertSystemsNewComponentAdded<TyComponent>(uuid);
@@ -129,6 +130,8 @@ public:
         : nextIndex(0)
     {
         bookComponent<Position>(100);
+        bookComponent<Rotation>(100);
+        bookComponent<RotationalVelocity>(100);
         bookComponent<Velocity>(100);
         bookComponent<Acceleration>(100);
         bookComponent<Sprite>(100);
@@ -200,16 +203,15 @@ public:
 
     void destroy(UUID uuid)
     {
-        // TODO: remember that this method will get more complex once
-        // entities contain references to other UUIDS (ex: parent/children)
-        for (auto& cm : m_store) {
-            UUIDCompMap& compMap = cm.second;
-            compMap.erase(uuid.unwrap());
-        }
-
         for (auto& p : m_subscribedComponents) {
             System* sys = p.first;
             sys->unfollow(uuid);
+        }
+
+        // TODO: remember that this method will get more complex once
+        // entities contain references to other UUIDS (ex: parent/children)
+        for (const auto& idx : m_allComponentIndices) {
+            m_store[idx].erase(uuid.unwrap());
         }
     }
 
