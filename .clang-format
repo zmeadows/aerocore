@@ -7,5 +7,7 @@ AccessModifierOffset: -4
 ColumnLimit: 110
 BinPackParameters: false
 AlwaysBreakTemplateDeclarations: true
-BreakConstructorInitializers: BeforeComma
-BreakBeforeBraces: Linux
+# BreakConstructorInitializers: BeforeComma
+# BreakBeforeBraces: Linux
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
