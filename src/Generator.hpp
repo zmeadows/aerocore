@@ -44,12 +44,14 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
     bulletSprite->rgba.r = 0;
     bulletSprite->rgba.g = 200;
     bulletSprite->rgba.b = 0;
+    bulletSprite->rgba.a = 255;
     CM->add<Sprite>(bulletUUID, bulletSprite);
 
     CM->add<Position>(bulletUUID, Position());
     CM->add<Rotation>(bulletUUID, Rotation());
-    CM->add<Velocity>(bulletUUID, {0, 150});
+    CM->add<Velocity>(bulletUUID, {0, 10});
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
+    CM->get<RotationalVelocity>(bulletUUID)->value = 100;
     CM->add<Acceleration>(bulletUUID, {0, 0});
 
     CM->add<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
@@ -69,7 +71,7 @@ inline UUID generate<EntityType::Enemy>(ComponentManager* const CM)
 
     auto spr = new SquareSprite(10.0);
     spr->rgba.r = 255;
-    spr->rgba.g = 0;
+    spr->rgba.a = 255;
     CM->add<Sprite>(enemyUUID, spr);
     CM->add<Alliance>(enemyUUID, Alliance::Foe);
 
