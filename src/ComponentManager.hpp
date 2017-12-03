@@ -2,8 +2,8 @@
 
 #include <cstdint>
 #include <memory>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "Base.hpp"
@@ -13,19 +13,17 @@
 #include "UUID.hpp"
 #include "Util.hpp"
 
-class ComponentManager
-{
+class ComponentManager {
 private:
     using ComponentPtr = std::unique_ptr<void, void (*)(void*)>;
     using UUIDCompMap = std::unordered_map<UUID::rep, ComponentPtr>;
     using ComponentIndex = uint_fast16_t;
 
     ComponentIndex nextIndex;
-    std::set<ComponentIndex> m_allComponentIndices;
+    std::unordered_set<ComponentIndex> m_allComponentIndices;
     std::unordered_map<ComponentIndex, UUIDCompMap> m_store;
 
-    const ComponentIndex newIndex(void)
-    {
+    const ComponentIndex newIndex(void) {
         ComponentIndex idx = nextIndex;
         nextIndex = nextIndex + 1;
         m_allComponentIndices.insert(idx);
@@ -33,20 +31,18 @@ private:
     }
 
     template <typename TyComponent>
-    const ComponentIndex index(void)
-    {
+    const ComponentIndex index(void) {
         static const ComponentIndex idx = newIndex();
         return idx;
     }
 
-    using SystemSet = std::set<System*>;
-    using ComponentIndexSet = std::set<ComponentIndex>;
+    using SystemSet = std::unordered_set<System*>;
+    using ComponentIndexSet = std::unordered_set<ComponentIndex>;
     std::unordered_map<ComponentIndex, SystemSet> m_subscribedSystems;
     std::unordered_map<System*, ComponentIndexSet> m_subscribedComponents;
 
     template <typename TyComponent>
-    void bookComponent(const size_t alloc_size)
-    {
+    void bookComponent(const size_t alloc_size) {
         DEBUG("booking component: " << type_name<TyComponent>());
         const ComponentIndex newCompIDX = index<TyComponent>();
 
@@ -68,8 +64,7 @@ private:
     }
 
     template <typename TyComponent>
-    void alertSystemsNewComponentAdded(const UUID& uuid)
-    {
+    void alertSystemsNewComponentAdded(const UUID& uuid) {
         for (auto& sys : m_subscribedSystems.at(index<TyComponent>())) {
             if (sys->isFollowing(uuid))
                 continue;
@@ -89,23 +84,20 @@ private:
     }
 
     template <typename TyComponent>
-    void alertSystemsOldComponentRemoved(const UUID& uuid)
-    {
+    void alertSystemsOldComponentRemoved(const UUID& uuid) {
         for (auto& sys : m_subscribedSystems.at(index<TyComponent>()))
             sys->unfollow(uuid);
     }
 
     template <typename TyComponent>
-    UUIDCompMap& getCompMap(void)
-    {
+    UUIDCompMap& getCompMap(void) {
         auto compID = index<TyComponent>();
         assert(m_store.find(compID) != m_store.end());
         return m_store[compID];
     }
 
     template <typename TyComponent>
-    void insert(const UUID& uuid, TyComponent* data)
-    {
+    void insert(const UUID& uuid, TyComponent* data) {
         UUIDCompMap& compMap = getCompMap<TyComponent>();
 
         assert(compMap.find(uuid.unwrap()) == compMap.end());
@@ -126,9 +118,7 @@ public:
     ComponentManager(ComponentManager&&) = delete;
     ComponentManager& operator=(ComponentManager&&) = delete;
 
-    ComponentManager()
-        : nextIndex(0)
-    {
+    ComponentManager() : nextIndex(0) {
         bookComponent<Position>(100);
         bookComponent<Rotation>(100);
         bookComponent<RotationalVelocity>(100);
@@ -141,26 +131,22 @@ public:
     ~ComponentManager() = default;
 
     template <typename TyComponent>
-    void add(UUID uuid, const TyComponent& value)
-    {
+    void add(UUID uuid, const TyComponent& value) {
         insert<TyComponent>(uuid, new TyComponent(value));
     }
 
     template <typename TyComponent>
-    void add(UUID uuid, TyComponent&& value)
-    {
+    void add(UUID uuid, TyComponent&& value) {
         insert<TyComponent>(uuid, new TyComponent(value));
     }
 
     template <typename TyComponent>
-    void add(UUID uuid, TyComponent* value)
-    {
+    void add(UUID uuid, TyComponent* value) {
         insert<TyComponent>(uuid, value);
     }
 
     template <typename TyComponent>
-    void remove(const UUID& uuid)
-    {
+    void remove(const UUID& uuid) {
         UUIDCompMap& compMap = getCompMap<TyComponent>();
 
         auto oldValue = compMap.find(uuid.unwrap());
@@ -172,8 +158,7 @@ public:
     }
 
     template <typename TyComponent>
-    TyComponent* get(const UUID& uuid)
-    {
+    TyComponent* get(const UUID& uuid) {
         UUIDCompMap& compMap = getCompMap<TyComponent>();
 
         auto comp = compMap.find(uuid.unwrap());
@@ -187,8 +172,7 @@ public:
     }
 
     template <typename TyComponent>
-    const TyComponent* get(UUID uuid) const
-    {
+    const TyComponent* get(UUID uuid) const {
         const UUIDCompMap& compMap = m_store.at(index<TyComponent>());
 
         const auto comp = compMap.find(uuid.unwrap());
@@ -201,8 +185,7 @@ public:
         }
     }
 
-    void destroy(UUID uuid)
-    {
+    void destroy(UUID uuid) {
         for (auto& p : m_subscribedComponents) {
             System* sys = p.first;
             sys->unfollow(uuid);
@@ -216,14 +199,12 @@ public:
     }
 
     template <typename TyComponent>
-    bool has(UUID uuid)
-    {
+    bool has(UUID uuid) {
         return static_cast<bool>(getCompMap<TyComponent>().count(uuid.unwrap()));
     }
 
     template <typename TyComponent>
-    void subscribe(System* sys)
-    {
+    void subscribe(System* sys) {
         auto idx = index<TyComponent>();
 
         if (m_subscribedComponents.find(sys) == m_subscribedComponents.end()) {
@@ -237,8 +218,7 @@ public:
     }
 
     template <typename TyComponent1, typename TyComponent2, typename... TyComponents>
-    void subscribe(System* s)
-    {
+    void subscribe(System* s) {
         subscribe<TyComponent1>(s);
         subscribe<TyComponent2, TyComponents...>(s);
     }

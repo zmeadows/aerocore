@@ -1,7 +1,6 @@
 #include "SystemManager.hpp"
 
-void TranslationSystem::run(float dt)
-{
+void TranslationSystem::run(float dt) {
     for (const UUID& uuid : m_followed) {
         auto pos = CM->get<Position>(uuid);
         auto const vel = CM->get<Velocity>(uuid);
@@ -21,8 +20,7 @@ void TranslationSystem::run(float dt)
     }
 }
 
-void RotationSystem::run(float dt)
-{
+void RotationSystem::run(float dt) {
     for (const UUID& uuid : m_followed) {
         auto rot = CM->get<Rotation>(uuid);
         auto const vel = CM->get<RotationalVelocity>(uuid);
@@ -30,8 +28,7 @@ void RotationSystem::run(float dt)
     }
 }
 
-bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB)
-{
+bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB) {
     const auto allA = CM->get<Alliance>(uuidA);
     const auto allB = CM->get<Alliance>(uuidB);
 
@@ -50,12 +47,12 @@ bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB)
     }
 }
 
-void CollisionSystem::run(float dt)
-{
+void CollisionSystem::run(float dt) {
+    // TODO: make a CollisionSet class for better performance
     std::set<std::pair<UUID, UUID>> collisions;
 
-    for (std::set<UUID>::const_iterator uuidA = m_followed.begin(); uuidA != m_followed.end(); ++uuidA) {
-        for (std::set<UUID>::const_iterator uuidB = next(uuidA); uuidB != m_followed.end(); ++uuidB) {
+    for (UUIDSet::iterator uuidA = m_followed.begin(); uuidA != m_followed.end(); ++uuidA) {
+        for (auto uuidB = next(uuidA); uuidB != m_followed.end(); ++uuidB) {
             if (areColliding(*uuidA, *uuidB)) {
                 collisions.insert(std::make_pair(*uuidA, *uuidB));
             }
