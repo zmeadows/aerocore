@@ -4,6 +4,8 @@
 #include "ComponentManager.hpp"
 #include "System.hpp"
 
+#include <SDL2/SDL2_gfxPrimitives.h>
+
 class TranslationSystem final : public System
 {
 public:
@@ -52,6 +54,8 @@ public:
         for (const UUID& uuid : m_followed) {
             CM->get<Sprite>(uuid)->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
         }
+
+        stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);
     }
 
     DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)

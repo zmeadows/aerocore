@@ -1,6 +1,7 @@
 #include "GraphicsContext.hpp"
 
 #include <iostream>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 GraphicsContext::GraphicsContext(void)
     : m_screenWidth(800)
@@ -19,6 +20,8 @@ GraphicsContext::GraphicsContext(void)
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
+    gfxPrimitivesSetFont(nullptr, 0, 0);
 }
 
 GraphicsContext::~GraphicsContext(void)

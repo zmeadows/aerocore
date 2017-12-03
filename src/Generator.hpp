@@ -45,11 +45,11 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
     bulletSprite->rgba.g = 200;
     bulletSprite->rgba.b = 0;
     bulletSprite->rgba.a = 255;
-    CM->add<Sprite>(bulletUUID, bulletSprite);
 
+    CM->add<Sprite>(bulletUUID, bulletSprite);
     CM->add<Position>(bulletUUID, Position());
     CM->add<Rotation>(bulletUUID, Rotation());
-    CM->add<Velocity>(bulletUUID, {0, 10});
+    CM->add<Velocity>(bulletUUID, {0, 150});
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
     CM->get<RotationalVelocity>(bulletUUID)->value = 100;
     CM->add<Acceleration>(bulletUUID, {0, 0});
