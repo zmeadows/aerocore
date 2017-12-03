@@ -185,7 +185,9 @@ public:
         }
     }
 
-    void destroy(UUID uuid) {
+    void destroy(const UUID& uuid) {
+        DEBUG("Destroying UUID: " << uuid);
+
         for (auto& p : m_subscribedComponents) {
             System* sys = p.first;
             sys->unfollow(uuid);

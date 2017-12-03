@@ -3,8 +3,7 @@
 #include "ComponentManager.hpp"
 #include "Generator.hpp"
 
-void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp)
-{
+void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
     const KeyState newKeyState = keyUp ? KeyState::Released : KeyState::Pressed;
     auto keyFunc = keyUp ? std::mem_fn(&InputManager::processReleasedKey)
                          : std::mem_fn(&InputManager::processPressedKey);
@@ -37,14 +36,11 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp)
         keyFunc(this, Key::Spacebar);
         break;
     }
-    default: {
-        break;
-    }
+    default: { break; }
     }
 }
 
-void InputManager::processPressedKey(const Key& key)
-{
+void InputManager::processPressedKey(const Key& key) {
     auto acc = CM->get<Acceleration>(UUID::playerUUID);
     auto rotVel = CM->get<RotationalVelocity>(UUID::playerUUID);
     assert(acc != nullptr);
@@ -77,19 +73,23 @@ void InputManager::processPressedKey(const Key& key)
         UUID bulletUUID = generate<EntityType::Bullet>(CM);
         CM->add<Alliance>(bulletUUID, Alliance::Friend);
         auto const playerPos = CM->get<Position>(UUID::playerUUID);
+        const float angle = CM->get<Rotation>(UUID::playerUUID)->getAngle();
+
         auto pos = CM->get<Position>(bulletUUID);
-        pos->x = playerPos->x;
-        pos->y = playerPos->y + 5;
+        pos->x = playerPos->x - 7.5 * std::sin(angle);
+        pos->y = playerPos->y + 7.5 * std::cos(angle);
+
+        auto vel = CM->get<Velocity>(bulletUUID);
+        vel->x = -100 * std::sin(angle);
+        vel->y = 100 * std::cos(angle);
+
         break;
     }
-    default: {
-        break;
-    }
+    default: { break; }
     }
 }
 
-void InputManager::processReleasedKey(const Key& key)
-{
+void InputManager::processReleasedKey(const Key& key) {
     auto acc = CM->get<Acceleration>(UUID::playerUUID);
     auto rotVel = CM->get<RotationalVelocity>(UUID::playerUUID);
     assert(acc != nullptr);
@@ -126,8 +126,6 @@ void InputManager::processReleasedKey(const Key& key)
     case Key::Spacebar: {
         break;
     }
-    default: {
-        break;
-    }
+    default: { break; }
     }
 }

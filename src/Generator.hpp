@@ -4,15 +4,13 @@
 #include "ComponentManager.hpp"
 
 template <EntityType EType>
-UUID generate(ComponentManager* const CM)
-{
+UUID generate(ComponentManager* const CM) {
     UUID newUUID;
     return newUUID;
 }
 
 template <>
-inline UUID generate<EntityType::Player>(ComponentManager* const CM)
-{
+inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
     CM->add<Position>(UUID::playerUUID, {0, 0});
     CM->add<Rotation>(UUID::playerUUID, Rotation());
 
@@ -36,11 +34,10 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM)
 }
 
 template <>
-inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
-{
+inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     UUID bulletUUID;
 
-    auto bulletSprite = new SquareSprite(2);
+    auto bulletSprite = new SquareSprite(1.0);
     bulletSprite->rgba.r = 0;
     bulletSprite->rgba.g = 200;
     bulletSprite->rgba.b = 0;
@@ -51,7 +48,7 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
     CM->add<Rotation>(bulletUUID, Rotation());
     CM->add<Velocity>(bulletUUID, {0, 150});
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
-    CM->get<RotationalVelocity>(bulletUUID)->value = 100;
+    CM->get<RotationalVelocity>(bulletUUID)->value = 10;
     CM->add<Acceleration>(bulletUUID, {0, 0});
 
     CM->add<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
@@ -60,8 +57,7 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
 }
 
 template <>
-inline UUID generate<EntityType::Enemy>(ComponentManager* const CM)
-{
+inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     UUID enemyUUID;
     CM->add<Position>(enemyUUID, {0, 75});
     CM->add<Rotation>(enemyUUID, Rotation());

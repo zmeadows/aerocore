@@ -1,23 +1,26 @@
 #include "SystemManager.hpp"
 
 void TranslationSystem::run(float dt) {
+    UUIDSet toDestroy;
+
     for (const UUID& uuid : m_followed) {
         auto pos = CM->get<Position>(uuid);
-        auto const vel = CM->get<Velocity>(uuid);
-        auto const acc = CM->get<Acceleration>(uuid);
+        if (std::fabs(pos->x) > 150 || std::fabs(pos->y) > 150) {
+            toDestroy.insert(uuid);
+        } else {
+            auto const vel = CM->get<Velocity>(uuid);
+            auto const acc = CM->get<Acceleration>(uuid);
 
-        pos->x += dt * vel->x;
-        pos->y += dt * vel->y;
-        vel->x += dt * acc->x;
-        vel->y += dt * acc->y;
+            pos->x += dt * (vel->x + 0.5 * acc->x * dt);
+            pos->y += dt * (vel->y + 0.5 * acc->x * dt);
 
-        // if (uuid.unwrap() == UUID::playerUUID.unwrap()) {
-        //     if (acc->x == 0.0 && std::abs(vel->x) < 10.0)
-        //         vel->x *= 0.9;
-        //     if (acc->y == 0.0 && std::abs(vel->y) < 10.0)
-        //         vel->y *= 0.9;
-        // }
+            vel->x += dt * acc->x;
+            vel->y += dt * acc->y;
+        }
     }
+
+    for (const UUID& uuid : toDestroy)
+        CM->destroy(uuid);
 }
 
 void RotationSystem::run(float dt) {
@@ -35,6 +38,7 @@ bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB) {
     if (*allA == *allB) {
         return false;
     } else {
+        DEBUG("attempting collision detection in full");
         const auto bsA = CM->get<BoundingSurface>(uuidA);
         const auto posA = CM->get<Position>(uuidA);
         const auto rotA = CM->get<Rotation>(uuidA);

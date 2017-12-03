@@ -7,5 +7,6 @@ int main(int argc, char** argv)
     Aerocore game;
     while (!game.tick())
         continue;
-    return EXIT_SUCCESS;
+
+    std::exit(EXIT_SUCCESS);
 }
