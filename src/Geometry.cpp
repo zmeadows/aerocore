@@ -42,8 +42,10 @@ std::vector<Vector2f> PolygonShape::getTransRotVertices(const Position& pos, con
     std::vector<Vector2f> tmpVertices;
     tmpVertices.reserve(this->vertices.size());
 
+    Rotation2Df rotator(rot.getAngle());
+
     for (const Vector2f& vtx : this->vertices) {
-        tmpVertices.push_back({vtx.x() + pos.x, vtx.y() + pos.y});
+        tmpVertices.push_back(rotator * vtx + Vector2f({pos.x, pos.y}));
     }
 
     return tmpVertices;

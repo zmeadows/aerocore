@@ -11,7 +11,8 @@ class ComponentManager;
 enum class Key { LeftArrow, RightArrow, UpArrow, DownArrow, Spacebar };
 enum class KeyState { Pressed, Released };
 
-class InputManager {
+class InputManager
+{
     ComponentManager* const CM;
 
     std::unordered_map<Key, KeyState> m_keyStates;
@@ -20,7 +21,9 @@ class InputManager {
     void processReleasedKey(const Key& key);
 
 public:
-    InputManager(ComponentManager* const CM_) : CM(CM_) {
+    InputManager(ComponentManager* const CM_)
+        : CM(CM_)
+    {
         m_keyStates[Key::LeftArrow] = KeyState::Released;
         m_keyStates[Key::RightArrow] = KeyState::Released;
         m_keyStates[Key::DownArrow] = KeyState::Released;

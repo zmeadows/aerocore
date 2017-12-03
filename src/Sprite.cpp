@@ -1,5 +1,7 @@
 #include "Sprite.hpp"
 
+#include <vector>
+
 void SquareSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const
 {
     const auto pc = GC->toScreenCoordinates(pos);
@@ -13,13 +15,17 @@ void SquareSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation
 
 void IsoTriangleSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const
 {
-    const auto pc = GC->toScreenCoordinates(pos);
+    std::vector<Vector2f> vertices = triangle.getTransRotVertices(pos, rot);
+    assert(vertices.size() == 3);
 
-    const int x = pc.x;
-    const int y = pc.y;
-    const int tmpX = GC->toScreenSpan(triangle.baseWidth / 2.0);
-    const int tmpY = GC->toScreenSpan(triangle.height / 3.0);
+    std::vector<ScreenCoordinates> vsc;
+    vsc.reserve(3);
 
-    aatrigonRGBA(GC->renderer, x - tmpX, y + tmpY, x + tmpX, y + tmpY, x, y - 2 * tmpY, rgba.r, rgba.g,
-                 rgba.b, rgba.a);
+    for (const auto& vtx : vertices) {
+        vsc.push_back(GC->toScreenCoordinates({vtx.x(), vtx.y()}));
+    }
+
+    aalineRGBA(GC->renderer, vsc[0].x, vsc[0].y, vsc[1].x, vsc[1].y, rgba.r, rgba.g, rgba.b, rgba.a);
+    aalineRGBA(GC->renderer, vsc[1].x, vsc[1].y, vsc[2].x, vsc[2].y, rgba.r, rgba.g, rgba.b, rgba.a);
+    aalineRGBA(GC->renderer, vsc[2].x, vsc[2].y, vsc[0].x, vsc[0].y, rgba.r, rgba.g, rgba.b, rgba.a);
 }

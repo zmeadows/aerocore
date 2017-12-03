@@ -15,8 +15,12 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM)
 {
     CM->add<Position>(UUID::playerUUID, {0, 0});
     CM->add<Rotation>(UUID::playerUUID, Rotation());
+
     CM->add<Velocity>(UUID::playerUUID, {0, 0});
+    CM->add<RotationalVelocity>(UUID::playerUUID, RotationalVelocity());
+
     CM->add<Acceleration>(UUID::playerUUID, {0, 0});
+
     CM->add<Alliance>(UUID::playerUUID, Alliance::Friend);
 
     auto spr = new IsoTriangleSprite(7.0, 12.0);
@@ -45,6 +49,7 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM)
     CM->add<Position>(bulletUUID, Position());
     CM->add<Rotation>(bulletUUID, Rotation());
     CM->add<Velocity>(bulletUUID, {0, 150});
+    CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
     CM->add<Acceleration>(bulletUUID, {0, 0});
 
     CM->add<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
@@ -56,9 +61,10 @@ template <>
 inline UUID generate<EntityType::Enemy>(ComponentManager* const CM)
 {
     UUID enemyUUID;
-    CM->add<Position>(enemyUUID, {75, 0});
+    CM->add<Position>(enemyUUID, {0, 75});
     CM->add<Rotation>(enemyUUID, Rotation());
     CM->add<Velocity>(enemyUUID, {0, 0});
+    CM->add<RotationalVelocity>(enemyUUID, RotationalVelocity());
     CM->add<Acceleration>(enemyUUID, {0, 0});
 
     auto spr = new SquareSprite(10.0);

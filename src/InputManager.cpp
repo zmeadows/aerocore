@@ -46,30 +46,31 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp)
 void InputManager::processPressedKey(const Key& key)
 {
     auto acc = CM->get<Acceleration>(UUID::playerUUID);
+    auto rotVel = CM->get<RotationalVelocity>(UUID::playerUUID);
     assert(acc != nullptr);
+    assert(rotVel != nullptr);
 
     m_keyStates[key] = KeyState::Pressed;
 
     switch (key) {
 
     case Key::UpArrow: {
-        if (m_keyStates[Key::DownArrow] != KeyState::Pressed)
-            acc->y = 500;
+        const float angle = CM->get<Rotation>(UUID::playerUUID)->getAngle();
+        acc->x = -100 * std::sin(angle);
+        acc->y = 100 * std::cos(angle);
         break;
     }
     case Key::DownArrow: {
-        if (m_keyStates[Key::UpArrow] != KeyState::Pressed)
-            acc->y = -500;
         break;
     }
     case Key::RightArrow: {
         if (m_keyStates[Key::LeftArrow] != KeyState::Pressed)
-            acc->x = 500;
+            rotVel->value = -10;
         break;
     }
     case Key::LeftArrow: {
         if (m_keyStates[Key::RightArrow] != KeyState::Pressed)
-            acc->x = -500;
+            rotVel->value = 10;
         break;
     }
     case Key::Spacebar: {
@@ -90,41 +91,35 @@ void InputManager::processPressedKey(const Key& key)
 void InputManager::processReleasedKey(const Key& key)
 {
     auto acc = CM->get<Acceleration>(UUID::playerUUID);
+    auto rotVel = CM->get<RotationalVelocity>(UUID::playerUUID);
     assert(acc != nullptr);
+    assert(rotVel != nullptr);
 
     m_keyStates[key] = KeyState::Released;
 
     switch (key) {
 
     case Key::UpArrow: {
-        if (m_keyStates[Key::DownArrow] == KeyState::Pressed) {
-            acc->y = -500;
-        } else {
-            acc->y = 0;
-        }
+        acc->x = 0;
+        acc->y = 0;
         break;
     }
     case Key::DownArrow: {
-        if (m_keyStates[Key::UpArrow] == KeyState::Pressed) {
-            acc->y = 500;
-        } else {
-            acc->y = 0;
-        }
         break;
     }
     case Key::RightArrow: {
         if (m_keyStates[Key::LeftArrow] == KeyState::Pressed) {
-            acc->x = -500;
+            rotVel->value = 10;
         } else {
-            acc->x = 0;
+            rotVel->value = 0.f;
         }
         break;
     }
     case Key::LeftArrow: {
         if (m_keyStates[Key::RightArrow] == KeyState::Pressed) {
-            acc->x = 500;
+            rotVel->value = -10;
         } else {
-            acc->x = 0;
+            rotVel->value = 0.f;
         }
         break;
     }

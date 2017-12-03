@@ -9,20 +9,15 @@ void TranslationSystem::run(float dt)
 
         pos->x += dt * vel->x;
         pos->y += dt * vel->y;
+        vel->x += dt * acc->x;
+        vel->y += dt * acc->y;
 
-        // TODO: fix broken max velocity code here
-        if (std::abs(vel->x) <= 100)
-            vel->x += dt * acc->x;
-
-        if (std::abs(vel->y) <= 100)
-            vel->y += dt * acc->y;
-
-        if (uuid.unwrap() == UUID::playerUUID.unwrap()) {
-            if (acc->x == 0.0 && std::abs(vel->x) < 10.0)
-                vel->x *= 0.9;
-            if (acc->y == 0.0 && std::abs(vel->y) < 10.0)
-                vel->y *= 0.9;
-        }
+        // if (uuid.unwrap() == UUID::playerUUID.unwrap()) {
+        //     if (acc->x == 0.0 && std::abs(vel->x) < 10.0)
+        //         vel->x *= 0.9;
+        //     if (acc->y == 0.0 && std::abs(vel->y) < 10.0)
+        //         vel->y *= 0.9;
+        // }
     }
 }
 
@@ -31,6 +26,7 @@ void RotationSystem::run(float dt)
     for (const UUID& uuid : m_followed) {
         auto rot = CM->get<Rotation>(uuid);
         auto const vel = CM->get<RotationalVelocity>(uuid);
+        rot->rotateAngle(vel->value * dt);
     }
 }
 
