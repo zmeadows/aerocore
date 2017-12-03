@@ -17,8 +17,8 @@ public:
     UUID& operator=(const UUID& rhs) = delete;
     UUID& operator=(UUID&& rhs) = delete;
 
-    inline bool operator==(const UUID& rhs) { return m_ID == rhs.m_ID; }
-    inline bool operator!=(const UUID& rhs) { return m_ID != rhs.m_ID; }
+    inline bool operator==(const UUID& rhs) const { return m_ID == rhs.m_ID; }
+    inline bool operator!=(const UUID& rhs) const { return m_ID != rhs.m_ID; }
     inline friend bool operator<(const UUID& a, const UUID& b) { return a.m_ID < b.m_ID; }
 
     static const UUID playerUUID;
