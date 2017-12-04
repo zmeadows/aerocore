@@ -119,14 +119,15 @@ public:
     ComponentManager& operator=(ComponentManager&&) = delete;
 
     ComponentManager() : nextIndex(0) {
+        bookComponent<Acceleration>(100);
+        bookComponent<Alliance>(100);
+        bookComponent<BoundingSurface>(100);
+        bookComponent<OffscreenBehavior>(100);
         bookComponent<Position>(100);
         bookComponent<Rotation>(100);
         bookComponent<RotationalVelocity>(100);
-        bookComponent<Velocity>(100);
-        bookComponent<Acceleration>(100);
         bookComponent<Sprite>(100);
-        bookComponent<Alliance>(100);
-        bookComponent<BoundingSurface>(100);
+        bookComponent<Velocity>(100);
     }
     ~ComponentManager() = default;
 

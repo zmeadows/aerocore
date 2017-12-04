@@ -1,8 +1,5 @@
 #include "Geometry.hpp"
 
-#include <Eigen/Dense>
-using namespace Eigen;
-
 // float PolygonShape::area(void) const
 // {
 //     float sum = 0;
@@ -19,33 +16,18 @@ using namespace Eigen;
 //     return 0.5 * sum;
 // }
 
-void PolygonShape::scale(float factor)
-{
+void PolygonShape::scale(float factor) {
     for (Vector2f& vtx : this->vertices)
-        vtx *= factor;
+        vtx.scale(factor);
 }
 
-// void PolygonShape::rotate(float angle)
-// {
-//     const float tmpCos = std::cos(angle);
-//     const float tmpSin = std::sin(angle);
-//     for (Vector2f& vtx : this->vertices) {
-//         const float newX = tmpCos * vtx.x() - tmpSin * vtx.y();
-//         const float newY = tmpSin * vtx.x() + tmpCos * vtx.y();
-//         vtx.x() = newX;
-//         vtx.y() = newY;
-//     }
-// }
-
-std::vector<Vector2f> PolygonShape::getTransRotVertices(const Position& pos, const Rotation& rot) const
-{
+std::vector<Vector2f> PolygonShape::getTransRotVertices(const Position& pos, const Rotation& rot) const {
     std::vector<Vector2f> tmpVertices;
     tmpVertices.reserve(this->vertices.size());
-
-    Rotation2Df rotator(rot.getAngle());
+    const Vector2f posVec = {pos.x, pos.y};
 
     for (const Vector2f& vtx : this->vertices) {
-        tmpVertices.push_back(rotator * vtx + Vector2f({pos.x, pos.y}));
+        tmpVertices.push_back(vtx.rotated(rot.getAngle()) + posVec);
     }
 
     return tmpVertices;

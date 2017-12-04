@@ -23,6 +23,13 @@ struct RGBA {
     uint_fast8_t a = 0;
 };
 
+struct Extent {
+    float minX = 0.f;
+    float maxX = 0.f;
+    float minY = 0.f;
+    float maxY = 0.f;
+};
+
 struct Position {
     float x = 0.f;
     float y = 0.f;
@@ -47,16 +54,14 @@ struct RotationalVelocity {
     float value = 0.f;
 };
 
-class Rotation
-{
+class Rotation {
 private:
     float angle = 0.f;
 
 public:
     inline float getAngle(void) const { return angle; }
 
-    inline void rotateAngle(float radians)
-    {
+    inline void rotateAngle(float radians) {
         if (radians >= 0) {
             angle = std::fmod(angle + radians, 2 * M_PI);
         } else {

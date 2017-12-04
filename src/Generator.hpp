@@ -20,6 +20,7 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
     CM->add<Acceleration>(UUID::playerUUID, {0, 0});
 
     CM->add<Alliance>(UUID::playerUUID, Alliance::Friend);
+    CM->add<OffscreenBehavior>(UUID::playerUUID, OffscreenBehavior::Wraps);
 
     auto spr = new IsoTriangleSprite(7.0, 12.0);
     spr->rgba.r = 255;
@@ -50,6 +51,7 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
     CM->get<RotationalVelocity>(bulletUUID)->value = 10;
     CM->add<Acceleration>(bulletUUID, {0, 0});
+    CM->add<OffscreenBehavior>(bulletUUID, OffscreenBehavior::DiesInstantly);
 
     CM->add<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
 
@@ -64,6 +66,7 @@ inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     CM->add<Velocity>(enemyUUID, {0, 0});
     CM->add<RotationalVelocity>(enemyUUID, RotationalVelocity());
     CM->add<Acceleration>(enemyUUID, {0, 0});
+    CM->add<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);
 
     auto spr = new SquareSprite(10.0);
     spr->rgba.r = 255;

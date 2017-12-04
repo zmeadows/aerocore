@@ -6,20 +6,16 @@
 #include <memory>
 #include <vector>
 
-#include <Eigen/Dense>
-
 #include "Base.hpp"
 #include "Geometry.hpp"
-
-using namespace Eigen;
+#include "Vector2D.hpp"
 
 struct AxisProjection {
     float min = 0.f;
     float max = 0.f;
 };
 
-class SurfaceNormalSet
-{
+class SurfaceNormalSet {
 private:
     std::vector<Vector2f> normals;
 
@@ -47,18 +43,14 @@ struct BoundingSurface {
     virtual ~BoundingSurface() {}
 };
 
-class PolygonalBoundingSurface final : public BoundingSurface
-{
+class PolygonalBoundingSurface final : public BoundingSurface {
 private:
     PolygonShape polygon;
     SurfaceNormalSet normals;
 
 public:
     explicit PolygonalBoundingSurface(const PolygonShape& polygon_)
-        : polygon(polygon_)
-        , normals(polygon.getVertices())
-    {
-    }
+        : polygon(polygon_), normals(polygon.getVertices()) {}
 
     PolygonalBoundingSurface(void) = delete;
     PolygonalBoundingSurface& operator=(const PolygonalBoundingSurface&) = delete;
