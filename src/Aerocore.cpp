@@ -19,7 +19,8 @@ Aerocore::Aerocore(void)
 bool Aerocore::tick(void) {
     bool quitting = processInput();
 
-    static Uint64 t1 = 0, t0 = 0;
+    static Uint64 t0 = SDL_GetPerformanceCounter();
+    static Uint64 t1 = 0;
 
     SDL_SetRenderDrawColor(GC->renderer, 10, 10, 10, 0);
     SDL_RenderClear(GC->renderer);
