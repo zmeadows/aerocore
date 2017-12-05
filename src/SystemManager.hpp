@@ -44,6 +44,11 @@ public:
     void run(float dt) final {
         for (const UUID& uuid : m_followed) {
             CM->get<Sprite>(uuid)->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
+
+            auto bs = CM->get<BoundingSurface>(uuid);
+            if (bs) {
+                bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
+            }
         }
 
         stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);

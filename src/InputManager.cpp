@@ -80,8 +80,8 @@ void InputManager::processPressedKey(const Key& key) {
         pos->y = playerPos->y + 7.5 * std::cos(angle);
 
         auto vel = CM->get<Velocity>(bulletUUID);
-        vel->x = -100 * std::sin(angle);
-        vel->y = 100 * std::cos(angle);
+        vel->x = -25 * std::sin(angle);
+        vel->y = 25 * std::cos(angle);
 
         break;
     }

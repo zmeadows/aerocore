@@ -38,7 +38,7 @@ template <>
 inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     UUID bulletUUID;
 
-    auto bulletSprite = new SquareSprite(1.0);
+    auto bulletSprite = new IsoTriangleSprite(2.0, 2.0);
     bulletSprite->rgba.r = 0;
     bulletSprite->rgba.g = 200;
     bulletSprite->rgba.b = 0;
@@ -47,9 +47,9 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     CM->add<Sprite>(bulletUUID, bulletSprite);
     CM->add<Position>(bulletUUID, Position());
     CM->add<Rotation>(bulletUUID, Rotation());
-    CM->add<Velocity>(bulletUUID, {0, 150});
+    CM->add<Velocity>(bulletUUID, {0, 40});
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
-    CM->get<RotationalVelocity>(bulletUUID)->value = 10;
+    CM->get<RotationalVelocity>(bulletUUID)->value = 2;
     CM->add<Acceleration>(bulletUUID, {0, 0});
     CM->add<OffscreenBehavior>(bulletUUID, OffscreenBehavior::DiesInstantly);
 
@@ -61,18 +61,28 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
 template <>
 inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     UUID enemyUUID;
-    CM->add<Position>(enemyUUID, {0, 75});
-    CM->add<Rotation>(enemyUUID, Rotation());
-    CM->add<Velocity>(enemyUUID, {0, 0});
-    CM->add<RotationalVelocity>(enemyUUID, RotationalVelocity());
-    CM->add<Acceleration>(enemyUUID, {0, 0});
-    CM->add<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);
 
-    auto spr = new SquareSprite(10.0);
+    auto spr = new IsoTriangleSprite(10.0, 20.0);
     spr->rgba.r = 255;
     spr->rgba.a = 255;
     CM->add<Sprite>(enemyUUID, spr);
+
+    CM->add<Position>(enemyUUID, Position());
+    CM->add<Velocity>(enemyUUID, Velocity());
+    CM->add<Rotation>(enemyUUID, Rotation());
+    CM->add<RotationalVelocity>(enemyUUID, RotationalVelocity());
+    CM->get<RotationalVelocity>(enemyUUID)->value = 0.1;
+    CM->add<Acceleration>(enemyUUID, {0, 0});
     CM->add<Alliance>(enemyUUID, Alliance::Foe);
+    // CM->add<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);
+
+    auto pos = CM->get<Position>(enemyUUID);
+    pos->x = 0.f;
+    pos->y = 50.f;
+
+    auto vel = CM->get<Velocity>(enemyUUID);
+    vel->x = 0.f;
+    vel->y = 0.f;
 
     CM->add<BoundingSurface>(enemyUUID, spr->buildBoundingSurface());
 

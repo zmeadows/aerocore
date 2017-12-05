@@ -1,7 +1,6 @@
 #include "SystemManager.hpp"
 
 void TranslationSystem::wrapEntity(const UUID& uuid) {
-
     auto pos = CM->get<Position>(uuid);
     const auto spr = CM->get<Sprite>(uuid);
     const auto rot = CM->get<Rotation>(uuid);
@@ -24,6 +23,8 @@ void TranslationSystem::wrapEntity(const UUID& uuid) {
     if (ext.minY < -100.0 && vel->y < 0) {
         pos->y -= (ext.minY - 100.f);
     }
+
+    DEBUG("WRAPPED UUID: " << uuid);
 }
 
 void TranslationSystem::run(float dt) {

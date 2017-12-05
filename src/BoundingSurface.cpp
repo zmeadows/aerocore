@@ -21,30 +21,31 @@ SurfaceNormalSet::SurfaceNormalSet(const SurfaceNormalSet& rhs) {
     }
 }
 
-void SurfaceNormalSet::add(const Vector2f& vec) {
+void SurfaceNormalSet::add(const Vector2f& vec, float rotationAngle) {
     static const float tol = 1e-3;
 
     for (const auto& ov : normals) {
-        const float angle = std::atan2f(vec.y, vec.x) - std::atan2f(ov.y, ov.x);
+        const Vector2f rov = rotationAngle != 0.0 ? ov.rotated(rotationAngle) : ov;
+        const float angle = std::atan2f(vec.y, vec.x) - std::atan2f(rov.y, rov.x);
         if (std::abs(angle) < tol || std::abs(M_PI - std::abs(angle)) < tol)
             return;
     }
 
-    normals.push_back(vec.normalized());
+    normals.push_back(vec.normalized().rotated(rotationAngle));
 }
 
-void SurfaceNormalSet::add(const SurfaceNormalSet& rhs) {
+void SurfaceNormalSet::add(const SurfaceNormalSet& rhs, float rotationAngle) {
     normals.reserve(normals.size() + rhs.size());
     for (size_t i = 0; i < rhs.normals.size(); i++) {
-        this->add(rhs.normals[i]);
+        this->add(rhs.normals[i], rotationAngle);
     }
 }
 
-void SurfaceNormalSet::add(const SurfaceNormalSet* rhs) {
+void SurfaceNormalSet::add(const SurfaceNormalSet* rhs, float rotationAngle) {
     if (rhs) {
         normals.reserve(normals.size() + rhs->size());
         for (size_t i = 0; i < rhs->normals.size(); i++) {
-            this->add(rhs->normals[i]);
+            this->add(rhs->normals[i], rotationAngle);
         }
     }
 }
@@ -72,8 +73,8 @@ bool overlaps(const BoundingSurface& bsA,
     // combine surface normals into one SurfaceNormalSet so that
     // duplicates are removed, rather than separately looping over both sets
     SurfaceNormalSet combinedSurfaceNormals;
-    combinedSurfaceNormals.add(bsA.getSurfaceNormals());
-    combinedSurfaceNormals.add(bsB.getSurfaceNormals());
+    combinedSurfaceNormals.add(bsA.getSurfaceNormals(), rotA.getAngle());
+    combinedSurfaceNormals.add(bsB.getSurfaceNormals(), rotB.getAngle());
 
     for (const Vector2f& axis : combinedSurfaceNormals) {
         AxisProjection projA = bsA.projectOn(axis, posA, rotA);
