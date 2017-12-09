@@ -31,6 +31,10 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
     CM->add<Sprite>(UUID::playerUUID, spr);
     CM->add<BoundingSurface>(UUID::playerUUID, spr->buildBoundingSurface());
 
+    auto vel = CM->get<Velocity>(UUID::playerUUID);
+    vel->x = 0.f;
+    vel->y = 0.f;
+
     return UUID::playerUUID;
 }
 
@@ -47,12 +51,10 @@ inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     CM->add<Sprite>(bulletUUID, bulletSprite);
     CM->add<Position>(bulletUUID, Position());
     CM->add<Rotation>(bulletUUID, Rotation());
-    CM->add<Velocity>(bulletUUID, {0, 40});
+    CM->add<Velocity>(bulletUUID, Velocity());
     CM->add<RotationalVelocity>(bulletUUID, RotationalVelocity());
-    CM->get<RotationalVelocity>(bulletUUID)->value = 2;
     CM->add<Acceleration>(bulletUUID, {0, 0});
     CM->add<OffscreenBehavior>(bulletUUID, OffscreenBehavior::DiesInstantly);
-
     CM->add<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
 
     return bulletUUID;
@@ -74,7 +76,7 @@ inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     CM->get<RotationalVelocity>(enemyUUID)->value = 0.1;
     CM->add<Acceleration>(enemyUUID, {0, 0});
     CM->add<Alliance>(enemyUUID, Alliance::Foe);
-    // CM->add<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);
+    CM->add<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);
 
     auto pos = CM->get<Position>(enemyUUID);
     pos->x = 0.f;
@@ -82,7 +84,7 @@ inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
 
     auto vel = CM->get<Velocity>(enemyUUID);
     vel->x = 0.f;
-    vel->y = 0.f;
+    vel->y = 40.f;
 
     CM->add<BoundingSurface>(enemyUUID, spr->buildBoundingSurface());
 

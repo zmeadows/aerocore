@@ -52,8 +52,8 @@ void InputManager::processPressedKey(const Key& key) {
 
     case Key::UpArrow: {
         const float angle = CM->get<Rotation>(UUID::playerUUID)->getAngle();
-        acc->x = -100 * std::sin(angle);
-        acc->y = 100 * std::cos(angle);
+        acc->x = -75 * std::sin(angle);
+        acc->y = 75 * std::cos(angle);
         break;
     }
     case Key::DownArrow: {
@@ -61,18 +61,19 @@ void InputManager::processPressedKey(const Key& key) {
     }
     case Key::RightArrow: {
         if (m_keyStates[Key::LeftArrow] != KeyState::Pressed)
-            rotVel->value = -10;
+            rotVel->value = -7;
         break;
     }
     case Key::LeftArrow: {
         if (m_keyStates[Key::RightArrow] != KeyState::Pressed)
-            rotVel->value = 10;
+            rotVel->value = 7;
         break;
     }
     case Key::Spacebar: {
         UUID bulletUUID = generate<EntityType::Bullet>(CM);
         CM->add<Alliance>(bulletUUID, Alliance::Friend);
         auto const playerPos = CM->get<Position>(UUID::playerUUID);
+        auto const playerVel = CM->get<Velocity>(UUID::playerUUID);
         const float angle = CM->get<Rotation>(UUID::playerUUID)->getAngle();
 
         auto pos = CM->get<Position>(bulletUUID);
@@ -80,8 +81,8 @@ void InputManager::processPressedKey(const Key& key) {
         pos->y = playerPos->y + 7.5 * std::cos(angle);
 
         auto vel = CM->get<Velocity>(bulletUUID);
-        vel->x = -25 * std::sin(angle);
-        vel->y = 25 * std::cos(angle);
+        vel->x = 0.5 * playerVel->x - 125 * std::sin(angle);
+        vel->y = 0.5 * playerVel->y + 125 * std::cos(angle);
 
         break;
     }
@@ -109,7 +110,7 @@ void InputManager::processReleasedKey(const Key& key) {
     }
     case Key::RightArrow: {
         if (m_keyStates[Key::LeftArrow] == KeyState::Pressed) {
-            rotVel->value = 10;
+            rotVel->value = 7;
         } else {
             rotVel->value = 0.f;
         }
@@ -117,7 +118,7 @@ void InputManager::processReleasedKey(const Key& key) {
     }
     case Key::LeftArrow: {
         if (m_keyStates[Key::RightArrow] == KeyState::Pressed) {
-            rotVel->value = -10;
+            rotVel->value = -7;
         } else {
             rotVel->value = 0.f;
         }

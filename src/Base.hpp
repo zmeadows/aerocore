@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector2D.hpp"
+
 #include <SDL2/SDL.h>
 
 #include <cmath>
@@ -12,7 +14,7 @@
 #define DEBUG(x)
 #endif
 
-enum class EntityType { Player, Bullet, Enemy };
+enum class EntityType { Player, Bullet, Enemy, Particle };
 
 enum class Alliance { Friend, Foe, Neutral };
 
@@ -21,6 +23,20 @@ struct RGBA {
     uint_fast8_t g = 0;
     uint_fast8_t b = 0;
     uint_fast8_t a = 0;
+};
+
+inline float signum(float num) {
+    if (num > 0) {
+        return 1;
+    } else if (num < 0) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+struct DeathTimer {
+    float timeLeft = 0.0;
 };
 
 struct Extent {
@@ -33,6 +49,8 @@ struct Extent {
 struct Position {
     float x = 0.f;
     float y = 0.f;
+
+    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct ScreenCoordinates {
@@ -43,11 +61,15 @@ struct ScreenCoordinates {
 struct Velocity {
     float x = 0.f;
     float y = 0.f;
+
+    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct Acceleration {
     float x = 0.f;
     float y = 0.f;
+
+    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct RotationalVelocity {

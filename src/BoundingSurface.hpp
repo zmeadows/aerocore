@@ -8,6 +8,8 @@
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
+#include "wykobi.hpp"
+
 #include "Base.hpp"
 #include "Geometry.hpp"
 #include "GraphicsContext.hpp"
@@ -85,6 +87,11 @@ public:
 
     AxisProjection projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const final;
 };
+
+// class GeneralPolygonBoundingSurface final : public BoundingSurface {
+//
+//     SurfaceNormalSet normals;
+// };
 
 bool overlaps(const BoundingSurface& bsA,
               const Position& posA,

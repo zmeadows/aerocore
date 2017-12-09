@@ -2,11 +2,9 @@
 
 #include "Aerocore.hpp"
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     Aerocore game;
-    while (!game.tick())
-        continue;
+    game.run();
 
     std::exit(EXIT_SUCCESS);
 }
