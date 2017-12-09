@@ -5,6 +5,9 @@
 #include "System.hpp"
 
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <array>
+#include <memory>
+#include <string>
 
 class TranslationSystem final : public System {
     void wrapEntity(const UUID& uuidA);
@@ -40,47 +43,66 @@ public:
 class DrawSystem final : public System {
     GraphicsContext* const GC;
 
+    std::array<float, 100> m_fpsHistory;
+    Uint64 m_lastFrameTicks;
+    size_t m_modFrame;
+    float m_currentFpsAvg;
+
 public:
     void run(float dt) final {
+        Uint64 tmp = SDL_GetPerformanceCounter();
+        m_fpsHistory[m_modFrame % 100] =
+            1.0 / ((float)(tmp - m_lastFrameTicks) / SDL_GetPerformanceFrequency());
+        m_lastFrameTicks = tmp;
+        m_modFrame++;
+
         for (const UUID& uuid : m_followed) {
             CM->get<Sprite>(uuid)->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
-
-            auto bs = CM->get<BoundingSurface>(uuid);
-            if (bs) {
-                bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
-            }
+            // auto bs = CM->get<BoundingSurface>(uuid);
+            // if (bs) {
+            //     bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
+            // }
         }
 
         stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);
+
+        if (m_modFrame % 100 == 99) {
+            float sum = 0;
+            for (size_t i = 0; i < 100; i++) {
+                sum += m_fpsHistory[i];
+            }
+            m_currentFpsAvg = sum / 100.0;
+        }
+
+        stringColor(GC->renderer, 735, 10,
+                    ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
+                    0xFFFFFFFF);
     }
 
-    DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_) : System("Draw", CM_), GC(GC_) {
+    DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)
+        : System("Draw", CM_), GC(GC_), m_fpsHistory({{0.0}}), m_lastFrameTicks(SDL_GetPerformanceCounter()),
+          m_modFrame(0) {
         CM->subscribe<Sprite, Position, Rotation>(this);
     }
 };
 
 class SystemManager {
 private:
-    std::unique_ptr<TranslationSystem> m_translation;
-    std::unique_ptr<RotationSystem> m_rotation;
-    std::unique_ptr<CollisionSystem> m_collision;
-    std::unique_ptr<DrawSystem> m_draw;
+    std::vector<std::unique_ptr<System>> m_systems;
 
 public:
-    SystemManager(ComponentManager* const CM, GraphicsContext* const GC)
-        : m_translation(std::make_unique<TranslationSystem>(CM)),
-          m_rotation(std::make_unique<RotationSystem>(CM)),
-          m_collision(std::make_unique<CollisionSystem>(CM)), m_draw(std::make_unique<DrawSystem>(CM, GC)) {}
+    SystemManager(void) {}
 
     SystemManager(const SystemManager&) = delete;
     SystemManager(SystemManager&&) = delete;
     SystemManager& operator=(const SystemManager&) = delete;
     SystemManager& operator=(SystemManager&&) = delete;
 
+    inline void addSystem(System* sys) { m_systems.emplace_back(sys); }
+
     void runSystems(const float dt) {
-        m_translation->run(dt);
-        m_rotation->run(dt);
-        m_collision->run(dt);
-        m_draw->run(dt);
+        for (std::unique_ptr<System>& sys : m_systems) {
+            sys->run(dt);
+        }
     }
 };

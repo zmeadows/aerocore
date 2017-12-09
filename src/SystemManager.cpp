@@ -58,8 +58,8 @@ void TranslationSystem::run(float dt) {
             pos->x += dt * (vel->x + 0.5 * acc->x * dt);
             pos->y += dt * (vel->y + 0.5 * acc->x * dt);
 
-            vel->x += dt * acc->x;
-            vel->y += dt * acc->y;
+            vel->x += dt * (acc->x - signum(vel->x) * 0.4);
+            vel->y += dt * (acc->y - signum(vel->y) * 0.4);
         }
     }
 
@@ -82,7 +82,6 @@ bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB) {
     if (*allA == *allB) {
         return false;
     } else {
-        DEBUG("attempting collision detection in full");
         const auto bsA = CM->get<BoundingSurface>(uuidA);
         const auto posA = CM->get<Position>(uuidA);
         const auto rotA = CM->get<Rotation>(uuidA);

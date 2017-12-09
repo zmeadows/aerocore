@@ -1,5 +1,7 @@
 #include "Aerocore.hpp"
 
+#include <array>
+
 #include "ComponentManager.hpp"
 #include "Generator.hpp"
 #include "GraphicsContext.hpp"
@@ -11,7 +13,11 @@
 
 Aerocore::Aerocore(void)
     : GC(std::make_unique<GraphicsContext>()), CM(std::make_unique<ComponentManager>()),
-      SM(std::make_unique<SystemManager>(CM.get(), GC.get())), IM(std::make_unique<InputManager>(CM.get())) {
+      SM(std::make_unique<SystemManager>()), IM(std::make_unique<InputManager>(CM.get())) {
+    SM->addSystem(new TranslationSystem(CM.get()));
+    SM->addSystem(new RotationSystem(CM.get()));
+    SM->addSystem(new CollisionSystem(CM.get()));
+    SM->addSystem(new DrawSystem(CM.get(), GC.get()));
     generate<EntityType::Player>(CM.get());
     generate<EntityType::Enemy>(CM.get());
 }
@@ -22,17 +28,12 @@ bool Aerocore::tick(void) {
     static Uint64 t0 = SDL_GetPerformanceCounter();
     static Uint64 t1 = 0;
 
-    SDL_SetRenderDrawColor(GC->renderer, 10, 10, 10, 0);
+    SDL_SetRenderDrawColor(GC->renderer, 10, 10, 10, 255);
     SDL_RenderClear(GC->renderer);
 
     t1 = SDL_GetPerformanceCounter();
     const float tmpdt = (float)(t1 - t0) / SDL_GetPerformanceFrequency();
-    if (tmpdt > 1.0 / 60.0) {
-        SM->runSystems(tmpdt);
-    } else {
-        SDL_Delay(1000 * (1.0 / 60.0 - tmpdt));
-        SM->runSystems(1.0 / 60.0);
-    }
+    SM->runSystems(tmpdt);
     t0 = SDL_GetPerformanceCounter();
 
     SDL_RenderPresent(GC->renderer);
