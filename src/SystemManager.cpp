@@ -75,6 +75,27 @@ void RotationSystem::run(float dt) {
     }
 }
 
+void ParticleSystem::run(float dt) {
+    for (const UUID& uuid : m_followed) {
+        auto pg = CM->get<ParticleGenerator>(uuid);
+        pg->generate();
+    }
+}
+
+void CleanupSystem::run(float dt) {
+    UUIDSet toDestroy;
+
+    for (const UUID& uuid : m_followed) {
+        auto dtmr = CM->get<DeathTimer>(uuid);
+        dtmr->value -= dt;
+        if (dtmr->value <= 0.f)
+            toDestroy.insert(uuid);
+    }
+
+    for (const UUID& uuid : toDestroy)
+        CM->destroy(uuid);
+}
+
 bool CollisionSystem::areColliding(const UUID& uuidA, const UUID& uuidB) {
     const auto allA = CM->get<Alliance>(uuidA);
     const auto allB = CM->get<Alliance>(uuidB);

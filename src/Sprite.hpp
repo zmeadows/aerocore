@@ -16,6 +16,10 @@ struct Sprite {
     virtual ~Sprite(void) {}
 };
 
+struct SpriteUpdator {
+    std::function<void(Sprite*)> update;
+};
+
 struct SimplePolygonSprite : public Sprite {
     RGBA rgba;
 

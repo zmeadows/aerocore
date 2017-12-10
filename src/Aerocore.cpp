@@ -17,6 +17,8 @@ Aerocore::Aerocore(void)
     SM->addSystem(new TranslationSystem(CM.get()));
     SM->addSystem(new RotationSystem(CM.get()));
     SM->addSystem(new CollisionSystem(CM.get()));
+    SM->addSystem(new ParticleSystem(CM.get()));
+    SM->addSystem(new CleanupSystem(CM.get()));
     SM->addSystem(new DrawSystem(CM.get(), GC.get()));
     generate<EntityType::Player>(CM.get());
     generate<EntityType::Enemy>(CM.get());

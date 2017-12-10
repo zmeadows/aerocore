@@ -122,13 +122,18 @@ public:
         bookComponent<Acceleration>(100);
         bookComponent<Alliance>(100);
         bookComponent<BoundingSurface>(100);
+        bookComponent<ShotDelay>(100);
         bookComponent<OffscreenBehavior>(100);
         bookComponent<Position>(100);
         bookComponent<Rotation>(100);
         bookComponent<RotationalVelocity>(100);
         bookComponent<Sprite>(100);
         bookComponent<Velocity>(100);
+        bookComponent<ParticleGenerator>(100);
+        bookComponent<DeathTimer>(100);
+        bookComponent<SpriteUpdator>(100);
     }
+
     ~ComponentManager() = default;
 
     template <typename TyComponent>

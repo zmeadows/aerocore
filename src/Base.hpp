@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 
 #include <cmath>
+#include <functional>
 #include <iostream>
 
 #ifdef DODEBUG
@@ -14,7 +15,7 @@
 #define DEBUG(x)
 #endif
 
-enum class EntityType { Player, Bullet, Enemy, Particle };
+enum class EntityType { Player, Bullet, Enemy, Particle, Level };
 
 enum class Alliance { Friend, Foe, Neutral };
 
@@ -35,8 +36,17 @@ inline float signum(float num) {
     }
 }
 
+struct ParticleGenerator {
+    std::function<void(void)> generate;
+};
+
 struct DeathTimer {
-    float timeLeft = 0.0;
+    float value = 0.0;
+};
+
+struct ShotDelay {
+    const float delay = 0.0;
+    float lastShotTime = 0.0;
 };
 
 struct Extent {

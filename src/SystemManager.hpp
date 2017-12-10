@@ -5,6 +5,7 @@
 #include "System.hpp"
 
 #include <SDL2/SDL2_gfxPrimitives.h>
+
 #include <array>
 #include <memory>
 #include <string>
@@ -40,6 +41,22 @@ public:
     }
 };
 
+class CleanupSystem final : public System {
+public:
+    void run(float dt) final;
+
+    CleanupSystem(ComponentManager* const CM_) : System("Cleanup", CM_) { CM->subscribe<DeathTimer>(this); }
+};
+
+class ParticleSystem final : public System {
+public:
+    void run(float dt) final;
+
+    ParticleSystem(ComponentManager* const CM_) : System("Particle", CM_) {
+        CM->subscribe<ParticleGenerator>(this);
+    }
+};
+
 class DrawSystem final : public System {
     GraphicsContext* const GC;
 
@@ -57,7 +74,14 @@ public:
         m_modFrame++;
 
         for (const UUID& uuid : m_followed) {
-            CM->get<Sprite>(uuid)->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
+            auto spr = CM->get<Sprite>(uuid);
+
+            auto sprUpd = CM->get<SpriteUpdator>(uuid);
+            if (sprUpd) {
+                sprUpd->update(spr);
+            };
+
+            spr->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
             // auto bs = CM->get<BoundingSurface>(uuid);
             // if (bs) {
             //     bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
@@ -98,7 +122,10 @@ public:
     SystemManager& operator=(const SystemManager&) = delete;
     SystemManager& operator=(SystemManager&&) = delete;
 
-    inline void addSystem(System* sys) { m_systems.emplace_back(sys); }
+    inline void addSystem(System* sys) {
+        // TODO: check system with same name hasn't already been added
+        m_systems.emplace_back(sys);
+    }
 
     void runSystems(const float dt) {
         for (std::unique_ptr<System>& sys : m_systems) {

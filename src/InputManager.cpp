@@ -8,8 +8,6 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
     auto keyFunc = keyUp ? std::mem_fn(&InputManager::processReleasedKey)
                          : std::mem_fn(&InputManager::processPressedKey);
 
-    DEBUG("received input: " << SDLkey);
-
     switch (SDLkey) {
     case SDLK_UP: {
         m_keyStates[Key::UpArrow] = newKeyState;
