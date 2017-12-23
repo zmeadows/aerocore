@@ -16,8 +16,8 @@
 #include "Vector2D.hpp"
 
 struct AxisProjection {
-    float min = 0.f;
-    float max = 0.f;
+    const float min = 0.f;
+    const float max = 0.f;
 };
 
 class SurfaceNormalSet {
@@ -69,20 +69,21 @@ public:
     const SurfaceNormalSet* getSurfaceNormals(void) const final { return &normals; }
 
     void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const {
-        const std::vector<Vector2f> vertices = polygon.getTransRotVertices(pos, rot);
+        // const std::vector<Vector2f> vertices = polygon.getTransRotVertices(pos, rot);
 
-        std::vector<ScreenCoordinates> vtx;
+        // std::vector<ScreenCoordinates> vtx;
 
-        for (const auto& a : vertices) {
-            vtx.push_back(GC->toScreenCoordinates({a.x, a.y}));
-        }
+        // for (const auto& a : vertices) {
+        //     vtx.push_back(GC->toScreenCoordinates({a.x, a.y}));
+        // }
 
-        const size_t vtxCount = vtx.size();
+        // const size_t vtxCount = vtx.size();
 
-        for (size_t i = 0; i < vtxCount; i++) {
-            aalineRGBA(GC->renderer, vtx[i].x, vtx[i].y, vtx[(i + 1) % vtxCount].x, vtx[(i + 1) % vtxCount].y,
-                       0, 0, 255, 125);
-        }
+        // for (size_t i = 0; i < vtxCount; i++) {
+        //     aalineRGBA(GC->renderer, vtx[i].x, vtx[i].y, vtx[(i + 1) % vtxCount].x, vtx[(i + 1) %
+        //     vtxCount].y,
+        //                0, 0, 255, 125);
+        // }
     }
 
     AxisProjection projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const final;

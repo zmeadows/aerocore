@@ -88,7 +88,7 @@ public:
             // }
         }
 
-        stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);
+        // stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);
 
         if (m_modFrame % 100 == 99) {
             float sum = 0;
@@ -98,9 +98,9 @@ public:
             m_currentFpsAvg = sum / 100.0;
         }
 
-        stringColor(GC->renderer, 735, 10,
-                    ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
-                    0xFFFFFFFF);
+        // stringColor(GC->renderer, 735, 10,
+        //             ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
+        //             0xFFFFFFFF);
     }
 
     DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)

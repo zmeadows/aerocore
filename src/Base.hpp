@@ -8,12 +8,30 @@
 #include <functional>
 #include <iostream>
 
+/*
 #ifdef DODEBUG
-#define DEBUG(x)                                                                                             \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "]\t" << x << std::endl)
+
+#define DEBUG(msg)                                                                                           \
+    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "]\t" << msg << std::endl)
+
+#define DEBUG_ASSERT(cond, msg)                                                                              \
+    (if (!cond) {                                                                                            \
+        std::cerr << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "]\t" << msg << std::endl;     \
+        assert(false);                                                                                       \
+    })
+
 #else
-#define DEBUG(x)
-#endif
+
+*/
+#define DEBUG(msg)
+#define DEBUG_ASSERT(cond, msg)
+
+// #endif
+
+template <typename Container, typename T>
+inline bool contains(const Container& cont, const T& data) {
+    return cont.find(data) != cont.end();
+}
 
 enum class EntityType { Player, Bullet, Enemy, Particle, Level };
 

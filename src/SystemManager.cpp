@@ -1,5 +1,10 @@
 #include "SystemManager.hpp"
 
+#include <set>
+#include <utility>
+
+#include "UUID.hpp"
+
 void TranslationSystem::wrapEntity(const UUID& uuid) {
     auto pos = CM->get<Position>(uuid);
     const auto spr = CM->get<Sprite>(uuid);
@@ -88,6 +93,7 @@ void CleanupSystem::run(float dt) {
     for (const UUID& uuid : m_followed) {
         auto dtmr = CM->get<DeathTimer>(uuid);
         dtmr->value -= dt;
+
         if (dtmr->value <= 0.f)
             toDestroy.insert(uuid);
     }

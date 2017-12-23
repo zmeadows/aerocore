@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <set>
 #include <unordered_set>
 
 class UUID {
@@ -62,6 +63,7 @@ public:
     inline void insert(const UUID& uuid) { m_set.insert(uuid.unwrap()); }
     inline void erase(const UUID& uuid) { m_set.erase(uuid.unwrap()); }
     inline bool contains(const UUID& uuid) const { return static_cast<bool>(m_set.count(uuid.unwrap())); }
+    inline size_t size(void) const { return m_set.size(); }
 
     iterator begin(void) const { return iterator(m_set.begin()); }
     iterator end(void) const { return iterator(m_set.end()); }
