@@ -1,6 +1,7 @@
 # Compiler
 CC = clang++
-OPTS = -c -Wall -pedantic -std=c++14 -flto
+OPTS = -c -Wall -pedantic -std=c++14 -flto -I../aerocore
+
 
 # Project name
 PROJECT = aerocore
@@ -18,7 +19,7 @@ OBJDIR = obj
 SRCDIR = src
 
 # Libraries
-LIBS = -lSDL2 -lSDL2_gfx
+LIBS = -lSDL2 -lSDL2_gfx -I../aerocore/aerocore.hpp
 
 # Files and folders
 SRCS    = $(shell find $(SRCDIR) -name '*.cpp')
