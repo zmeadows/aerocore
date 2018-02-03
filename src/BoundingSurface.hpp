@@ -8,8 +8,6 @@
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-#include "wykobi.hpp"
-
 #include "Base.hpp"
 #include "Geometry.hpp"
 #include "GraphicsContext.hpp"
