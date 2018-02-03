@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Base.hpp"
-#include "ComponentManager.hpp"
 #include "System.hpp"
+
+#include "aerocore.hpp"
+using namespace aerocore;
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 

@@ -6,6 +6,7 @@
 using namespace aerocore;
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
+#include "SystemManager.hpp"
 
 class Game {
     std::unique_ptr<GraphicsContext> GC;

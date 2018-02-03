@@ -1,7 +1,8 @@
 #pragma once
 
+#include "aerocore.hpp"
+
 #include "Base.hpp"
-#include "ComponentManager.hpp"
 
 #include <random>
 

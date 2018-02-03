@@ -3,9 +3,9 @@
 #include <memory>
 #include <set>
 
-#include "UUID.hpp"
+#include "aerocore.hpp"
 
-class ComponentManager;
+#include "UUID.hpp"
 
 class System
 {

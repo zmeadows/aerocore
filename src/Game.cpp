@@ -2,11 +2,13 @@
 
 #include <array>
 
-#include "ComponentManager.hpp"
 #include "Generator.hpp"
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
 #include "SystemManager.hpp"
+
+#include "aerocore.hpp"
+using namespace aerocore;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
