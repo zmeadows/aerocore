@@ -1,7 +1,6 @@
 # Compiler
-CC = /usr/local/opt/llvm/bin/clang++
-# OPTS = -c -Wall -Werror -pedantic -std=c++17
-OPTS = -c -Wall -pedantic -std=c++17 -I./lib/eigen -flto
+CC = clang++
+OPTS = -c -Wall -pedantic -std=c++14 -flto
 
 # Project name
 PROJECT = aerocore
