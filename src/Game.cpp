@@ -1,4 +1,4 @@
-#include "Aerocore.hpp"
+#include "Game.hpp"
 
 #include <array>
 
@@ -11,7 +11,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
-Aerocore::Aerocore(void)
+Game::Game(void)
     : GC(std::make_unique<GraphicsContext>()), CM(std::make_unique<ComponentManager>()),
       SM(std::make_unique<SystemManager>()), IM(std::make_unique<InputManager>(CM.get())) {
     SM->addSystem(new TranslationSystem(CM.get()));
@@ -24,7 +24,7 @@ Aerocore::Aerocore(void)
     generate<EntityType::Enemy>(CM.get());
 }
 
-bool Aerocore::tick(void) {
+bool Game::tick(void) {
     bool quitting = processInput();
 
     static Uint64 t0 = SDL_GetPerformanceCounter();
@@ -47,7 +47,7 @@ bool Aerocore::tick(void) {
     return quitting;
 }
 
-bool Aerocore::processInput(void) {
+bool Game::processInput(void) {
     SDL_Event e;
 
     while (SDL_PollEvent(&e) != 0) {
