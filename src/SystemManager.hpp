@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.hpp"
-#include "System.hpp"
+#include "Sprite.hpp"
 
 #include "aerocore.hpp"
 using namespace aerocore;
@@ -12,6 +12,7 @@ using namespace aerocore;
 #include <memory>
 #include <string>
 
+//TODO: combine translation/rotation systems into MotionSystem
 class TranslationSystem final : public System {
     void wrapEntity(const UUID& uuidA);
 
@@ -76,14 +77,14 @@ public:
         m_modFrame++;
 
         for (const UUID& uuid : m_followed) {
-            auto spr = CM->get<Sprite>(uuid);
+            auto spr = CM->get<Sprite*>(uuid);
 
-            auto sprUpd = CM->get<SpriteUpdator>(uuid);
-            if (sprUpd) {
-                sprUpd->update(spr);
+            if (CM->has<SpriteUpdator>(uuid)) {
+                CM->get<SpriteUpdator>(uuid).update(spr);
             };
 
-            spr->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
+            spr->draw(GC, CM->get<Position>(uuid), CM->get<Rotation>(uuid));
+            //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
             // auto bs = CM->get<BoundingSurface>(uuid);
             // if (bs) {
             //     bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
@@ -112,6 +113,7 @@ public:
     }
 };
 
+//TODO: just remove this class entirely
 class SystemManager {
 private:
     std::vector<std::unique_ptr<System>> m_systems;

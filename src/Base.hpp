@@ -1,12 +1,16 @@
 #pragma once
 
-#include "Vector2D.hpp"
-
-#include <SDL2/SDL.h>
-
 #include <cmath>
 #include <functional>
 #include <iostream>
+
+#include <SDL2/SDL.h>
+
+#include "aerocore.hpp"
+using namespace aerocore;
+#include "Vector2D.hpp"
+
+const UUID playerUUID;
 
 #ifdef DODEBUG
 #define DEBUG(x)                                                                                             \
@@ -45,7 +49,7 @@ struct DeathTimer {
 };
 
 struct ShotDelay {
-    const float delay = 0.0;
+    float delay = 0.0;
     float lastShotTime = 0.0;
 };
 
@@ -59,8 +63,6 @@ struct Extent {
 struct Position {
     float x = 0.f;
     float y = 0.f;
-
-    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct ScreenCoordinates {
@@ -71,15 +73,11 @@ struct ScreenCoordinates {
 struct Velocity {
     float x = 0.f;
     float y = 0.f;
-
-    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct Acceleration {
     float x = 0.f;
     float y = 0.f;
-
-    inline Vector2f toVec(void) { return {x, y}; }
 };
 
 struct RotationalVelocity {

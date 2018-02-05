@@ -13,6 +13,7 @@ void SquareSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation
         vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
     }
 
+    // TODO: use new SDL_gpu code
     aalineRGBA(GC->renderer, vsc[0].x, vsc[0].y, vsc[1].x, vsc[1].y, rgba.r, rgba.g, rgba.b, rgba.a);
     aalineRGBA(GC->renderer, vsc[1].x, vsc[1].y, vsc[2].x, vsc[2].y, rgba.r, rgba.g, rgba.b, rgba.a);
     aalineRGBA(GC->renderer, vsc[2].x, vsc[2].y, vsc[3].x, vsc[3].y, rgba.r, rgba.g, rgba.b, rgba.a);
@@ -30,6 +31,7 @@ void IsoTriangleSprite::draw(GraphicsContext* GC, const Position& pos, const Rot
         vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
     }
 
+    // TODO: use new SDL_gpu code
     aalineRGBA(GC->renderer, vsc[0].x, vsc[0].y, vsc[1].x, vsc[1].y, rgba.r, rgba.g, rgba.b, rgba.a);
     aalineRGBA(GC->renderer, vsc[1].x, vsc[1].y, vsc[2].x, vsc[2].y, rgba.r, rgba.g, rgba.b, rgba.a);
     aalineRGBA(GC->renderer, vsc[2].x, vsc[2].y, vsc[0].x, vsc[0].y, rgba.r, rgba.g, rgba.b, rgba.a);

@@ -14,8 +14,23 @@ using namespace aerocore;
 #include <SDL2/SDL2_gfxPrimitives.h>
 
 Game::Game(void)
-    : GC(std::make_unique<GraphicsContext>()), CM(std::make_unique<ComponentManager>()),
-      SM(std::make_unique<SystemManager>()), IM(std::make_unique<InputManager>(CM.get())) {
+    : GC(std::make_unique<GraphicsContext>()),
+      CM(std::make_unique<ComponentManager>()),
+      SM(std::make_unique<SystemManager>()),
+      IM(std::make_unique<InputManager>(CM.get()))
+{
+    // TODO: add check in aerocore that components have
+    // actually been registered.
+    CM->registerComponent<Position>(1000);
+    CM->registerComponent<Velocity>(1000);
+    CM->registerComponent<Acceleration>(1000);
+    CM->registerComponent<Rotation>(1000);
+    CM->registerComponent<RotationalVelocity>(1000);
+    CM->registerComponent<Alliance>(1000);
+    CM->registerComponent<OffscreenBehavior>(1000);
+    CM->registerComponent<ShotDelay>(1000);
+    CM->registerComponent<DeathTimer>(1000);
+
     SM->addSystem(new TranslationSystem(CM.get()));
     SM->addSystem(new RotationSystem(CM.get()));
     SM->addSystem(new CollisionSystem(CM.get()));
@@ -43,7 +58,7 @@ bool Game::tick(void) {
     SDL_RenderPresent(GC->renderer);
 
     if (!quitting) {
-        quitting = !CM->has<Position>(UUID::playerUUID);
+        quitting = !CM->has<Position>(playerUUID);
     }
 
     return quitting;

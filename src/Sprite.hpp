@@ -4,9 +4,22 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 
 #include "Base.hpp"
+#include "Sprite.hpp"
 #include "BoundingSurface.hpp"
 #include "Geometry.hpp"
 #include "GraphicsContext.hpp"
+
+struct NewSprite {
+    std::vector<Vector2f> vertices;
+    SurfaceNormalSet normals;
+    Color rgba;
+    bool filled;
+};
+
+void drawSprite(GraphicsContext* GC,
+                const NewSprite& sprite,
+                const Position& pos,
+                const Rotation& rot);
 
 struct Sprite {
     virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
