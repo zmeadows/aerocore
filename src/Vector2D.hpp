@@ -2,19 +2,19 @@
 
 #include <cmath>
 
-struct Vector2f {
+struct v2 {
     float x = 0.f;
     float y = 0.f;
 
-    Vector2f normalized(void) const;
-    Vector2f rotated(float angle) const;
-    float dot(const Vector2f& rhs) const;
+    v2 normalized(void) const;
+    v2 rotated(float angle) const;
+    float dot(const v2& rhs) const;
     float magnitude(void) const;
     void rotate(float angle);
     void scale(float factor);
 };
 
-Vector2f operator+(const Vector2f& vecA, const Vector2f& vecB);
+v2 operator+(const v2& vecA, const v2& vecB);
 
-Vector2f operator-(const Vector2f& vecA, const Vector2f& vecB);
+v2 operator-(const v2& vecA, const v2& vecB);
 

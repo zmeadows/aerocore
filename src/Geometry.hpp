@@ -24,14 +24,14 @@ public:
 
 class PolygonShape : public Shape {
     // in coordinate system with origin at geometrical center of polygon
-    std::vector<Vector2f> vertices;
+    std::vector<v2> vertices;
 
 public:
-    PolygonShape(std::vector<Vector2f>&& vertices_) { std::swap(vertices, vertices_); }
+    PolygonShape(std::vector<v2>&& vertices_) { std::swap(vertices, vertices_); }
     PolygonShape(const PolygonShape& rhs) { vertices = rhs.vertices; }
 
-    const std::vector<Vector2f>& getVertices(void) const { return vertices; }
-    std::vector<Vector2f> getTransRotVertices(const Position& pos, const Rotation& rot) const;
+    const std::vector<v2>& getVertices(void) const { return vertices; }
+    std::vector<v2> getTransRotVertices(const Position& pos, const Rotation& rot) const;
 
     void scale(float factor) final;
 

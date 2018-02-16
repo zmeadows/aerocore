@@ -20,19 +20,19 @@ struct AxisProjection {
 
 class SurfaceNormalSet {
 private:
-    std::vector<Vector2f> normals;
+    std::vector<v2> normals;
 
 public:
-    SurfaceNormalSet(const std::vector<Vector2f>& vertices);
+    SurfaceNormalSet(const std::vector<v2>& vertices);
     SurfaceNormalSet(const SurfaceNormalSet& rhs);
     SurfaceNormalSet(void) {}
 
-    void add(const Vector2f& vec, float rotationAngle = 0.f);
+    void add(const v2& vec, float rotationAngle = 0.f);
     void add(const SurfaceNormalSet& rhs, float rotationAngle = 0.f);
     void add(const SurfaceNormalSet* rhs, float rotationAngle = 0.f);
 
-    std::vector<Vector2f>::const_iterator begin(void) const { return normals.begin(); }
-    std::vector<Vector2f>::const_iterator end(void) const { return normals.end(); }
+    std::vector<v2>::const_iterator begin(void) const { return normals.begin(); }
+    std::vector<v2>::const_iterator end(void) const { return normals.end(); }
 
     inline size_t size(void) const { return normals.size(); }
 };
@@ -43,7 +43,7 @@ public:
 
 struct BoundingSurface {
     virtual AxisProjection
-    projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const = 0;
+    projectOn(const v2& axis, const Position& pos, const Rotation& rot) const = 0;
 
     virtual const SurfaceNormalSet* getSurfaceNormals(void) const = 0;
 
@@ -71,7 +71,7 @@ public:
     const SurfaceNormalSet* getSurfaceNormals(void) const final { return &normals; }
 
     void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const {
-        const std::vector<Vector2f> vertices = polygon.getTransRotVertices(pos, rot);
+        const std::vector<v2> vertices = polygon.getTransRotVertices(pos, rot);
 
         std::vector<ScreenCoordinates> vtx;
 
@@ -87,7 +87,7 @@ public:
         }
     }
 
-    AxisProjection projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const final;
+    AxisProjection projectOn(const v2& axis, const Position& pos, const Rotation& rot) const final;
 };
 
 */

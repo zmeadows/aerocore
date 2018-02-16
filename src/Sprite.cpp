@@ -3,12 +3,12 @@
 #include <vector>
 
 std::vector<ScreenCoordinates> vtxToScreenCoords(GraphicsContext* GC,
-                                              const std::vector<Vector2f>& vertices)
+                                              const std::vector<v2>& vertices)
 {
     std::vector<ScreenCoordinates> vsc;
     vsc.reserve(vertices.size());
 
-    for (const Vector2f& vtx : vertices) {
+    for (const v2& vtx : vertices) {
         vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
     }
 
@@ -42,16 +42,16 @@ Sprite makeSquareSprite(float width)
     return spr;
 }
 
-std::vector<Vector2f> transformVtxs(const std::vector<Vector2f> vertices,
+std::vector<v2> transformVtxs(const std::vector<v2> vertices,
                                     const Position& pos, const Rotation& rot)
 {
-    std::vector<Vector2f> tmpVertices;
+    std::vector<v2> tmpVertices;
     tmpVertices.reserve(vertices.size());
 
-    const Vector2f posVec = {pos.x, pos.y};
+    const v2 posVec = {pos.x, pos.y};
     const float angle = rot.getAngle();
 
-    for (const Vector2f& vtx : vertices) {
+    for (const v2& vtx : vertices) {
         tmpVertices.push_back(vtx.rotated(angle) + posVec);
     }
 
@@ -75,7 +75,7 @@ void draw(GraphicsContext* GC, const Sprite& sprite,
 }
 
 void scale(Sprite& sprite, float factor) {
-    for (Vector2f& vtx : sprite.vertices)
+    for (v2& vtx : sprite.vertices)
         vtx.scale(factor);
 }
 
@@ -86,7 +86,7 @@ void extentAt(Extent& ext, const Sprite& sprite, const Position& pos, const Rota
     ext.minY = std::numeric_limits<float>::max();
     ext.maxY = std::numeric_limits<float>::lowest();
 
-    for (const Vector2f& vtx : transformVtxs(sprite.vertices, pos, rot))
+    for (const v2& vtx : transformVtxs(sprite.vertices, pos, rot))
     {
         ext.minX = std::min(ext.minX, vtx.x);
         ext.maxX = std::max(ext.maxX, vtx.x);
@@ -97,7 +97,7 @@ void extentAt(Extent& ext, const Sprite& sprite, const Position& pos, const Rota
 
 bool isOffScreen(const Sprite& sprite, const Position& pos, const Rotation& rot)
 {
-    for (const Vector2f& vtx : transformVtxs(sprite.vertices, pos, rot))
+    for (const v2& vtx : transformVtxs(sprite.vertices, pos, rot))
     {
         if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
             return false;

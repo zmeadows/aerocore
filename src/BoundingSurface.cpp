@@ -1,12 +1,12 @@
 #include "BoundingSurface.hpp"
 
-SurfaceNormalSet::SurfaceNormalSet(const std::vector<Vector2f>& vertices) {
+SurfaceNormalSet::SurfaceNormalSet(const std::vector<v2>& vertices) {
     const size_t numVertices = vertices.size();
 
     normals.reserve(numVertices);
 
     for (size_t i = 0; i < numVertices; i++) {
-        Vector2f ov = vertices[(i + 1) % numVertices] - vertices[i];
+        v2 ov = vertices[(i + 1) % numVertices] - vertices[i];
         std::swap(ov.x, ov.y);
         if (ov.x != 0.f)
             ov.x *= -1.0;
@@ -21,11 +21,11 @@ SurfaceNormalSet::SurfaceNormalSet(const SurfaceNormalSet& rhs) {
     }
 }
 
-void SurfaceNormalSet::add(const Vector2f& vec, float rotationAngle) {
+void SurfaceNormalSet::add(const v2& vec, float rotationAngle) {
     static const float tol = 0.001f;
 
     for (const auto& ov : normals) {
-        const Vector2f rov = rotationAngle != 0.f ? ov.rotated(rotationAngle) : ov;
+        const v2 rov = rotationAngle != 0.f ? ov.rotated(rotationAngle) : ov;
         const float angle = std::atan2f(vec.y, vec.x) - std::atan2f(rov.y, rov.x);
         if (std::abs(angle) < tol || std::abs(PI - std::abs(angle)) < tol)
             return;

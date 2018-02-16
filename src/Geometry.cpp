@@ -5,7 +5,7 @@
 //     float sum = 0;
 //     const size_t numVertices = vertices.size();
 //
-//     const auto det = [](const Vector2f& v1, const Vector2f& v2) -> float {
+//     const auto det = [](const v2& v1, const v2& v2) -> float {
 //         return v1.x() * v2.y() - v1.y() * v2.x();
 //     };
 //
@@ -17,16 +17,16 @@
 // }
 
 void PolygonShape::scale(float factor) {
-    for (Vector2f& vtx : this->vertices)
+    for (v2& vtx : this->vertices)
         vtx.scale(factor);
 }
 
-std::vector<Vector2f> PolygonShape::getTransRotVertices(const Position& pos, const Rotation& rot) const {
-    std::vector<Vector2f> tmpVertices;
+std::vector<v2> PolygonShape::getTransRotVertices(const Position& pos, const Rotation& rot) const {
+    std::vector<v2> tmpVertices;
     tmpVertices.reserve(this->vertices.size());
-    const Vector2f posVec = {pos.x, pos.y};
+    const v2 posVec = {pos.x, pos.y};
 
-    for (const Vector2f& vtx : this->vertices) {
+    for (const v2& vtx : this->vertices) {
         tmpVertices.push_back(vtx.rotated(rot.getAngle()) + posVec);
     }
 
