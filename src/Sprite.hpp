@@ -10,17 +10,30 @@
 #include "GraphicsContext.hpp"
 
 struct NewSprite {
-    std::vector<Vector2f> vertices;
-    SurfaceNormalSet normals;
-    Color rgba;
-    bool filled;
+    std::vector<Vector2f> vertices = {};
+    RGBA color = { 255, 255, 255, 255 };
+    bool filled = false;
 };
 
-void drawSprite(GraphicsContext* GC,
-                const NewSprite& sprite,
-                const Position& pos,
-                const Rotation& rot);
+std::vector<ScreenCoordinates> vtxToScreenCoords(GraphicsContext* GC, 
+                                                 const std::vector<Vector2f>& vertices);
 
+NewSprite makeIsoTriangleSprite(float baseWidth, float height);
+NewSprite makeSquareSprite(float width);
+
+std::vector<Vector2f> transformVtxs(const std::vector<Vector2f> vertices,
+                                    const Position& pos, const Rotation& rot);
+
+void draw(GraphicsContext* GC, const NewSprite& sprite,
+          const Position& pos, const Rotation& rot);
+
+void scale(NewSprite& sprite, float factor);
+
+void extentAt(Extent& ext, const NewSprite& sprite, const Position& pos, const Rotation& rot);
+
+bool isOffScreen(const NewSprite& sprite, const Position& pos, const Rotation& rot);
+
+/*
 struct Sprite {
     virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
     virtual BoundingSurface* buildBoundingSurface(void) const = 0;
@@ -104,3 +117,4 @@ public:
 
     ~IsoTriangleSprite() {}
 };
+*/

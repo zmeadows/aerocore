@@ -1,28 +1,29 @@
 #include "SystemManager.hpp"
 
 void TranslationSystem::wrapEntity(const UUID& uuid) {
-    // auto pos = CM->get<Position>(uuid);
-    // const auto spr = CM->get<Sprite>(uuid);
-    // const auto rot = CM->get<Rotation>(uuid);
-    // const auto vel = CM->get<Velocity>(uuid);
+    auto pos = CM->get<Position>(uuid);
+    const auto& spr = CM->get<NewSprite>(uuid);
+    const auto& rot = CM->get<Rotation>(uuid);
+    const auto& vel = CM->get<Velocity>(uuid);
 
-    // const Extent ext = spr->extentAt(*pos, *rot);
+    static Extent ext;
+    extentAt(ext, spr, pos, rot);
 
-    // if (ext.maxX > 100.0 && vel->x > 0) {
-    //     pos->x -= (ext.maxX + 100.f);
-    // }
+    if (ext.maxX > 100.0 && vel.x > 0) {
+        pos.x -= (ext.maxX + 100.f);
+    }
 
-    // if (ext.minX < -100.0 && vel->x < 0) {
-    //     pos->x -= (ext.minX - 100.f);
-    // }
+    if (ext.minX < -100.0 && vel.x < 0) {
+        pos.x -= (ext.minX - 100.f);
+    }
 
-    // if (ext.maxY > 100.0 && vel->y > 0) {
-    //     pos->y -= (ext.maxY + 100.f);
-    // }
+    if (ext.maxY > 100.0 && vel.y > 0) {
+        pos.y -= (ext.maxY + 100.f);
+    }
 
-    // if (ext.minY < -100.0 && vel->y < 0) {
-    //     pos->y -= (ext.minY - 100.f);
-    // }
+    if (ext.minY < -100.0 && vel.y < 0) {
+        pos.y -= (ext.minY - 100.f);
+    }
 
     DEBUG("WRAPPED UUID: " << uuid);
 }

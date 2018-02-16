@@ -25,9 +25,8 @@ private:
         Node(const unsigned depth_) : depth(depth_) {}
     };
 
-    Node top;
-
-    const float minimumNodeWidth;
+    Node m_top;
+    const float m_minimumNodeWidth;
 
     Node* insert(const UUID& uuid, const Position& pos);
     Node* update(const UUID& uuid, Node* currentNode, const Position& newPos);

@@ -38,15 +38,15 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
 }
 
 void InputManager::processPressedKey(const Key& key) {
-    auto acc = CM->get<Acceleration>(playerUUID);
-    auto rotVel = CM->get<RotationalVelocity>(playerUUID);
+    auto acc = CM->get<Acceleration>(playerUUID());
+    auto rotVel = CM->get<RotationalVelocity>(playerUUID());
 
     m_keyStates[key] = KeyState::Pressed;
 
     switch (key) {
 
     case Key::UpArrow: {
-        const float angle = CM->get<Rotation>(playerUUID).getAngle();
+        const float angle = CM->get<Rotation>(playerUUID()).getAngle();
         acc.x = -75 * std::sin(angle);
         acc.y = 75 * std::cos(angle);
         break;
@@ -67,9 +67,9 @@ void InputManager::processPressedKey(const Key& key) {
     case Key::Spacebar: {
         UUID bulletUUID = generate<EntityType::Bullet>(CM);
         CM->book<Alliance>(bulletUUID, Alliance::Friend);
-        auto const playerPos = CM->get<Position>(playerUUID);
-        auto const playerVel = CM->get<Velocity>(playerUUID);
-        const float angle = CM->get<Rotation>(playerUUID).getAngle();
+        auto const playerPos = CM->get<Position>(playerUUID());
+        auto const playerVel = CM->get<Velocity>(playerUUID());
+        const float angle = CM->get<Rotation>(playerUUID()).getAngle();
 
         auto pos = CM->get<Position>(bulletUUID);
         pos.x = playerPos.x - 7.5 * std::sin(angle);
@@ -86,8 +86,8 @@ void InputManager::processPressedKey(const Key& key) {
 }
 
 void InputManager::processReleasedKey(const Key& key) {
-    auto acc = CM->get<Acceleration>(playerUUID);
-    auto rotVel = CM->get<RotationalVelocity>(playerUUID);
+    auto acc = CM->get<Acceleration>(playerUUID());
+    auto rotVel = CM->get<RotationalVelocity>(playerUUID());
 
     m_keyStates[key] = KeyState::Released;
 

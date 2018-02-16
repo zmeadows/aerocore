@@ -7,21 +7,14 @@
 #include <SDL2/SDL.h>
 
 #include "aerocore.hpp"
-using namespace aerocore;
+#include "UUID.hpp"
 #include "Vector2D.hpp"
-
-const UUID playerUUID;
-
-#ifdef DODEBUG
-#define DEBUG(x)                                                                                             \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "]\t" << x << std::endl)
-#else
-#define DEBUG(x)
-#endif
 
 enum class EntityType { Player, Bullet, Enemy, Particle, Level };
 
 enum class Alliance { Friend, Foe, Neutral };
+
+const UUID playerUUID(void);
 
 struct RGBA {
     uint_fast8_t r = 0;
@@ -53,6 +46,7 @@ struct ShotDelay {
     float lastShotTime = 0.0;
 };
 
+// TODO: move to Sprite file
 struct Extent {
     float minX = 0.f;
     float maxX = 0.f;

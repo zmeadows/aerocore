@@ -86,11 +86,6 @@ public:
     AxisProjection projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const final;
 };
 
-// class GeneralPolygonBoundingSurface final : public BoundingSurface {
-//
-//     SurfaceNormalSet normals;
-// };
-
 bool overlaps(const BoundingSurface& bsA,
               const Position& posA,
               const Rotation& rotA,

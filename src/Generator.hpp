@@ -3,6 +3,7 @@
 #include "aerocore.hpp"
 
 #include "Base.hpp"
+#include "Sprite.hpp"
 
 #include <random>
 
@@ -14,28 +15,27 @@ UUID generate(ComponentManager* const CM) {
 
 template <>
 inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
-    CM->book<Position>(playerUUID);
-    CM->book<Rotation>(playerUUID);
-    CM->book<Velocity>(playerUUID);
-    CM->book<RotationalVelocity>(playerUUID);
-    CM->book<Acceleration>(playerUUID);
+    CM->book<Position>(playerUUID());
+    CM->book<Rotation>(playerUUID());
+    CM->book<Velocity>(playerUUID());
+    CM->book<RotationalVelocity>(playerUUID());
+    CM->book<Acceleration>(playerUUID());
 
-    CM->book<Alliance>(playerUUID, Alliance::Friend);
-    CM->book<OffscreenBehavior>(playerUUID, OffscreenBehavior::Wraps);
+    CM->book<Alliance>(playerUUID(), Alliance::Friend);
+    CM->book<OffscreenBehavior>(playerUUID(), OffscreenBehavior::Wraps);
 
-    // auto spr = new IsoTriangleSprite(7.0, 12.0);
-    // spr->rgba.r = 255;
-    // spr->rgba.g = 255;
-    // spr->rgba.b = 255;
-    // spr->rgba.a = 255;
+    auto spr = CM->book<NewSprite>(playerUUID(), makeIsoTriangleSprite(7.0, 12.0));
+    spr.color.r = 255;
+    spr.color.g = 255;
+    spr.color.b = 255;
+    spr.color.a = 255;
 
-    // CM->book<Sprite>(playerUUID, spr);
-    // CM->book<BoundingSurface*>(playerUUID, spr->buildBoundingSurface());
+    // CM->book<BoundingSurface*>(playerUUID(), spr->buildBoundingSurface());
 
     // auto sprUpd = [CM](Sprite* thisSpr) -> void {
     //     SimplePolygonSprite* spr = static_cast<SimplePolygonSprite*>(thisSpr);
 
-    //     auto pacc = CM->get<Acceleration>(playerUUID);
+    //     auto pacc = CM->get<Acceleration>(playerUUID());
     //     if (std::fabs(pacc.x) > 0 || std::fabs(pacc.y) > 0) {
     //         spr->rgba.r = std::min(255, spr->rgba.r + 3);
     //         spr->rgba.g = std::min(255, spr->rgba.r + 3);
@@ -47,22 +47,23 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
     //     }
     // };
 
-    // CM->book<SpriteUpdator>(playerUUID, {sprUpd});
+    // CM->book<SpriteUpdator>(playerUUID(), {sprUpd});
 
-    auto sd = CM->book<ShotDelay>(playerUUID);
+    auto sd = CM->book<ShotDelay>(playerUUID());
     sd.delay = 1000.f;
 
+    /*
     auto pgen = [CM](void) -> void {
         static std::random_device rd;
         static std::mt19937 gen(rd());
         static std::uniform_real_distribution<> dis(0.0, 1.0);
 
         if (dis(gen) < 0.5) {
-            auto pacc = CM->get<Acceleration>(playerUUID);
+            auto pacc = CM->get<Acceleration>(playerUUID());
             if (std::fabs(pacc.x) > 0 || std::fabs(pacc.y) > 0) {
-                const auto ppos = CM->get<Position>(playerUUID);
-                const auto pvel = CM->get<Velocity>(playerUUID);
-                const auto prot = CM->get<Rotation>(playerUUID);
+                const auto ppos = CM->get<Position>(playerUUID());
+                const auto pvel = CM->get<Velocity>(playerUUID());
+                const auto prot = CM->get<Rotation>(playerUUID());
                 const float pangle = prot.getAngle();
 
                 UUID partUUID;
@@ -98,21 +99,22 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
             }
         }
     };
+    */
 
-    // CM->book<ParticleGenerator>(playerUUID, pgen);
+    // CM->book<ParticleGenerator>(playerUUID(), pgen);
 
-    return playerUUID;
+    return playerUUID();
 }
 
 template <>
 inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     UUID bulletUUID;
 
-    // auto bulletSprite = new SquareSprite(1.0);
-    // bulletSprite->rgba.r = 0;
-    // bulletSprite->rgba.g = 200;
-    // bulletSprite->rgba.b = 0;
-    // bulletSprite->rgba.a = 255;
+    auto bulletSprite = CM->book<NewSprite>(bulletUUID, makeSquareSprite(1.0));
+    bulletSprite.color.r = 0;
+    bulletSprite.color.g = 200;
+    bulletSprite.color.b = 0;
+    bulletSprite.color.a = 255;
 
     // CM->book<Sprite>(bulletUUID, bulletSprite);
     // CM->book<BoundingSurface>(bulletUUID, bulletSprite->buildBoundingSurface());
@@ -130,10 +132,12 @@ template <>
 inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     UUID enemyUUID;
 
-    // auto spr = new IsoTriangleSprite(10.0, 20.0);
-    // spr->rgba.r = 255;
-    // spr->rgba.a = 255;
-    // CM->book<Sprite>(enemyUUID, spr);
+    auto spr = CM->book<NewSprite>(enemyUUID, makeIsoTriangleSprite(10.0, 20.0));
+    spr.color.r = 255;
+    spr.color.g = 255;
+    spr.color.b = 255;
+    spr.color.a = 255;
+
     // CM->book<BoundingSurface>(enemyUUID, spr->buildBoundingSurface());
 
     auto& pos = CM->book<Position>(enemyUUID);

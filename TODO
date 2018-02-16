@@ -2,7 +2,7 @@
 #### TODO ####
 ##############
 
-Create UUIDSet class
+rename Vector2f to just V2
 
 Set up QuadTree (as soon as notice any slowdown from O(n^2) collision detection currently)
 
@@ -19,3 +19,5 @@ Create GraphicsContext class that contains:
   - integer pixel coordinates vs. continous game grid coordinates utility functions
   - all SDL pointers necessary (renderer/window/surface/etc)
   - window/screen width/height constants
+
+Create UUIDSet class

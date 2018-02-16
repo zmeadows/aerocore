@@ -30,3 +30,4 @@ public:
     }
     void processInput(SDL_Keycode SDLkey, bool keyUp);
 };
+

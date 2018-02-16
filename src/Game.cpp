@@ -20,7 +20,7 @@ Game::Game(void)
       IM(std::make_unique<InputManager>(CM.get()))
 {
     // TODO: add check in aerocore that components have
-    // actually been registered.
+    // actually been registered. Right now it just segfaults.
     CM->registerComponent<Position>(1000);
     CM->registerComponent<Velocity>(1000);
     CM->registerComponent<Acceleration>(1000);
@@ -30,6 +30,7 @@ Game::Game(void)
     CM->registerComponent<OffscreenBehavior>(1000);
     CM->registerComponent<ShotDelay>(1000);
     CM->registerComponent<DeathTimer>(1000);
+    CM->registerComponent<NewSprite>(1000);
 
     SM->addSystem(new TranslationSystem(CM.get()));
     SM->addSystem(new RotationSystem(CM.get()));
@@ -58,7 +59,7 @@ bool Game::tick(void) {
     SDL_RenderPresent(GC->renderer);
 
     if (!quitting) {
-        quitting = !CM->has<Position>(playerUUID);
+        quitting = !CM->has<Position>(playerUUID());
     }
 
     return quitting;

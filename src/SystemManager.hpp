@@ -77,13 +77,13 @@ public:
         m_modFrame++;
 
         for (const UUID& uuid : m_followed) {
-            auto spr = CM->get<Sprite*>(uuid);
+            auto spr = CM->get<NewSprite>(uuid);
 
-            if (CM->has<SpriteUpdator>(uuid)) {
-                CM->get<SpriteUpdator>(uuid).update(spr);
-            };
+            // if (CM->has<SpriteUpdator>(uuid)) {
+            //     CM->get<SpriteUpdator>(uuid).update(spr);
+            // };
 
-            spr->draw(GC, CM->get<Position>(uuid), CM->get<Rotation>(uuid));
+            draw(GC, spr, CM->get<Position>(uuid), CM->get<Rotation>(uuid));
             //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
             // auto bs = CM->get<BoundingSurface>(uuid);
             // if (bs) {
@@ -109,7 +109,7 @@ public:
     DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)
         : System("Draw", CM_), GC(GC_), m_fpsHistory({{0.0}}), m_lastFrameTicks(SDL_GetPerformanceCounter()),
           m_modFrame(0) {
-        CM->subscribe<Sprite, Position, Rotation>(this);
+        CM->subscribe<NewSprite, Position, Rotation>(this);
     }
 };
 
