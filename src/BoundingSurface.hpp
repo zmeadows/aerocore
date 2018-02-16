@@ -9,7 +9,7 @@
 #include <SDL2/SDL2_gfxPrimitives.h>
 
 #include "Base.hpp"
-#include "Geometry.hpp"
+#include "Sprite.hpp"
 #include "GraphicsContext.hpp"
 #include "Vector2D.hpp"
 
@@ -36,6 +36,10 @@ public:
 
     inline size_t size(void) const { return normals.size(); }
 };
+
+
+
+/*
 
 struct BoundingSurface {
     virtual AxisProjection
@@ -86,9 +90,5 @@ public:
     AxisProjection projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const final;
 };
 
-bool overlaps(const BoundingSurface& bsA,
-              const Position& posA,
-              const Rotation& rotA,
-              const BoundingSurface& bsB,
-              const Position& posB,
-              const Rotation& rotB);
+*/
+

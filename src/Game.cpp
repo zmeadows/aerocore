@@ -8,14 +8,13 @@
 #include "SystemManager.hpp"
 
 #include "aerocore.hpp"
-using namespace aerocore;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
 Game::Game(void)
-    : GC(std::make_unique<GraphicsContext>()),
-      CM(std::make_unique<ComponentManager>()),
+    : CM(std::make_unique<ComponentManager>()),
+      GC(std::make_unique<GraphicsContext>()),
       SM(std::make_unique<SystemManager>()),
       IM(std::make_unique<InputManager>(CM.get()))
 {
@@ -30,7 +29,7 @@ Game::Game(void)
     CM->registerComponent<OffscreenBehavior>(1000);
     CM->registerComponent<ShotDelay>(1000);
     CM->registerComponent<DeathTimer>(1000);
-    CM->registerComponent<NewSprite>(1000);
+    CM->registerComponent<Sprite>(1000);
 
     SM->addSystem(new TranslationSystem(CM.get()));
     SM->addSystem(new RotationSystem(CM.get()));
@@ -52,7 +51,7 @@ bool Game::tick(void) {
     SDL_RenderClear(GC->renderer);
 
     t1 = SDL_GetPerformanceCounter();
-    const float tmpdt = (float)(t1 - t0) / SDL_GetPerformanceFrequency();
+    const float tmpdt = static_cast<float>(t1 - t0) / SDL_GetPerformanceFrequency();
     SM->runSystems(tmpdt);
     t0 = SDL_GetPerformanceCounter();
 
@@ -81,4 +80,17 @@ bool Game::processInput(void) {
     }
 
     return false;
+}
+
+Game::~Game(void) {
+    CM->unRegisterComponent<Position>();
+    CM->unRegisterComponent<Velocity>();
+    CM->unRegisterComponent<Acceleration>();
+    CM->unRegisterComponent<Rotation>();
+    CM->unRegisterComponent<RotationalVelocity>();
+    CM->unRegisterComponent<Alliance>();
+    CM->unRegisterComponent<OffscreenBehavior>();
+    CM->unRegisterComponent<ShotDelay>();
+    CM->unRegisterComponent<DeathTimer>();
+    CM->unRegisterComponent<Sprite>();
 }

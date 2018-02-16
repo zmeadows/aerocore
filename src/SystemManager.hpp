@@ -4,7 +4,6 @@
 #include "Sprite.hpp"
 
 #include "aerocore.hpp"
-using namespace aerocore;
 
 #include <SDL2/SDL2_gfxPrimitives.h>
 
@@ -40,7 +39,7 @@ public:
     void run(float dt) final;
 
     CollisionSystem(ComponentManager* const CM_) : System("Collision", CM_) {
-        CM->subscribe<Position, Rotation, BoundingSurface, Alliance>(this);
+        CM->subscribe<Position, Rotation, Sprite, Alliance>(this);
     }
 };
 
@@ -63,53 +62,18 @@ public:
 class DrawSystem final : public System {
     GraphicsContext* const GC;
 
-    std::array<float, 100> m_fpsHistory;
+    std::array<double, 100> m_fpsHistory;
     Uint64 m_lastFrameTicks;
     size_t m_modFrame;
-    float m_currentFpsAvg;
+    double m_currentFpsAvg;
 
 public:
-    void run(float dt) final {
-        Uint64 tmp = SDL_GetPerformanceCounter();
-        m_fpsHistory[m_modFrame % 100] =
-            1.0 / ((float)(tmp - m_lastFrameTicks) / SDL_GetPerformanceFrequency());
-        m_lastFrameTicks = tmp;
-        m_modFrame++;
-
-        for (const UUID& uuid : m_followed) {
-            auto spr = CM->get<NewSprite>(uuid);
-
-            // if (CM->has<SpriteUpdator>(uuid)) {
-            //     CM->get<SpriteUpdator>(uuid).update(spr);
-            // };
-
-            draw(GC, spr, CM->get<Position>(uuid), CM->get<Rotation>(uuid));
-            //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
-            // auto bs = CM->get<BoundingSurface>(uuid);
-            // if (bs) {
-            //     bs->draw(GC, *CM->get<Position>(uuid), *CM->get<Rotation>(uuid));
-            // }
-        }
-
-        stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);
-
-        if (m_modFrame % 100 == 99) {
-            float sum = 0;
-            for (size_t i = 0; i < 100; i++) {
-                sum += m_fpsHistory[i];
-            }
-            m_currentFpsAvg = sum / 100.0;
-        }
-
-        stringColor(GC->renderer, 735, 10,
-                    ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
-                    0xFFFFFFFF);
-    }
+    void run(float) final;
 
     DrawSystem(ComponentManager* const CM_, GraphicsContext* const GC_)
         : System("Draw", CM_), GC(GC_), m_fpsHistory({{0.0}}), m_lastFrameTicks(SDL_GetPerformanceCounter()),
           m_modFrame(0) {
-        CM->subscribe<NewSprite, Position, Rotation>(this);
+        CM->subscribe<Sprite, Position, Rotation>(this);
     }
 };
 

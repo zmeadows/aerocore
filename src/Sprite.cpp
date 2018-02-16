@@ -15,9 +15,9 @@ std::vector<ScreenCoordinates> vtxToScreenCoords(GraphicsContext* GC,
     return vsc;
 }
 
-NewSprite makeIsoTriangleSprite(float baseWidth, float height)
+Sprite makeIsoTriangleSprite(float baseWidth, float height)
 {
-    NewSprite spr;
+    Sprite spr;
 
     spr.vertices = {
         {-baseWidth / 2.f, -height / 3.f},
@@ -28,9 +28,9 @@ NewSprite makeIsoTriangleSprite(float baseWidth, float height)
     return spr;
 }
 
-NewSprite makeSquareSprite(float width)
+Sprite makeSquareSprite(float width)
 {
-    NewSprite spr;
+    Sprite spr;
 
     spr.vertices = {
         {-width / 2.f, -width / 2.f},
@@ -58,7 +58,7 @@ std::vector<Vector2f> transformVtxs(const std::vector<Vector2f> vertices,
     return tmpVertices;
 }
 
-void draw(GraphicsContext* GC, const NewSprite& sprite,
+void draw(GraphicsContext* GC, const Sprite& sprite,
           const Position& pos, const Rotation& rot)
 {
     const std::vector<ScreenCoordinates> vsc = vtxToScreenCoords(GC, transformVtxs(sprite.vertices, pos, rot));
@@ -74,12 +74,12 @@ void draw(GraphicsContext* GC, const NewSprite& sprite,
     }
 }
 
-void scale(NewSprite& sprite, float factor) {
+void scale(Sprite& sprite, float factor) {
     for (Vector2f& vtx : sprite.vertices)
         vtx.scale(factor);
 }
 
-void extentAt(Extent& ext, const NewSprite& sprite, const Position& pos, const Rotation& rot)
+void extentAt(Extent& ext, const Sprite& sprite, const Position& pos, const Rotation& rot)
 {
     ext.minX = std::numeric_limits<float>::max();
     ext.maxX = std::numeric_limits<float>::lowest();
@@ -95,7 +95,7 @@ void extentAt(Extent& ext, const NewSprite& sprite, const Position& pos, const R
     }
 }
 
-bool isOffScreen(const NewSprite& sprite, const Position& pos, const Rotation& rot)
+bool isOffScreen(const Sprite& sprite, const Position& pos, const Rotation& rot)
 {
     for (const Vector2f& vtx : transformVtxs(sprite.vertices, pos, rot))
     {
@@ -107,41 +107,3 @@ bool isOffScreen(const NewSprite& sprite, const Position& pos, const Rotation& r
     return true;
 }
 
-
-
-/*
-void SquareSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const {
-    std::vector<Vector2f> vertices = square.getTransRotVertices(pos, rot);
-    assert(vertices.size() == 4);
-
-    std::vector<ScreenCoordinates> vsc;
-    vsc.reserve(4);
-
-    for (const auto& vtx : vertices) {
-        vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
-    }
-
-    // TODO: use new SDL_gpu code
-    aalineRGBA(GC->renderer, vsc[0].x, vsc[0].y, vsc[1].x, vsc[1].y, rgba.r, rgba.g, rgba.b, rgba.a);
-    aalineRGBA(GC->renderer, vsc[1].x, vsc[1].y, vsc[2].x, vsc[2].y, rgba.r, rgba.g, rgba.b, rgba.a);
-    aalineRGBA(GC->renderer, vsc[2].x, vsc[2].y, vsc[3].x, vsc[3].y, rgba.r, rgba.g, rgba.b, rgba.a);
-    aalineRGBA(GC->renderer, vsc[3].x, vsc[3].y, vsc[0].x, vsc[0].y, rgba.r, rgba.g, rgba.b, rgba.a);
-}
-
-void IsoTriangleSprite::draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const {
-    std::vector<Vector2f> vertices = triangle.getTransRotVertices(pos, rot);
-    assert(vertices.size() == 3);
-
-    std::vector<ScreenCoordinates> vsc;
-    vsc.reserve(3);
-
-    for (const auto& vtx : vertices) {
-        vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
-    }
-
-    // TODO: use new SDL_gpu code
-    aalineRGBA(GC->renderer, vsc[0].x, vsc[0].y, vsc[1].x, vsc[1].y, rgba.r, rgba.g, rgba.b, rgba.a);
-    aalineRGBA(GC->renderer, vsc[1].x, vsc[1].y, vsc[2].x, vsc[2].y, rgba.r, rgba.g, rgba.b, rgba.a);
-    aalineRGBA(GC->renderer, vsc[2].x, vsc[2].y, vsc[0].x, vsc[0].y, rgba.r, rgba.g, rgba.b, rgba.a);
-}
-*/

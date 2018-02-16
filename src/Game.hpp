@@ -3,13 +3,14 @@
 #include <memory>
 
 #include "aerocore.hpp"
+
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
 #include "SystemManager.hpp"
 
 class Game {
     // TODO: create custom ComponentManager?
-    std::unique_ptr<aerocore::ComponentManager> CM;
+    std::unique_ptr<ComponentManager> CM;
 
     std::unique_ptr<GraphicsContext> GC;
     std::unique_ptr<SystemManager> SM;
@@ -25,4 +26,6 @@ public:
         while (!tick())
             continue;
     }
+
+    ~Game(void);
 };

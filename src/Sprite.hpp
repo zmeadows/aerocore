@@ -6,115 +6,69 @@
 #include "Base.hpp"
 #include "Sprite.hpp"
 #include "BoundingSurface.hpp"
-#include "Geometry.hpp"
 #include "GraphicsContext.hpp"
 
-struct NewSprite {
+struct Sprite {
     std::vector<Vector2f> vertices = {};
     RGBA color = { 255, 255, 255, 255 };
     bool filled = false;
 };
 
+//TODO: struct SpritePool
+
 std::vector<ScreenCoordinates> vtxToScreenCoords(GraphicsContext* GC, 
                                                  const std::vector<Vector2f>& vertices);
 
-NewSprite makeIsoTriangleSprite(float baseWidth, float height);
-NewSprite makeSquareSprite(float width);
+Sprite makeIsoTriangleSprite(float baseWidth, float height);
+Sprite makeSquareSprite(float width);
 
 std::vector<Vector2f> transformVtxs(const std::vector<Vector2f> vertices,
                                     const Position& pos, const Rotation& rot);
 
-void draw(GraphicsContext* GC, const NewSprite& sprite,
+void draw(GraphicsContext* GC, const Sprite& sprite,
           const Position& pos, const Rotation& rot);
 
-void scale(NewSprite& sprite, float factor);
+void scale(Sprite& sprite, float factor);
 
-void extentAt(Extent& ext, const NewSprite& sprite, const Position& pos, const Rotation& rot);
+void extentAt(Extent& ext, const Sprite& sprite, const Position& pos, const Rotation& rot);
 
-bool isOffScreen(const NewSprite& sprite, const Position& pos, const Rotation& rot);
+bool isOffScreen(const Sprite& sprite, const Position& pos, const Rotation& rot);
 
 /*
-struct Sprite {
-    virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
-    virtual BoundingSurface* buildBoundingSurface(void) const = 0;
-    virtual bool isOffScreen(const Position& pos, const Rotation& rot) const = 0;
-    virtual Extent extentAt(const Position& pos, const Rotation& rot) const = 0;
-    virtual ~Sprite(void) {}
-};
+bool overlaps(const Sprite& bsA,
+              const Position& posA,
+              const Rotation& rotA,
+              const Sprite& bsB,
+              const Position& posB,
+              const Rotation& rotB) {
+    // combine surface normals into one SurfaceNormalSet so that
+    // duplicates are removed, rather than separately looping over both sets
+    SurfaceNormalSet combinedSurfaceNormals;
+    combinedSurfaceNormals.add(SurfaceNormalSet(bsA.vertices()), rotA.getAngle());
+    combinedSurfaceNormals.add(SurfaceNormalSet(bsB.vertices()), rotB.getAngle());
 
-struct SpriteUpdator {
-    std::function<void(Sprite*)> update;
-};
-
-struct SimplePolygonSprite : public Sprite {
-    RGBA rgba;
-
-    virtual void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const = 0;
-
-    virtual const PolygonShape& getPolygon(void) const = 0;
-    virtual PolygonShape& getPolygon(void) = 0;
-
-    BoundingSurface* buildBoundingSurface(void) const final {
-        return new PolygonalBoundingSurface(getPolygon());
-    }
-
-    bool isOffScreen(const Position& pos, const Rotation& rot) const final {
-
-        for (const auto& vtx : getPolygon().getTransRotVertices(pos, rot)) {
-            if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
-                return false;
-            }
+    for (const Vector2f& axis : combinedSurfaceNormals) {
+        AxisProjection projA = bsA.projectOn(axis, posA, rotA);
+        AxisProjection projB = bsB.projectOn(axis, posB, rotB);
+        if (!(projA.max >= projB.min && projB.max >= projA.min)) {
+            return false;
         }
-
-        return true;
     }
 
-    Extent extentAt(const Position& pos, const Rotation& rot) const final {
-        Extent ext;
+    return true;
+}
 
-        ext.minX = std::numeric_limits<float>::max();
-        ext.maxX = std::numeric_limits<float>::lowest();
-        ext.minY = std::numeric_limits<float>::max();
-        ext.maxY = std::numeric_limits<float>::lowest();
+AxisProjection
+projectOn(const Sprite& sprite, const Vector2f& axis, const Position& pos, const Rotation& rot) const {
+    float minProjection = std::numeric_limits<float>::max();
+    float maxProjection = std::numeric_limits<float>::lowest();
 
-        for (const auto& vtx : getPolygon().getTransRotVertices(pos, rot)) {
-            ext.minX = std::min(ext.minX, vtx.x);
-            ext.maxX = std::max(ext.maxX, vtx.x);
-            ext.minY = std::min(ext.minY, vtx.y);
-            ext.maxY = std::max(ext.maxY, vtx.y);
-        }
-
-        return ext;
+    for (const Vector2f& vtx : polygon.getTransRotVertices(pos, rot)) {
+        const float projection = vtx.dot(axis);
+        minProjection = std::min(projection, minProjection);
+        maxProjection = std::max(projection, maxProjection);
     }
 
-    virtual ~SimplePolygonSprite(void) {}
-};
-
-class SquareSprite final : public SimplePolygonSprite {
-    SquareShape square;
-
-public:
-    SquareSprite(const float width) : square(width) {}
-
-    const PolygonShape& getPolygon(void) const final { return square; }
-    PolygonShape& getPolygon(void) final { return square; }
-
-    void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const final;
-
-    ~SquareSprite() {}
-};
-
-class IsoTriangleSprite final : public SimplePolygonSprite {
-    IsoTriangleShape triangle;
-
-public:
-    IsoTriangleSprite(float baseWidth, float height) : triangle(baseWidth, height) {}
-
-    const PolygonShape& getPolygon(void) const final { return triangle; }
-    PolygonShape& getPolygon(void) final { return triangle; }
-
-    void draw(GraphicsContext* GC, const Position& pos, const Rotation& rot) const final;
-
-    ~IsoTriangleSprite() {}
-};
+    return AxisProjection({minProjection, maxProjection});
+}
 */

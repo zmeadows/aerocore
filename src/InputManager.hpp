@@ -7,7 +7,6 @@
 #include <SDL2/SDL.h>
 
 #include "aerocore.hpp"
-using namespace aerocore;
 
 enum class Key { LeftArrow, RightArrow, UpArrow, DownArrow, Spacebar };
 enum class KeyState { Pressed, Released };

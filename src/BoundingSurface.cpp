@@ -8,7 +8,7 @@ SurfaceNormalSet::SurfaceNormalSet(const std::vector<Vector2f>& vertices) {
     for (size_t i = 0; i < numVertices; i++) {
         Vector2f ov = vertices[(i + 1) % numVertices] - vertices[i];
         std::swap(ov.x, ov.y);
-        if (ov.x != 0.0)
+        if (ov.x != 0.f)
             ov.x *= -1.0;
         add(ov);
     }
@@ -22,12 +22,12 @@ SurfaceNormalSet::SurfaceNormalSet(const SurfaceNormalSet& rhs) {
 }
 
 void SurfaceNormalSet::add(const Vector2f& vec, float rotationAngle) {
-    static const float tol = 1e-3;
+    static const float tol = 0.001f;
 
     for (const auto& ov : normals) {
-        const Vector2f rov = rotationAngle != 0.0 ? ov.rotated(rotationAngle) : ov;
+        const Vector2f rov = rotationAngle != 0.f ? ov.rotated(rotationAngle) : ov;
         const float angle = std::atan2f(vec.y, vec.x) - std::atan2f(rov.y, rov.x);
-        if (std::abs(angle) < tol || std::abs(M_PI - std::abs(angle)) < tol)
+        if (std::abs(angle) < tol || std::abs(PI - std::abs(angle)) < tol)
             return;
     }
 
@@ -50,39 +50,3 @@ void SurfaceNormalSet::add(const SurfaceNormalSet* rhs, float rotationAngle) {
     }
 }
 
-AxisProjection
-PolygonalBoundingSurface::projectOn(const Vector2f& axis, const Position& pos, const Rotation& rot) const {
-    float minProjection = std::numeric_limits<float>::max();
-    float maxProjection = std::numeric_limits<float>::lowest();
-
-    for (const Vector2f& vtx : polygon.getTransRotVertices(pos, rot)) {
-        const float projection = vtx.dot(axis);
-        minProjection = std::min(projection, minProjection);
-        maxProjection = std::max(projection, maxProjection);
-    }
-
-    return AxisProjection({minProjection, maxProjection});
-}
-
-bool overlaps(const BoundingSurface& bsA,
-              const Position& posA,
-              const Rotation& rotA,
-              const BoundingSurface& bsB,
-              const Position& posB,
-              const Rotation& rotB) {
-    // combine surface normals into one SurfaceNormalSet so that
-    // duplicates are removed, rather than separately looping over both sets
-    SurfaceNormalSet combinedSurfaceNormals;
-    combinedSurfaceNormals.add(bsA.getSurfaceNormals(), rotA.getAngle());
-    combinedSurfaceNormals.add(bsB.getSurfaceNormals(), rotB.getAngle());
-
-    for (const Vector2f& axis : combinedSurfaceNormals) {
-        AxisProjection projA = bsA.projectOn(axis, posA, rotA);
-        AxisProjection projB = bsB.projectOn(axis, posB, rotB);
-        if (!(projA.max >= projB.min && projB.max >= projA.min)) {
-            return false;
-        }
-    }
-
-    return true;
-}

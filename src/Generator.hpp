@@ -8,7 +8,7 @@
 #include <random>
 
 template <EntityType EType>
-UUID generate(ComponentManager* const CM) {
+UUID generate(ComponentManager* const) {
     UUID newUUID;
     return newUUID;
 }
@@ -24,7 +24,7 @@ inline UUID generate<EntityType::Player>(ComponentManager* const CM) {
     CM->book<Alliance>(playerUUID(), Alliance::Friend);
     CM->book<OffscreenBehavior>(playerUUID(), OffscreenBehavior::Wraps);
 
-    auto spr = CM->book<NewSprite>(playerUUID(), makeIsoTriangleSprite(7.0, 12.0));
+    auto spr = CM->book<Sprite>(playerUUID(), makeIsoTriangleSprite(7.0, 12.0));
     spr.color.r = 255;
     spr.color.g = 255;
     spr.color.b = 255;
@@ -110,7 +110,7 @@ template <>
 inline UUID generate<EntityType::Bullet>(ComponentManager* const CM) {
     UUID bulletUUID;
 
-    auto bulletSprite = CM->book<NewSprite>(bulletUUID, makeSquareSprite(1.0));
+    auto& bulletSprite = CM->book<Sprite>(bulletUUID, makeSquareSprite(1.0));
     bulletSprite.color.r = 0;
     bulletSprite.color.g = 200;
     bulletSprite.color.b = 0;
@@ -132,10 +132,10 @@ template <>
 inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     UUID enemyUUID;
 
-    auto spr = CM->book<NewSprite>(enemyUUID, makeIsoTriangleSprite(10.0, 20.0));
-    spr.color.r = 255;
+    auto& spr = CM->book<Sprite>(enemyUUID, makeIsoTriangleSprite(10.0, 20.0));
+    spr.color.r = 0;
     spr.color.g = 255;
-    spr.color.b = 255;
+    spr.color.b = 0;
     spr.color.a = 255;
 
     // CM->book<BoundingSurface>(enemyUUID, spr->buildBoundingSurface());
@@ -149,8 +149,8 @@ inline UUID generate<EntityType::Enemy>(ComponentManager* const CM) {
     CM->book<Acceleration>(enemyUUID);
 
     CM->book<Rotation>(enemyUUID);
-    auto& rot = CM->book<RotationalVelocity>(enemyUUID);
-    rot.value = 0.1;
+    RotationalVelocity& rot = CM->book<RotationalVelocity>(enemyUUID);
+    rot.value = 0.1f;
 
     CM->book<Alliance>(enemyUUID, Alliance::Foe);
     CM->book<OffscreenBehavior>(enemyUUID, OffscreenBehavior::Wraps);

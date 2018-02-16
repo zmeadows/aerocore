@@ -85,11 +85,12 @@ private:
 public:
     inline float getAngle(void) const { return angle; }
 
+    // TODO: this if/else redundant?
     inline void rotateAngle(float radians) {
         if (radians >= 0) {
-            angle = std::fmod(angle + radians, 2 * M_PI);
+            angle = std::fmod(angle + radians, TWOPI);
         } else {
-            angle = std::fmod(angle + radians + 2 * M_PI, 2 * M_PI);
+            angle = std::fmod(angle + radians + TWOPI, TWOPI);
         }
     }
 };
