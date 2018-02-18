@@ -16,6 +16,18 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     return this;
 };
 
+void QuadNode::retrieve(std::vector<UUID>& candidates) {
+
+    for (UUID uuid : m_containedUUIDs)
+        candidates.push_back(uuid);
+
+    if (m_hasChildren) {
+        for (auto& node : m_childNodes) {
+            node->retrieve(candidates);
+        }
+    }
+};
+
 bool QuadNode::has_parent(const QuadNode* node) const {
     if (!node || (node->c_depth >= this->c_depth))
         return false;
@@ -79,3 +91,4 @@ QuadTree::QuadTree(unsigned max_depth) :
 {
     m_top.produce_children(c_maxDepth);
 }
+

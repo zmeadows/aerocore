@@ -35,9 +35,6 @@ private:
     // Component Data Storage //
     ////////////////////////////
 
-    // TODO: switch to an array of handles, with size == max number of entities
-    // will be a little tough and bug-prone to implement, since we would have to re-use UUIDs
-    // and implement a UUID pool
     // TODO: make UUIDMap class?
     using UUIDCompMap = std::unordered_map<UUID::rep, ResourceManager::Handle>;
     std::vector<UUIDCompMap> m_store;

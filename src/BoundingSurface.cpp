@@ -70,17 +70,17 @@ bool overlaps(const CollisionData& colA,
               const v2& posB,
               const float rotB) {
 
-    if (colA.node && colB.node && colA.node != colB.node) {
-        const int delta_depth = static_cast<int>(colA.node->c_depth) - static_cast<int>(colB.node->c_depth);
+    // if (colA.node && colB.node && colA.node != colB.node) {
+    //     const int delta_depth = static_cast<int>(colA.node->c_depth) - static_cast<int>(colB.node->c_depth);
 
-        if (delta_depth == 0) {
-            return false;
-        } else if (delta_depth > 0 && !colA.node->has_parent(colB.node)) {
-            return false;
-        } else if (delta_depth < 0 && !colB.node->has_parent(colA.node)) {
-            return false;
-        }
-    }
+    //     if (delta_depth == 0) {
+    //         return false;
+    //     } else if (delta_depth > 0 && !colA.node->has_parent(colB.node)) {
+    //         return false;
+    //     } else if (delta_depth < 0 && !colB.node->has_parent(colA.node)) {
+    //         return false;
+    //     }
+    // }
     // TODO: check simple bounding box overlap first
     // combine surface normals into one SurfaceNormalSet so that
     // duplicates are removed, rather than separately looping over both sets

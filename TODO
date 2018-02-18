@@ -8,6 +8,10 @@ write script to do code coverage test
 
 clean up quad tree and collision code
 
+don't triangulate an already-convex polygon
+
+do monotone polygon decomposition instead of triangulation
+
 
 ##############
 #### DONE ####

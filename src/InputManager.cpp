@@ -70,18 +70,20 @@ void InputManager::processPressedKey(const Key& key) {
         }
 
         case Key::Spacebar: {
-            const UUID bulletUUID = generateBullet(CM, m_quadTree);
-            CM->book<Alliance>(bulletUUID, Alliance::Friend);
-            const v2& player_pos = playerCD.pos;
-            const v2& player_vel = playerCD.vel;
+            for (float angle : { -0.5, -0.4, -0.25, -0.15 -0.05, 0.0, 0.05, 0.15, 0.25, 0.4, 0.5 }) {
+                const UUID bulletUUID = generateBullet(CM, m_quadTree);
+                CM->book<Alliance>(bulletUUID, Alliance::Friend);
+                const v2& player_pos = playerCD.pos;
+                const v2& player_vel = playerCD.vel;
 
-            auto& bulletCD = CM->get<CoreData>(bulletUUID);
+                auto& bulletCD = CM->get<CoreData>(bulletUUID);
 
-            bulletCD.pos.x = player_pos.x - 7.5f * std::sin(player_angle);
-            bulletCD.pos.y = player_pos.y + 7.5f * std::cos(player_angle);
+                bulletCD.pos.x = player_pos.x - 7.5f * std::sin(player_angle);
+                bulletCD.pos.y = player_pos.y + 7.5f * std::cos(player_angle);
 
-            bulletCD.vel.x = 0.5f * player_vel.x - 125.f * std::sin(player_angle);
-            bulletCD.vel.y = 0.5f * player_vel.y + 125.f * std::cos(player_angle);
+                bulletCD.vel.x = 0.5f * player_vel.x - 125.f * std::sin(player_angle + angle);
+                bulletCD.vel.y = 0.5f * player_vel.y + 125.f * std::cos(player_angle + angle);
+            }
 
             break;
         }

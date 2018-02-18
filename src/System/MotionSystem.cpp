@@ -131,9 +131,6 @@ void MotionSystem::run(float dt) {
                 coldat.node = m_quadTree->insert_entity(uuid, clip_to_screen(ext));
             } else {
                 coldat.node = coldat.node->update_entity(uuid, ext);
-                // if (!coldat.node) {
-                //     coldat.node = m_quadTree->insert_entity(uuid, clip_to_screen(ext));
-                // }
             }
         }
     }

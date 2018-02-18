@@ -28,6 +28,7 @@ struct QuadNode {
     }
 
     bool has_parent(const QuadNode* node) const;
+    void retrieve(std::vector<UUID>& candidate);
 
     QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
         c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {}
@@ -42,6 +43,8 @@ private:
 public:
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext) { return m_top.insert_entity(uuid, ext); }
     QuadNode m_top;
+
+    void retrieve(std::vector<UUID>& candidate, const Extent& ext);
 
     // std::vector<std::pair<UUID,UUID>> collision_candidates(void);
 
