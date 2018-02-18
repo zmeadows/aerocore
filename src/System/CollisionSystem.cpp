@@ -1,5 +1,7 @@
 #include "System/CollisionSystem.hpp"
 
+#include "Entity.hpp"
+
 bool CollisionSystem::are_colliding(const UUID& uuidA, const UUID& uuidB) {
     const auto& colA = CM->get<CollisionData>(uuidA);
     const auto& colB = CM->get<CollisionData>(uuidB);
@@ -29,23 +31,8 @@ void CollisionSystem::run(float dt) {
     }
 
     for (const auto& p : collisions) {
-
-        //FIXME
-        if (CM->has<CollisionData>(p.first)) {
-            auto& coldat = CM->get<CollisionData>(p.first);
-            if (coldat.node)
-                coldat.node->release_entity(p.first);
-        }
-
-        //FIXME
-        if (CM->has<CollisionData>(p.second)) {
-            auto& coldat = CM->get<CollisionData>(p.second);
-            if (coldat.node)
-                coldat.node->release_entity(p.second);
-        }
-
-        CM->destroy(p.first);
-        CM->destroy(p.second);
+        destroy_entity(CM, p.first);
+        destroy_entity(CM, p.second);
     }
 }
 

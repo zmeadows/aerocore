@@ -1,6 +1,7 @@
 #include "System/MotionSystem.hpp"
 
 #include "Sprite.hpp"
+#include "Entity.hpp"
 
 MotionSystem::HandleOffScreenBehaviorResult
 MotionSystem::handle_offscreen_behavior(const UUID& uuid, CoreData& CD, const Extent& ext)
@@ -67,10 +68,6 @@ MotionSystem::handle_offscreen_behavior(const UUID& uuid, CoreData& CD, const Ex
     // NOTHING //
     /////////////
 
-    } else {  // offscreen but no specified behavior, so destroy.
-        res.to_be_destroyed = true;
-        res.skip_updating_kinematic_data = true;
-        res.skip_updating_collision_data = true;
     }
 
     return res;
@@ -94,6 +91,12 @@ void MotionSystem::run(float dt) {
         HandleOffScreenBehaviorResult res;
         if (entity_is_offscreen && entity_has_offscreen_behavior)
             res = handle_offscreen_behavior(uuid, CD, ext);
+
+        if (entity_is_offscreen && !entity_has_offscreen_behavior) {
+            res.to_be_destroyed = true;
+            res.skip_updating_kinematic_data = true;
+            res.skip_updating_collision_data = true;
+        }
 
         if (res.to_be_destroyed) {
             toDestroy.insert(uuid);
@@ -135,15 +138,8 @@ void MotionSystem::run(float dt) {
         }
     }
 
-    for (const UUID uuid : toDestroy) {
-        if (CM->has<CollisionData>(uuid)) {
-            auto& coldat = CM->get<CollisionData>(uuid);
-            if (coldat.node)
-                coldat.node->release_entity(uuid);
-        }
-
-        CM->destroy(uuid);
-    }
+    for (const UUID uuid : toDestroy)
+        destroy_entity(CM, uuid);
 }
 
 
