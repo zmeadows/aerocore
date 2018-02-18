@@ -22,5 +22,6 @@ void draw(GraphicsContext* GC,
 Extent extent_at(const CoreData& cd);
 Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float angle);
 
+bool is_offscreen(const CoreData& cd);
 bool is_offscreen(const std::vector<v2>& vertices, const v2& pos, const float rot);
 

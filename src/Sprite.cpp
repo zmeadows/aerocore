@@ -86,7 +86,11 @@ Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float ang
     return ext;
 }
 
-// TODO: take extent as argument
+bool is_offscreen(const CoreData& cd) {
+    return is_offscreen(cd.vertices, cd. pos, cd.angle);
+}
+
+
 bool is_offscreen(const std::vector<v2>& vertices, const v2& pos, const float angle)
 {
     for (const v2& vtx : transform_vertices(vertices, pos, angle))

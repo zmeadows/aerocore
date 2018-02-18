@@ -20,7 +20,7 @@ Game::Game(void)
     : CM(std::make_unique<ComponentManager>()),
       GC(std::make_unique<GraphicsContext>()),
       SM(std::make_unique<SystemManager>()),
-      m_quadTree(std::make_unique<QuadTree>(3)),
+      m_quadTree(std::make_unique<QuadTree>(5)),
       IM(std::make_unique<InputManager>(CM.get(), m_quadTree.get()))
 {
     // TODO: add check in aerocore that components have
@@ -47,7 +47,7 @@ bool Game::tick(void) {
     bool quitting = processInput();
 
     static Uint64 t0 = SDL_GetPerformanceCounter();
-    static Uint64 t1 = 0;
+    // static Uint64 t1 = 0;
 
     GPU_ClearRGB(GC->renderer, 30, 30, 30);
 
@@ -57,7 +57,7 @@ bool Game::tick(void) {
         generateOffscreenAsteroid(CM.get(), m_quadTree.get());
     }
 
-    drawQuadTree(GC.get(), m_quadTree.get());
+    // drawQuadTree(GC.get(), m_quadTree.get());
     SM->runSystems(static_cast<float>(SDL_GetPerformanceCounter() - t0) / SDL_GetPerformanceFrequency());
     t0 = SDL_GetPerformanceCounter();
 

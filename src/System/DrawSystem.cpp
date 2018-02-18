@@ -17,18 +17,18 @@ void DrawSystem::run(float) {
 
 
 
-        if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
-            SDL_Color test;
-            test.r = 255;
-            test.g = 255;
-            test.b = 255;
-            test.a = 255;
-            for (const auto& tri : CM->get<CollisionData>(uuid).triangles) {
-                draw(GC, tri, CD.pos, CD.angle, test);
-            }
-        } else {
+        // if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
+        //     SDL_Color test;
+        //     test.r = 255;
+        //     test.g = 255;
+        //     test.b = 255;
+        //     test.a = 255;
+        //     for (const auto& tri : CM->get<CollisionData>(uuid).triangles) {
+        //         draw(GC, tri, CD.pos, CD.angle, test);
+        //     }
+        // } else {
          draw(GC, CD.vertices, CD.pos, CD.angle, CD.color);
-        }
+        // }
 
         //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
         // auto bs = CM->get<BoundingSurface>(uuid);

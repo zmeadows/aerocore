@@ -1,7 +1,7 @@
 #include "QuadTree.hpp"
 
 QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
-    if (!is_in_node_boundary(ext)) 
+    if (!is_in_node_boundary(ext))
         return nullptr;
 
     if (m_hasChildren) {
@@ -74,8 +74,8 @@ void QuadNode::produce_children(const unsigned max_depth) {
 
 
 QuadTree::QuadTree(unsigned max_depth) :
-    m_top(QuadNode(nullptr, 0,-100.f, 100.f, 200.f)),
-    c_maxDepth(max_depth)
+    c_maxDepth(max_depth),
+    m_top(QuadNode(nullptr, 0,-100.f, 100.f, 200.f))
 {
     m_top.produce_children(c_maxDepth);
 }

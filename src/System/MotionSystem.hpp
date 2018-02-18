@@ -5,9 +5,15 @@
 #include "QuadTree.hpp"
 
 class MotionSystem final : public System {
-    void wrapEntity(const UUID& uuidA);
-
     QuadTree* const m_quadTree = nullptr;
+
+    struct HandleOffScreenBehaviorResult {
+        bool skip_updating_kinematic_data = false;
+        bool skip_updating_collision_data = false;
+        bool to_be_destroyed = false;
+    };
+
+    HandleOffScreenBehaviorResult handle_offscreen_behavior(const UUID& uuid, CoreData& cd, const Extent& ext);
 
 public:
     void run(float dt) final;

@@ -38,9 +38,9 @@ UUID generateOffscreenAsteroid(ComponentManager* CM, QuadTree* quadTree) {
         vtx.scale(sf);
     };
 
-    CD.color.r = 20;
+    CD.color.r = 200;
     CD.color.g = 20;
-    CD.color.b = 200;
+    CD.color.b = 20;
     CD.color.a = 200;
 
     CD.vertices = {
