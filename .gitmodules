@@ -1,3 +1,6 @@
 [submodule "/Users/zac/Code/mine/aerocore/lib/wykobi"]
 	path = /Users/zac/Code/mine/aerocore/lib/wykobi
 	url = https://github.com/ArashPartow/wykobi.git
+[submodule "lib/sdl-gpu"]
+	path = lib/sdl-gpu
+	url = https://github.com/grimfang4/sdl-gpu.git

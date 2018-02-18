@@ -2,9 +2,13 @@
 #### TODO ####
 ##############
 
-rename Vector2f to just V2
+make asteroids explode
 
-Set up QuadTree (as soon as notice any slowdown from O(n^2) collision detection currently)
+write script to do code coverage test
+
+clean up quad tree and collision code
+
+create generic destroy_entity code
 
 ##############
 #### DONE ####
@@ -21,3 +25,7 @@ Create GraphicsContext class that contains:
   - window/screen width/height constants
 
 Create UUIDSet class
+
+rename Vector2f to just V2
+
+Set up QuadTree (as soon as notice any slowdown from O(n^2) collision detection currently)

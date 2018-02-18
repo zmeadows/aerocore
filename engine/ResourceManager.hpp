@@ -2,6 +2,8 @@
 
 #include "Util.hpp"
 
+#include <functional>
+
 class ResourceManager final {
 public:
     using Handle = size_t;
@@ -10,6 +12,7 @@ private:
     std::unique_ptr<char[]> m_data;
     size_t m_capacity;
     std::set<Handle> m_inactive;
+    std::function<void(Handle)> release_func;
 
     template <typename T>
     inline T* data(void) {
@@ -42,6 +45,8 @@ public:
 
         for (Handle h = 0; h < m_capacity; h++)
             m_inactive.insert(h);
+
+        release_func = [this](Handle h) { get<T>(h).~T(); };
     }
 
     template <typename T>
@@ -73,9 +78,8 @@ public:
         return data<T>()[handle];
     }
 
-    template <typename T>
     inline void release(Handle handle) {
-        data<T>()[handle].~T();
+        release_func(handle);
         const bool releaseSuccess = m_inactive.insert(handle).second;
         assert(releaseSuccess && "Attempted to release inactive data in ResourceManager for type: ");
     }

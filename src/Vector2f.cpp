@@ -41,3 +41,11 @@ v2 v2::normalized(void) const {
     tmp.scale(1.f / tmp.magnitude());
     return tmp;
 }
+
+float cross(const v2& lhs, const v2& rhs) {
+    return lhs.x * rhs.y - lhs.y * rhs.x;
+}
+
+bool operator==(const v2& vecA, v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
+bool operator==(v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
+bool operator==(const v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }

@@ -2,37 +2,51 @@
 
 #include <array>
 #include <memory>
+#include <optional>
 #include <set>
 
 #include "Base.hpp"
 #include "UUID.hpp"
 
-class QuadTree {
-private:
-    struct Node {
-        const unsigned depth;
-        const float x, y, w;
+struct QuadNode {
+    const unsigned c_depth;
+    const float c_x, c_y, c_w;
+    bool m_hasChildren;
+    UUIDSet m_containedUUIDs;
 
-        Node* parent;
+    QuadNode* m_parent = nullptr;
+    std::array<std::unique_ptr<QuadNode>, 4> m_childNodes;
 
-        std::array<std::unique_ptr<Node>, 4> children;
+    bool is_in_node_boundary(const Extent& ext) const;
+    void produce_children(const unsigned max_depth);
+    void release_entity(const UUID& uuid) { m_containedUUIDs.erase(uuid); }
+    bool contains_entity(const UUID& uuid) const;
+    QuadNode* insert_entity(const UUID& uuid, const Extent& ext);
+    QuadNode* update_entity(const UUID& uuid, const Extent& ext) {
+        m_containedUUIDs.erase(uuid);
+        return insert_entity(uuid,ext);
+    }
 
-        std::set<UUID> containedUUIDs;
+    bool has_parent(const QuadNode* node) const;
 
-        bool inBounds(const Position& pos) const;
-        bool hasChildren(void) const { return children[0] != nullptr; }
+    QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
+        c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {}
 
-        Node(const unsigned depth_) : depth(depth_) {}
-    };
-
-    Node m_top;
-    const float m_minimumNodeWidth;
-
-    Node* insert(const UUID& uuid, const Position& pos);
-    Node* update(const UUID& uuid, Node* currentNode, const Position& newPos);
-
-    // std::vector<UUID> collisionCandidates (across all nodes)
-public:
 };
 
-bool QuadTree::Node::inBounds(const Position& pos) const { return false; }
+
+class QuadTree {
+private:
+    const unsigned c_maxDepth;
+
+public:
+    QuadNode* insert_entity(const UUID& uuid, const Extent& ext) { return m_top.insert_entity(uuid, ext); }
+    QuadNode m_top;
+
+    // std::vector<std::pair<UUID,UUID>> collision_candidates(void);
+
+    QuadTree(void) = delete;
+
+    QuadTree(unsigned max_depth);
+};
+

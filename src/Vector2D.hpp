@@ -15,6 +15,10 @@ struct v2 {
 };
 
 v2 operator+(const v2& vecA, const v2& vecB);
-
 v2 operator-(const v2& vecA, const v2& vecB);
 
+bool operator==(const v2& vecA, const v2& vecB);
+bool operator==(const v2& vecA, v2& vecB);
+bool operator==(v2& vecA, const v2& vecB);
+
+float cross(const v2& lhs, const v2& rhs);

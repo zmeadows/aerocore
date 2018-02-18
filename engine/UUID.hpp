@@ -13,7 +13,7 @@ public:
 
     UUID(const UUID& rhs) : m_ID(rhs.m_ID) {}
     UUID(UUID&& rhs) : m_ID(rhs.m_ID) {}
-    rep unwrap(void) const { return m_ID; }
+    inline rep unwrap(void) const { return m_ID; }
 
     UUID& operator=(const UUID& rhs) = delete;
     UUID& operator=(UUID&& rhs) = delete;
@@ -57,10 +57,10 @@ public:
     UUIDSet(UUIDSet&&) = delete;
     UUIDSet(const UUIDSet&) = delete;
 
-    void insert(const UUID& uuid) { m_set.insert(uuid.unwrap()); }
-    void erase(const UUID& uuid) { m_set.erase(uuid.unwrap()); }
-    bool contains(const UUID& uuid) const { return static_cast<bool>(m_set.count(uuid.unwrap())); }
-    size_t size(void) const { return m_set.size(); }
+    inline void insert(const UUID& uuid) { m_set.insert(uuid.unwrap()); }
+    inline void erase(const UUID& uuid) { m_set.erase(uuid.unwrap()); }
+    inline bool contains(const UUID& uuid) const { return static_cast<bool>(m_set.count(uuid.unwrap())); }
+    inline size_t size(void) const { return m_set.size(); }
 
     iterator begin(void) const { return iterator(m_set.begin()); }
     iterator end(void) const { return iterator(m_set.end()); }

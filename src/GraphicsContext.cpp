@@ -1,40 +1,36 @@
 #include "GraphicsContext.hpp"
 
-#include <SDL2/SDL2_gfxPrimitives.h>
 #include <iostream>
 
-GraphicsContext::GraphicsContext(void) : m_screenWidth(800), m_screenWidthFloat(800.0) {
+GraphicsContext::GraphicsContext(void) : screen_width(1000), screen_width_f(1000.0) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    window = SDL_CreateWindow("aerocore", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_screenWidth,
-                              m_screenWidth, SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    // window = SDL_CreateWindow("aerocore",
+    //                           SDL_WINDOWPOS_CENTERED,
+    //                           SDL_WINDOWPOS_CENTERED,
+    //                           screen_width,
+    //                           screen_width,
+    //                           SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
 
-    SDL_GL_SetSwapInterval(1);
+    renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
 
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 2);
-    SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-
-    gfxPrimitivesSetFont(nullptr, 0, 0);
+    // gfxPrimitivesSetFont(nullptr, 0, 0);
 }
 
 GraphicsContext::~GraphicsContext(void) {
     DEBUG("Destroying GraphicsContext...");
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    GPU_Quit();
 }
 
-Sint16 GraphicsContext::toScreenSpan(const float gridSpan) const {
-    return static_cast<int>(nearbyint(m_screenWidthFloat * gridSpan / 200.0));
+Sint16 GraphicsContext::to_screen_span(const float grid_span) const {
+    //TODO: assert in window
+    return static_cast<Sint16>(nearbyint(screen_width_f * grid_span / 200.f));
 }
 
-ScreenCoordinates GraphicsContext::toScreenCoordinates(const Position& pos) const {
-    Sint16 x = static_cast<int>(nearbyint(m_screenWidthFloat * pos.x / 200.0 + m_screenWidthFloat / 2.0));
-
-    Sint16 y = static_cast<int>(nearbyint(m_screenWidthFloat * pos.y / (-200.0) + m_screenWidthFloat / 2.0));
+ScreenCoordinates GraphicsContext::to_screen_coords(const v2& pos) const {
+    //TODO: assert in window
+    Sint16 x = static_cast<Sint16>(nearbyint(screen_width_f * pos.x / 200.f + screen_width_f / 2.f));
+    Sint16 y = static_cast<Sint16>(nearbyint(screen_width_f * pos.y / (-200.f) + screen_width_f / 2.f));
 
     return {x, y};
 }

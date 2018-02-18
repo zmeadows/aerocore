@@ -2,54 +2,32 @@
 
 #include <vector>
 
-std::vector<ScreenCoordinates> vtxToScreenCoords(GraphicsContext* GC,
-                                              const std::vector<v2>& vertices)
+std::vector<v2> make_iso_triangle_vertices(float baseWidth, float height)
 {
-    std::vector<ScreenCoordinates> vsc;
-    vsc.reserve(vertices.size());
-
-    for (const v2& vtx : vertices) {
-        vsc.push_back(GC->toScreenCoordinates({vtx.x, vtx.y}));
-    }
-
-    return vsc;
-}
-
-Sprite makeIsoTriangleSprite(float baseWidth, float height)
-{
-    Sprite spr;
-
-    spr.vertices = {
+    return {
         {-baseWidth / 2.f, -height / 3.f},
-        {baseWidth / 2.f, -height / 3.f},
-        {0.f, 2.f * height / 3.f}
+        {0.f, 2.f * height / 3.f},
+        {baseWidth / 2.f, -height / 3.f}
     };
-
-    return spr;
 }
 
-Sprite makeSquareSprite(float width)
+std::vector<v2> make_square_vertices(float width)
 {
-    Sprite spr;
-
-    spr.vertices = {
+    return {
         {-width / 2.f, -width / 2.f},
-        {width / 2.f, -width / 2.f},
+        {-width / 2.f, width / 2.f},
         {width / 2.f, width / 2.f},
-        {-width / 2.f, width / 2.f}
+        {width / 2.f, -width / 2.f}
     };
-
-    return spr;
 }
 
-std::vector<v2> transformVtxs(const std::vector<v2> vertices,
-                                    const Position& pos, const Rotation& rot)
+std::vector<v2> transform_vertices(const std::vector<v2>& vertices,
+                                    const v2& pos, const float angle)
 {
     std::vector<v2> tmpVertices;
     tmpVertices.reserve(vertices.size());
 
     const v2 posVec = {pos.x, pos.y};
-    const float angle = rot.getAngle();
 
     for (const v2& vtx : vertices) {
         tmpVertices.push_back(vtx.rotated(angle) + posVec);
@@ -58,46 +36,60 @@ std::vector<v2> transformVtxs(const std::vector<v2> vertices,
     return tmpVertices;
 }
 
-void draw(GraphicsContext* GC, const Sprite& sprite,
-          const Position& pos, const Rotation& rot)
+void draw(GraphicsContext* GC,
+          const std::vector<v2>& vertices,
+          const v2& pos,
+          const float angle,
+          const SDL_Color& rgba)
 {
-    const std::vector<ScreenCoordinates> vsc = vtxToScreenCoords(GC, transformVtxs(sprite.vertices, pos, rot));
+    const std::vector<v2> trans_vertices = transform_vertices(vertices, pos, angle);
+    const size_t count = trans_vertices.size();
 
-    const RGBA rgba = sprite.color;
-    const size_t vtxCount = vsc.size();
-    // TODO: use new SDL_gpu code
-    for (size_t i = 0; i < vtxCount; i++) {
-        aalineRGBA(GC->renderer,
-                   vsc[i].x, vsc[i].y,
-                   vsc[(i + 1) % vtxCount].x, vsc[(i + 1) % vtxCount].y,
-                   rgba.r, rgba.g, rgba.b, rgba.a);
+    // GPU_CircleFilled(GC->renderer,
+    //                  GC->to_screen_coords(trans_vertices[0]).x,
+    //                  GC->to_screen_coords(trans_vertices[0]).y,
+    //                  20,
+    //                  { 0,0,255,255});
+
+    for (size_t i = 0; i < count; i++) {
+        ScreenCoordinates sc1 = GC->to_screen_coords(trans_vertices[i]);
+        ScreenCoordinates sc2 = GC->to_screen_coords(trans_vertices[(i+1) % count]);
+
+        GPU_Line(GC->renderer,
+                 sc1.x, sc1.y,
+                 sc2.x, sc2.y,
+                 rgba);
     }
 }
 
-void scale(Sprite& sprite, float factor) {
-    for (v2& vtx : sprite.vertices)
-        vtx.scale(factor);
+Extent extent_at(const CoreData& cd) {
+    return extent_at(cd.vertices, cd.pos, cd.angle);
 }
 
-void extentAt(Extent& ext, const Sprite& sprite, const Position& pos, const Rotation& rot)
+Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float angle)
 {
+    Extent ext;
+
     ext.minX = std::numeric_limits<float>::max();
     ext.maxX = std::numeric_limits<float>::lowest();
     ext.minY = std::numeric_limits<float>::max();
     ext.maxY = std::numeric_limits<float>::lowest();
 
-    for (const v2& vtx : transformVtxs(sprite.vertices, pos, rot))
+    for (const v2& vtx : transform_vertices(vertices, pos, angle))
     {
         ext.minX = std::min(ext.minX, vtx.x);
         ext.maxX = std::max(ext.maxX, vtx.x);
         ext.minY = std::min(ext.minY, vtx.y);
         ext.maxY = std::max(ext.maxY, vtx.y);
     }
+
+    return ext;
 }
 
-bool isOffScreen(const Sprite& sprite, const Position& pos, const Rotation& rot)
+// TODO: take extent as argument
+bool is_offscreen(const std::vector<v2>& vertices, const v2& pos, const float angle)
 {
-    for (const v2& vtx : transformVtxs(sprite.vertices, pos, rot))
+    for (const v2& vtx : transform_vertices(vertices, pos, angle))
     {
         if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
             return false;

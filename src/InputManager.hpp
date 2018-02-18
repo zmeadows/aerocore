@@ -7,12 +7,14 @@
 #include <SDL2/SDL.h>
 
 #include "aerocore.hpp"
+#include "QuadTree.hpp"
 
 enum class Key { LeftArrow, RightArrow, UpArrow, DownArrow, Spacebar };
 enum class KeyState { Pressed, Released };
 
 class InputManager {
-    ComponentManager* const CM;
+    ComponentManager* CM;
+    QuadTree* m_quadTree;
 
     std::unordered_map<Key, KeyState> m_keyStates;
 
@@ -20,7 +22,7 @@ class InputManager {
     void processReleasedKey(const Key& key);
 
 public:
-    InputManager(ComponentManager* const CM_) : CM(CM_) {
+    InputManager(ComponentManager* CM_, QuadTree* quadTree) : CM(CM_), m_quadTree(quadTree) {
         m_keyStates[Key::LeftArrow] = KeyState::Released;
         m_keyStates[Key::RightArrow] = KeyState::Released;
         m_keyStates[Key::DownArrow] = KeyState::Released;

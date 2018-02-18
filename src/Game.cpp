@@ -2,43 +2,45 @@
 
 #include <array>
 
-#include "Generator.hpp"
+#include "Generator/Player.hpp"
+#include "Generator/Enemy.hpp"
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
 #include "SystemManager.hpp"
+#include "System/MotionSystem.hpp"
+#include "System/CollisionSystem.hpp"
+#include "System/DrawSystem.hpp"
+#include "QuadTreeDraw.hpp"
 
 #include "aerocore.hpp"
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
 
 Game::Game(void)
     : CM(std::make_unique<ComponentManager>()),
       GC(std::make_unique<GraphicsContext>()),
       SM(std::make_unique<SystemManager>()),
-      IM(std::make_unique<InputManager>(CM.get()))
+      m_quadTree(std::make_unique<QuadTree>(3)),
+      IM(std::make_unique<InputManager>(CM.get(), m_quadTree.get()))
 {
     // TODO: add check in aerocore that components have
     // actually been registered. Right now it just segfaults.
-    CM->registerComponent<Position>(1000);
-    CM->registerComponent<Velocity>(1000);
-    CM->registerComponent<Acceleration>(1000);
-    CM->registerComponent<Rotation>(1000);
-    CM->registerComponent<RotationalVelocity>(1000);
-    CM->registerComponent<Alliance>(1000);
-    CM->registerComponent<OffscreenBehavior>(1000);
-    CM->registerComponent<ShotDelay>(1000);
-    CM->registerComponent<DeathTimer>(1000);
-    CM->registerComponent<Sprite>(1000);
+    CM->registerComponent<CoreData>(10000);
+    CM->registerComponent<Alliance>(10000);
+    CM->registerComponent<OffscreenBehavior>(10000);
+    CM->registerComponent<ShotDelay>(10000);
+    CM->registerComponent<DeathTimer>(10000);
+    CM->registerComponent<ParticleGenerator>(10);
+    CM->registerComponent<CollisionData>(10000);
 
-    SM->addSystem(new TranslationSystem(CM.get()));
-    SM->addSystem(new RotationSystem(CM.get()));
+    SM->addSystem(new MotionSystem(CM.get(), m_quadTree.get()));
     SM->addSystem(new CollisionSystem(CM.get()));
     SM->addSystem(new ParticleSystem(CM.get()));
     SM->addSystem(new CleanupSystem(CM.get()));
     SM->addSystem(new DrawSystem(CM.get(), GC.get()));
-    generate<EntityType::Player>(CM.get());
-    generate<EntityType::Enemy>(CM.get());
+    generatePlayer(CM.get(), m_quadTree.get());
+
+    void drawQuadtree(void);
 }
 
 bool Game::tick(void) {
@@ -47,18 +49,22 @@ bool Game::tick(void) {
     static Uint64 t0 = SDL_GetPerformanceCounter();
     static Uint64 t1 = 0;
 
-    SDL_SetRenderDrawColor(GC->renderer, 10, 10, 10, 255);
-    SDL_RenderClear(GC->renderer);
+    GPU_ClearRGB(GC->renderer, 30, 30, 30);
 
-    t1 = SDL_GetPerformanceCounter();
-    const float tmpdt = static_cast<float>(t1 - t0) / SDL_GetPerformanceFrequency();
-    SM->runSystems(tmpdt);
+    Uint32 tmp_ticks = SDL_GetTicks();
+    if (last_asteroid_time == 0 || tmp_ticks > last_asteroid_time + 1000) {
+        last_asteroid_time = SDL_GetTicks();
+        generateOffscreenAsteroid(CM.get(), m_quadTree.get());
+    }
+
+    drawQuadTree(GC.get(), m_quadTree.get());
+    SM->runSystems(static_cast<float>(SDL_GetPerformanceCounter() - t0) / SDL_GetPerformanceFrequency());
     t0 = SDL_GetPerformanceCounter();
 
-    SDL_RenderPresent(GC->renderer);
+    GPU_Flip(GC->renderer);
 
     if (!quitting) {
-        quitting = !CM->has<Position>(playerUUID());
+        quitting = !CM->has<CoreData>(playerUUID());
     }
 
     return quitting;
@@ -83,14 +89,11 @@ bool Game::processInput(void) {
 }
 
 Game::~Game(void) {
-    CM->unRegisterComponent<Position>();
-    CM->unRegisterComponent<Velocity>();
-    CM->unRegisterComponent<Acceleration>();
-    CM->unRegisterComponent<Rotation>();
-    CM->unRegisterComponent<RotationalVelocity>();
+    CM->unRegisterComponent<CoreData>();
     CM->unRegisterComponent<Alliance>();
     CM->unRegisterComponent<OffscreenBehavior>();
     CM->unRegisterComponent<ShotDelay>();
     CM->unRegisterComponent<DeathTimer>();
-    CM->unRegisterComponent<Sprite>();
+    CM->unRegisterComponent<ParticleGenerator>();
+    CM->unRegisterComponent<CollisionData>();
 }

@@ -38,6 +38,7 @@ private:
     // TODO: switch to an array of handles, with size == max number of entities
     // will be a little tough and bug-prone to implement, since we would have to re-use UUIDs
     // and implement a UUID pool
+    // TODO: make UUIDMap class?
     using UUIDCompMap = std::unordered_map<UUID::rep, ResourceManager::Handle>;
     std::vector<UUIDCompMap> m_store;
     std::vector<std::unique_ptr<ResourceManager>> m_pools;
@@ -69,10 +70,7 @@ public:
     ComponentManager(ComponentManager&&) = delete;
     ComponentManager& operator=(ComponentManager&&) = delete;
 
-    ComponentManager() : m_nextIndex(0) {
-        m_pools.reserve(1000);
-        m_store.reserve(1000);
-    }
+    ComponentManager() : m_nextIndex(0) {}
 
     ~ComponentManager() = default;
 
@@ -197,7 +195,7 @@ void ComponentManager::remove(const UUID& uuid) {
 
     compMap.erase(oldValue);
 
-    m_pools[compID]->release<TyComponent>(oldHandle);
+    m_pools[compID]->release(oldHandle);
 
     alertSystemsOldComponentRemoved<TyComponent>(uuid);
 }
@@ -238,9 +236,12 @@ void ComponentManager::destroy(const UUID& uuid) {
         sys->unfollow(uuid);
     }
 
-    // TODO: Need to allow user to pass custom destroy function...
     for (const auto& idx : m_allComponentIndices) {
-        m_store[idx].erase(uuid.unwrap());
+        auto hit = m_store[idx].find(uuid.unwrap());
+        if (hit != m_store[idx].end()) {
+            m_pools[idx]->release(hit->second);
+            m_store[idx].erase(uuid.unwrap());
+        }
     }
 }
 

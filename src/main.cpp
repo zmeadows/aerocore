@@ -1,14 +1,16 @@
-#define DODEBUG
-
 #include <SDL2/SDL.h>
 
 #include <iostream>
+#include <memory>
+#include <time.h>
+#include <stdlib.h>
 
 #include "Game.hpp"
 
 int main(/* int argc, char** argv */) {
-    Game game;
-    game.run();
+    srand (time(NULL));
+    auto game = std::make_unique<Game>();
+    game->run();
 
-    std::exit(EXIT_SUCCESS);
+    return 0;
 }
