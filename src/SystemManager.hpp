@@ -2,6 +2,7 @@
 
 #include "Base.hpp"
 #include "Sprite.hpp"
+#include "Globals.hpp"
 
 #include "aerocore.hpp"
 
@@ -14,15 +15,17 @@ class CleanupSystem final : public System {
 public:
     void run(float dt) final;
 
-    CleanupSystem(ComponentManager* const CM_) : System("Cleanup", CM_) { CM->subscribe<DeathTimer>(this); }
+    CleanupSystem() : System("Cleanup") {
+        get_manager()->subscribe<DeathTimer>(this);
+    }
 };
 
 class ParticleSystem final : public System {
 public:
     void run(float dt) final;
 
-    ParticleSystem(ComponentManager* const CM_) : System("Particle", CM_) {
-        CM->subscribe<ParticleGenerator>(this);
+    ParticleSystem() : System("Particle") {
+        get_manager()->subscribe<ParticleGenerator>(this);
     }
 };
 

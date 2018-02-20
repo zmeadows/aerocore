@@ -1,25 +1,42 @@
 #include "Generator.hpp"
 #include "Generator/Player.hpp"
 #include "Geometry.hpp"
+#include "Globals.hpp"
 
 #include <random>
 
-UUID generatePlayer(ComponentManager* CM, QuadTree* quadTree) {
+UUID generatePlayer() {
 
-    CoreData& CD = CM->book<CoreData>(playerUUID());
+    auto CM = get_manager();
+
+    Entity& CD = CM->book<Entity>(playerUUID());
 
     CM->book<Alliance>(playerUUID(), Alliance::Friend);
 
-    CD.wraps = true;
+    // CD.vertices = make_iso_triangle_vertices(7.0, 12.0);
+    // assert(is_convex(CD.vertices));
 
-    CD.vertices = make_iso_triangle_vertices(7.0, 12.0);
-    assert(is_convex(CD.vertices));
+    CD.vertices = {
+        { -1.f, -2.f },
+        { -2.f, -1.f },
+        { -2.f, 0.f },
+        { -1.f, 3.f },
+        { -1.f, 0.f },
+        { 1.f, 0.f },
+        { 1.f, 3.f },
+        { 2.f, 0.f },
+        { 2.f, -1.f },
+        { 1.f, -2.f }
+    };
+
+    for (v2& vtx : CD.vertices)
+        vtx.scale(3.f);
 
     auto& coldat = CM->book<CollisionData>(playerUUID());
     coldat.friendly = true;
-    coldat.triangles = triangulate(CD.vertices);
+    coldat.triangles = decompose(CD.vertices);
     coldat.normals = SurfaceNormalSet(coldat.triangles);
-    coldat.node = quadTree->insert_entity(playerUUID(), extent_at(CD));
+    coldat.node = get_quad_tree()->insert_entity(playerUUID(), extent_of(CD));
 
     assert(coldat.node);
 
@@ -56,10 +73,10 @@ UUID generatePlayer(ComponentManager* CM, QuadTree* quadTree) {
     auto pgen = [CM](void) -> void {
 
         if (static_cast<float>(rand()) / static_cast <float>(RAND_MAX) < 9999.f) {
-            const auto& playerCD = CM->get<CoreData>(playerUUID());
+            const auto& playerCD = CM->get<Entity>(playerUUID());
             const v2& pacc = playerCD.acc;
             if (std::fabs(pacc.x) > 0 || std::fabs(pacc.y) > 0) {
-                for (size_t i = 0; i < 4; i++) {
+                for (size_t i = 0; i < 5; i++) {
                 const v2& ppos = playerCD.pos;
                 const v2& pvel = playerCD.vel;
                 const float pangle = playerCD.angle;
@@ -71,7 +88,7 @@ UUID generatePlayer(ComponentManager* CM, QuadTree* quadTree) {
                 const float r3 = static_cast<float>(rand()) / static_cast <float>(RAND_MAX);
                 const float r4 = static_cast<float>(rand()) / static_cast <float>(RAND_MAX);
 
-                CoreData& partCD = CM->book<CoreData>(partUUID);
+                Entity& partCD = CM->book<Entity>(partUUID);
                 partCD.pos.x = ppos.x + 6.f * std::sin(pangle) + 1.f * r1;
                 partCD.pos.y = ppos.y - 6.f * std::cos(pangle) + 1.f * r2;
 

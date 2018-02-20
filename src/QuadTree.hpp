@@ -29,6 +29,8 @@ struct QuadNode {
 
     bool has_parent(const QuadNode* node) const;
     void retrieve(std::vector<UUID>& candidate);
+    void retrieve_from_parents(std::vector<UUID>& candidates);
+    void retrieve_from_children(std::vector<UUID>& candidates);
 
     QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
         c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {}

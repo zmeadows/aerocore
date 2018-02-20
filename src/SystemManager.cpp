@@ -1,6 +1,8 @@
 #include "SystemManager.hpp"
 
 void ParticleSystem::run(float dt) {
+    auto CM = get_manager();
+
     for (const UUID uuid : m_followed) {
         auto pg = CM->get<ParticleGenerator>(uuid);
         pg.generate();
@@ -9,6 +11,8 @@ void ParticleSystem::run(float dt) {
 
 void CleanupSystem::run(float dt) {
     UUIDSet toDestroy;
+
+    auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         auto& dtmr = CM->get<DeathTimer>(uuid);

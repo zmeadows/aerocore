@@ -1,21 +1,96 @@
-##############
-#### TODO ####
-##############
+/* vim: set filetype=journal */
 
-make asteroids explode
+====
+TODO
+====
+
+FIX ANGLES
+
+
+leave objects pre-created and don't recreate them in the ResourceManager each
+time the space is re-booked
+
+store individual polygon decomposition elements in QuadTree, not simply entire
+polygon. right now you check all surface normals against each sub-polygon,
+which is very wasteful.
+
+print out collision candidate UUIDs to search for duplicates each frame, and
+just for curiousity.
+
+add item to GraphicsContext that tells you how big a pixel is in grid
+coordinates
+
+use followed UUID set special sorting procedure to determine draw order
+incrementally
+
+
+jonathan blow, mike acton, casey (handmade hero)
+
+make global variables:
+    * ComponentManager
+    * GraphicsContext
+    * AudioContext
+
+remove STL?
+
+add basic audio
+
+get font rendering working
+
+make player explode when dies and give death message and 'press spacebar to retry'
+
+write function to transform a vector set so that the origin is geometric/weighted center
+
+make debug overlay showing number of entities, fps, etc
+
+add switch to ComponentManager to record debug information:
+    * calls/second to different methods
+    * total memory allocated
+    * total number of entities
+    * creation/destruction rate of entities
+
+set FX hotkeys to turn on/off:
+    * Draw QuadTree
+    * Draw Polygon Decompositions
+    * Draw ECS Debug Overlay
+
+write some helper functions to return CoreData directly, as well as
+std::optional of certain types: EntityType, 
+
+write entity_exists function to add to assert statements
+
+
 
 write script to do code coverage test
 
-clean up quad tree and collision code
-
-don't triangulate an already-convex polygon
+clean up quad tree and collision code (automatic node release?)
 
 do monotone polygon decomposition instead of triangulation
 
+make quad tree adaptive (if slowdown occurs)
 
-##############
-#### DONE ####
-##############
+new alternative to UUIDSet that is sorted according to ResourceManager handle instead of UUID for beter CPU cache friendliness
+
+add enemies: (new system for each new enemy with distinct behavior/state)
+    * basic charging enemy
+
+add speed limit to player
+
+add basic powers:
+    * bombs
+    * triple shot
+    * laser beam
+    * better ship handling/speed (add more drag to ship and increase max speed)
+    * slow down time for player only (i.e. apply different dt for enemies/players)
+
+make System a struct with no virtual members, and make all other systems just contain a System instead of inherit.
+
+
+make Polygon struct to abstract over plain std::vector<v2>
+
+====
+DONE
+====
 
 Flush out details of time per frame.
     - lock frame rate at some fixed value (35?)
@@ -34,3 +109,12 @@ rename Vector2f to just V2
 Set up QuadTree (as soon as notice any slowdown from O(n^2) collision detection currently)
 
 create generic destroy_entity code
+
+don't triangulate an already-convex polygon
+
+make asteroids explode
+
+make asteroid shards fade out
+
+rename CoreData to Entity so you can use the intuitive 'entity' variable
+name.

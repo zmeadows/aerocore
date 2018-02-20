@@ -8,10 +8,7 @@ class System {
 protected:
     UUIDSet m_followed;
 
-    ComponentManager* const CM;
-
-    System(const std::string& name_, ComponentManager* const CM_)
-        : CM(CM_), name(name_) {}
+    System(const std::string& system_name) : name(system_name) {}
 
 public:
     const std::string name;

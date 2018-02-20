@@ -4,6 +4,10 @@
 #include "ResourceManager.hpp"
 #include "System.hpp"
 
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
+
 class ComponentManager {
 private:
     ////////////////////////

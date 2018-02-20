@@ -36,6 +36,10 @@ std::vector<v2> transform_vertices(const std::vector<v2>& vertices,
     return tmpVertices;
 }
 
+std::vector<v2> transform_vertices(const Entity& CD) {
+    return transform_vertices(CD.vertices, CD.pos, CD.angle);
+}
+
 void draw(GraphicsContext* GC,
           const std::vector<v2>& vertices,
           const v2& pos,
@@ -62,7 +66,7 @@ void draw(GraphicsContext* GC,
     }
 }
 
-Extent extent_at(const CoreData& cd) {
+Extent extent_of(const Entity& cd) {
     return extent_at(cd.vertices, cd.pos, cd.angle);
 }
 
@@ -86,8 +90,15 @@ Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float ang
     return ext;
 }
 
-bool is_offscreen(const CoreData& cd) {
+bool is_offscreen(const Entity& cd) {
     return is_offscreen(cd.vertices, cd. pos, cd.angle);
+}
+
+bool is_offscreen(const Extent& ext) {
+        return ext.maxX < -100.f
+            && ext.minX > 100.f
+            && ext.maxY < -100.f
+            && ext.minY > 100.f;
 }
 
 

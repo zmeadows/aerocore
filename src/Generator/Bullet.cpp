@@ -1,27 +1,30 @@
+#include "BoundingSurface.hpp"
 #include "Generator.hpp"
 #include "Generator/Bullet.hpp"
 #include "Geometry.hpp"
-#include "BoundingSurface.hpp"
+#include "Globals.hpp"
 
-UUID generateBullet(ComponentManager* CM, QuadTree* quadTree) {
+UUID generateBullet(void) {
     UUID bulletUUID;
 
-    CoreData& CD = CM->book<CoreData>(bulletUUID);
+    auto CM = get_manager();
 
-    CD.angvel = 10.f;
+    Entity& entity = CM->book<Entity>(bulletUUID);
 
-    CD.color.r = 20;
-    CD.color.g = 200;
-    CD.color.b = 20;
-    CD.color.a = 200;
+    entity.angvel = 10.f;
 
-    CD.vertices = make_square_vertices(0.75);
+    entity.color.r = 20;
+    entity.color.g = 200;
+    entity.color.b = 20;
+    entity.color.a = 200;
+
+    entity.vertices = make_square_vertices(0.75);
 
     auto& coldat = CM->book<CollisionData>(bulletUUID);
     coldat.friendly = true;
-    coldat.triangles = triangulate(CD.vertices);
+    coldat.triangles = decompose(entity.vertices);
     coldat.normals = SurfaceNormalSet(coldat.triangles);
-    coldat.node = quadTree->insert_entity(bulletUUID, extent_at(CD));
+    coldat.node = get_quad_tree()->insert_entity(bulletUUID, extent_of(entity));
 
     return bulletUUID;
 }

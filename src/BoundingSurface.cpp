@@ -63,43 +63,42 @@ void SurfaceNormalSet::add(const SurfaceNormalSet* rhs, float rotationAngle) {
     }
 }
 
-bool overlaps(const CollisionData& colA,
-              const v2& posA,
-              const float rotA,
-              const CollisionData& colB,
-              const v2& posB,
-              const float rotB) {
+//@FIXME: This is still inefficient. Move individual triangles into quad tree
+//and only test surface normals from each pair of triangles.
+bool overlaps(const CollisionData& colA, const Entity& entityA,
+              const CollisionData& colB, const Entity& entityB)
+{
+    const Extent extA = extent_of(entityA);
+    const Extent extB = extent_of(entityB);
 
-    // if (colA.node && colB.node && colA.node != colB.node) {
-    //     const int delta_depth = static_cast<int>(colA.node->c_depth) - static_cast<int>(colB.node->c_depth);
+    // @REMINDER: currently collisions are not processed offscreen (could change)
+    if (is_offscreen(extA) || is_offscreen(extB))
+        return false;
 
-    //     if (delta_depth == 0) {
-    //         return false;
-    //     } else if (delta_depth > 0 && !colA.node->has_parent(colB.node)) {
-    //         return false;
-    //     } else if (delta_depth < 0 && !colB.node->has_parent(colA.node)) {
-    //         return false;
-    //     }
-    // }
-    // TODO: check simple bounding box overlap first
+    // first check if the AABB's overlap, since this offers an early exit in many cases.
+    if (extA.minX > extB.maxX || extB.minX > extB.maxX)
+        return false;
+    if (extA.minY > extB.maxY || extB.minY > extB.maxY)
+        return false;
+
     // combine surface normals into one SurfaceNormalSet so that
     // duplicates are removed, rather than separately looping over both sets
     SurfaceNormalSet combinedSurfaceNormals;
-    combinedSurfaceNormals.add(colA.normals, rotA);
-    combinedSurfaceNormals.add(colB.normals, rotB);
+    combinedSurfaceNormals.add(colA.normals, entityA.angle);
+    combinedSurfaceNormals.add(colB.normals, entityB.angle);
 
     for (const std::vector<v2>& trA : colA.triangles) {
         for (const std::vector<v2>& trB : colB.triangles) {
             bool collided = true;
             for (const v2& axis : combinedSurfaceNormals) {
-                AxisProjection projA = project_on(trA, axis, posA, rotA);
-                AxisProjection projB = project_on(trB, axis, posB, rotB);
+                AxisProjection projA = project_on(trA, axis, entityA.pos, entityA.angle);
+                AxisProjection projB = project_on(trB, axis, entityB.pos, entityB.angle);
                 if (!(projA.max >= projB.min && projB.max >= projA.min)) {
                     collided = false;
                     break;
                 }
             }
-            if (collided) { return true; }
+            if (collided) return true;
         }
     }
 

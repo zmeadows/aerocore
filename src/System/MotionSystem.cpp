@@ -4,9 +4,11 @@
 #include "Entity.hpp"
 
 MotionSystem::HandleOffScreenBehaviorResult
-MotionSystem::handle_offscreen_behavior(const UUID& uuid, CoreData& CD, const Extent& ext)
+MotionSystem::handle_offscreen_behavior(const UUID& uuid, Entity& CD, const Extent& ext)
 {
     auto res = HandleOffScreenBehaviorResult();
+
+    auto CM = get_manager();
 
     auto& osb = CM->get<OffscreenBehavior>(uuid);
 
@@ -76,15 +78,17 @@ MotionSystem::handle_offscreen_behavior(const UUID& uuid, CoreData& CD, const Ex
 void MotionSystem::run(float dt) {
     UUIDSet toDestroy;
 
+    auto CM = get_manager();
+
     for (const UUID uuid : m_followed) {
-        CoreData& CD = CM->get<CoreData>(uuid);
+        Entity& CD = CM->get<Entity>(uuid);
 
         v2& pos = CD.pos;
         v2& vel = CD.vel;
         const std::vector<v2>& vertices = CD.vertices;
         float& angle = CD.angle;
 
-        const Extent ext = extent_at(CD);
+        const Extent ext = extent_of(CD);
         const bool entity_is_offscreen = is_offscreen(CD);
         const bool entity_has_offscreen_behavior = CM->has<OffscreenBehavior>(uuid);
 
@@ -128,15 +132,15 @@ void MotionSystem::run(float dt) {
             auto& coldat = CM->get<CollisionData>(uuid);
 
             if (!coldat.node) {
-                coldat.node = m_quadTree->insert_entity(uuid, clip_to_screen(ext));
+                coldat.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(ext));
             } else {
-                coldat.node = coldat.node->update_entity(uuid, ext);
+                coldat.node = coldat.node->update_entity(uuid, clip_to_screen(ext));
             }
         }
     }
 
     for (const UUID uuid : toDestroy)
-        destroy_entity(CM, uuid);
+        destroy_entity(uuid);
 }
 
 

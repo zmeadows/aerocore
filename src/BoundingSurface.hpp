@@ -17,6 +17,8 @@ struct AxisProjection {
     float max = 0.f;
 };
 
+AxisProjection project_on(const std::vector<v2>& vertices, const v2& axis, const v2& pos, const float rot);
+
 class SurfaceNormalSet {
 private:
     std::vector<v2> normals;
@@ -37,6 +39,7 @@ public:
     inline size_t size(void) const { return normals.size(); }
 };
 
+//@TODO: create new struct for handling polygon decomposition elements (triangles for now)
 struct CollisionData {
     SurfaceNormalSet normals;
     std::vector<std::vector<v2>> triangles;
@@ -44,16 +47,6 @@ struct CollisionData {
     QuadNode* node = nullptr;
 };
 
-// std::vector<v2> boundingBox(const std::vector<std::vector<v2>>& triangles) {
-// }
 
+bool overlaps(const CollisionData& colA, const Entity& cdA, const CollisionData& colB, const Entity& cdB);
 
-
-bool overlaps(const CollisionData& colA,
-              const v2& posA,
-              const float rotA,
-              const CollisionData& colB,
-              const v2& posB,
-              const float rotB);
-
-AxisProjection project_on(const std::vector<v2>& vertices, const v2& axis, const v2& pos, const float rot);

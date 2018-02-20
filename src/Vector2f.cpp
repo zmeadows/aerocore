@@ -46,6 +46,12 @@ float cross(const v2& lhs, const v2& rhs) {
     return lhs.x * rhs.y - lhs.y * rhs.x;
 }
 
+float distance(const v2& lhs, const v2& rhs) {
+    return std::sqrt( std::pow(lhs.x - rhs.x, 2.f) + std::pow(lhs.y - rhs.y, 2.f) );
+}
+
 bool operator==(const v2& vecA, v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
 bool operator==(v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
 bool operator==(const v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
+
+

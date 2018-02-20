@@ -8,8 +8,11 @@ void DrawSystem::run(float) {
     m_lastFrameTicks = tmp;
     m_modFrame++;
 
+    auto CM = get_manager();
+    auto GC = get_graphics_context();
+
     for (const UUID uuid : m_followed) {
-        const CoreData& CD = CM->get<CoreData>(uuid);
+        const Entity& CD = CM->get<Entity>(uuid);
 
         // if (CM->has<SpriteUpdator>(uuid)) {
         //     CM->get<SpriteUpdator>(uuid).update(spr);
@@ -28,7 +31,7 @@ void DrawSystem::run(float) {
         //     }
         // } else {
          draw(GC, CD.vertices, CD.pos, CD.angle, CD.color);
-        // }
+        //}
 
         //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
         // auto bs = CM->get<BoundingSurface>(uuid);

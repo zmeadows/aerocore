@@ -4,4 +4,4 @@
 #include "Base.hpp"
 #include "BoundingSurface.hpp"
 
-void destroy_entity(ComponentManager* CM, const UUID& uuid);
+void destroy_entity(const UUID& uuid);

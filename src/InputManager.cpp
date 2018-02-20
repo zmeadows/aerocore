@@ -3,6 +3,7 @@
 #include "Base.hpp"
 #include "Generator.hpp"
 #include "Generator/Bullet.hpp"
+#include "Globals.hpp"
 
 void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
     const KeyState newKeyState = keyUp ? KeyState::Released : KeyState::Pressed;
@@ -35,12 +36,19 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
             keyFunc(this, Key::Spacebar);
             break;
         }
+        case SDLK_LSHIFT: {
+            m_keyStates[Key::Shift] = newKeyState;
+            keyFunc(this, Key::Shift);
+            break;
+        }
         default: { break; }
     }
 }
 
 void InputManager::processPressedKey(const Key& key) {
-    auto& playerCD = CM->get<CoreData>(playerUUID());
+    auto CM = get_manager();
+
+    auto& playerCD = CM->get<Entity>(playerUUID());
     const float player_angle = playerCD.angle;
 
     m_keyStates[key] = KeyState::Pressed;
@@ -58,40 +66,58 @@ void InputManager::processPressedKey(const Key& key) {
         }
 
         case Key::RightArrow: {
-            if (m_keyStates[Key::LeftArrow] != KeyState::Pressed)
-                playerCD.angvel = -7.f;
+            if (m_keyStates[Key::LeftArrow] != KeyState::Pressed) {
+                if (SDL_GetModState() & KMOD_LSHIFT) {
+                    playerCD.angvel = -2.5f;
+                } else {
+                    playerCD.angvel = -7.f;
+                }
+            }
             break;
         }
 
         case Key::LeftArrow: {
-            if (m_keyStates[Key::RightArrow] != KeyState::Pressed)
-                playerCD.angvel = 7.f;
+            if (m_keyStates[Key::RightArrow] != KeyState::Pressed) {
+                if (SDL_GetModState() & KMOD_LSHIFT) {
+                    playerCD.angvel = 2.5f;
+                } else {
+                    playerCD.angvel = 7.f;
+                }
+            }
             break;
         }
 
         case Key::Spacebar: {
-            for (float angle : { -0.5, -0.4, -0.25, -0.15 -0.05, 0.0, 0.05, 0.15, 0.25, 0.4, 0.5 }) {
-                const UUID bulletUUID = generateBullet(CM, m_quadTree);
-                CM->book<Alliance>(bulletUUID, Alliance::Friend);
+
+                const UUID bulletUUID = generateBullet();
+                // CM->book<Alliance>(bulletUUID, Alliance::Friend);
                 const v2& player_pos = playerCD.pos;
                 const v2& player_vel = playerCD.vel;
 
-                auto& bulletCD = CM->get<CoreData>(bulletUUID);
+                auto& bulletCD = CM->get<Entity>(bulletUUID);
 
-                bulletCD.pos.x = player_pos.x - 7.5f * std::sin(player_angle);
-                bulletCD.pos.y = player_pos.y + 7.5f * std::cos(player_angle);
+                bulletCD.pos.x = player_pos.x - 4.f * std::sin(player_angle);
+                bulletCD.pos.y = player_pos.y + 4.f * std::cos(player_angle);
 
-                bulletCD.vel.x = 0.5f * player_vel.x - 125.f * std::sin(player_angle + angle);
-                bulletCD.vel.y = 0.5f * player_vel.y + 125.f * std::cos(player_angle + angle);
-            }
+                bulletCD.vel.x = player_vel.x - 100.f * std::sin(player_angle);
+                bulletCD.vel.y = player_vel.y + 100.f * std::cos(player_angle);
 
             break;
         }
+
+        case Key::Shift: {
+                             if (fabs(playerCD.angvel) > 0) {
+                                 playerCD.angvel = 2.5 * signum(playerCD.angvel);
+                             }
+                             break;
+                         }
     }
 }
 
 void InputManager::processReleasedKey(const Key& key) {
-    auto& playerCD = CM->get<CoreData>(playerUUID());
+    auto CM = get_manager();
+
+    auto& playerCD = CM->get<Entity>(playerUUID());
 
     m_keyStates[key] = KeyState::Released;
 
@@ -107,7 +133,11 @@ void InputManager::processReleasedKey(const Key& key) {
     }
     case Key::RightArrow: {
         if (m_keyStates[Key::LeftArrow] == KeyState::Pressed) {
-            playerCD.angvel = 7;
+                if (SDL_GetModState() & KMOD_LSHIFT) {
+                    playerCD.angvel = 2.5f;
+                } else {
+                    playerCD.angvel = 7.f;
+                }
         } else {
             playerCD.angvel = 0.f;
         }
@@ -115,7 +145,11 @@ void InputManager::processReleasedKey(const Key& key) {
     }
     case Key::LeftArrow: {
         if (m_keyStates[Key::RightArrow] == KeyState::Pressed) {
-            playerCD.angvel = -7.f;
+                if (SDL_GetModState() & KMOD_LSHIFT) {
+                    playerCD.angvel = -2.5f;
+                } else {
+                    playerCD.angvel = -7.f;
+                }
         } else {
             playerCD.angvel = 0.f;
         }
@@ -124,5 +158,13 @@ void InputManager::processReleasedKey(const Key& key) {
     case Key::Spacebar: {
         break;
     }
+
+        case Key::Shift:
+                            {
+                             if (fabs(playerCD.angvel) > 0) {
+                                 playerCD.angvel = 7.0 * signum(playerCD.angvel);
+                             }
+                             break;
+                         }
     }
 }

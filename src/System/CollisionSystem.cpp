@@ -5,32 +5,25 @@
 bool CollisionSystem::are_colliding(const UUID& uuidA, const UUID& uuidB) {
     if (uuidA == uuidB) return false;
 
+    auto CM = get_manager();
+
     const auto& colA = CM->get<CollisionData>(uuidA);
     const auto& colB = CM->get<CollisionData>(uuidB);
 
     if (colA.friendly == colB.friendly) {
         return false;
     } else {
-        const auto& cdA = CM->get<CoreData>(uuidA);
-        const auto& cdB = CM->get<CoreData>(uuidB);
+        const auto& cdA = CM->get<Entity>(uuidA);
+        const auto& cdB = CM->get<Entity>(uuidB);
 
-        if (is_offscreen(cdA.vertices, cdA.pos, cdA.angle) || is_offscreen(cdB.vertices, cdB.pos, cdB.angle))
-            return false;
-
-        const Extent extA = extent_at(cdA);
-        const Extent extB = extent_at(cdB);
-
-        if (extA.minX > extB.maxX || extB.minX > extB.maxX)
-            return false;
-        if (extA.minY > extB.maxY || extB.minY > extB.maxY)
-            return false;
-
-        return overlaps(colA, cdA.pos, cdA.angle, colB, cdB.pos, cdB.angle);
+        return overlaps(colA, cdA, colB, cdB);
     }
 }
 
 void CollisionSystem::run(float dt) {
     std::set<std::pair<UUID, UUID>> collisions;
+
+    auto CM = get_manager();
 
     for (UUID uuidA : m_followed) {
         const auto& colA = CM->get<CollisionData>(uuidA);
@@ -46,8 +39,8 @@ void CollisionSystem::run(float dt) {
     }
 
     for (const auto& p : collisions) {
-        destroy_entity(CM, p.first);
-        destroy_entity(CM, p.second);
+        destroy_entity(p.first);
+        destroy_entity(p.second);
     }
 }
 

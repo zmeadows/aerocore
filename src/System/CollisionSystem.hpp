@@ -1,9 +1,11 @@
 #pragma once
 
+#include "aerocore.hpp"
+
 #include "System.hpp"
 #include "Base.hpp"
 #include "BoundingSurface.hpp"
-#include "aerocore.hpp"
+#include "Globals.hpp"
 
 class CollisionSystem final : public System {
     bool are_colliding(const UUID& uuidA, const UUID& uuidB);
@@ -11,7 +13,7 @@ class CollisionSystem final : public System {
 public:
     void run(float dt) final;
 
-    CollisionSystem(ComponentManager* const CM_) : System("Collision", CM_) {
-        CM->subscribe<CoreData, CollisionData>(this);
+    CollisionSystem(void) : System("Collision") {
+        get_manager()->subscribe<Entity, CollisionData>(this);
     }
 };

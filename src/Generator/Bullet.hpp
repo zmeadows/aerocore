@@ -2,4 +2,4 @@
 
 #include "QuadTree.hpp"
 
-UUID generateBullet(ComponentManager* CM, QuadTree* quadTree);
+UUID generateBullet(void);

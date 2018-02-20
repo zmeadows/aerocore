@@ -11,11 +11,12 @@
 
 class Game {
     // TODO: create custom ComponentManager?
-    std::unique_ptr<ComponentManager> CM;
-    std::unique_ptr<GraphicsContext> GC;
     std::unique_ptr<SystemManager> SM;
-    std::unique_ptr<QuadTree> m_quadTree;
     std::unique_ptr<InputManager> IM;
+
+    bool paused = false;
+
+    
 
     bool processInput(void);
     bool tick(void);
