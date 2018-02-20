@@ -31,10 +31,14 @@ void StabberSystem::run(float dt) {
                 if (distance(stabber.pos, stabber_data.idle_point) < 10.f) {
                     stabber.vel = {0.f, 0.f};
                     stabber.acc = {0.f, 0.f};
-                    if (stabber.pos.y * player.pos.x > stabber.pos.x * player.pos.y)
-                        stabber.angvel = -1.5f;
-                    else
+
+                    const v2 ov = { -std::sin(stabber.angle), std::cos(stabber.angle) };
+                    const v2 stp = (player.pos - stabber.pos).normalized();
+
+                    if (stp.y * ov.x > stp.x * ov.y)
                         stabber.angvel = 1.5f;
+                    else
+                        stabber.angvel = -1.5f;
 
                     stabber_data.state = StabberData::State::Aiming;
                 }
@@ -42,12 +46,12 @@ void StabberSystem::run(float dt) {
                 break;
             }
             case StabberData::State::Aiming: {
-                const v2 stabber_to_player = player.pos - stabber.pos;
-                const float angle_to_player = atan2(stabber_to_player.y, stabber_to_player.x) - PI/2.f;
+                const v2 stabber_to_player = (player.pos - stabber.pos).normalized();
+                const v2 orientation_vector = { -std::sin(stabber.angle), std::cos(stabber.angle) };
 
-                if (fabs(stabber.angvel * dt) > fabs(stabber.angle - angle_to_player)) {
+                if (stabber_to_player.dot(orientation_vector) > 0.99) {
                     stabber.angvel = 0;
-                    stabber.angle = angle_to_player;
+                    // stabber.angle = angle_to_player;
                     stabber.vel = (player.pos - stabber.pos).normalized();
                     stabber.vel.scale(stabber_data.speed);
                     stabber_data.state = StabberData::State::Stabbing;

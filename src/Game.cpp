@@ -28,14 +28,13 @@ Game::Game(void)
     auto CM = get_manager();
 
     CM->registerComponent<Entity>(10000);
-    CM->registerComponent<Alliance>(10000);
     CM->registerComponent<OffscreenBehavior>(10000);
     CM->registerComponent<ShotDelay>(10000);
     CM->registerComponent<DeathTimer>(10000);
     CM->registerComponent<ParticleGenerator>(10);
     CM->registerComponent<CollisionData>(10000);
     CM->registerComponent<AsteroidShardData>(1000);
-    CM->registerComponent<StabberData>(100);
+    CM->registerComponent<StabberData>(10000);
 
     SM->addSystem(new MotionSystem());
     SM->addSystem(new CollisionSystem());
@@ -62,18 +61,16 @@ bool Game::tick(void) {
         GPU_ClearRGB(GC->renderer, 30, 30, 30);
     }
 
-    // Uint32 tmp_ticks = SDL_GetTicks();
-
-    // if (last_asteroid_time == 0) {
-    //     generateStabber();
+    Uint32 tmp_ticks = SDL_GetTicks();
+    if (!paused && (last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 399) {
+        generateStabber();
+        last_asteroid_time = SDL_GetTicks();
+        generateOffscreenAsteroid();
+    }
     //     last_asteroid_time = SDL_GetTicks();
     // }
-    // if (last_asteroid_time == 0 || tmp_ticks > last_asteroid_time + 1000) {
-    //     last_asteroid_time = SDL_GetTicks();
-    //     generateOffscreenAsteroid();
-    // }
 
-    // drawQuadTree(GC.get(), m_quadTree.get());
+    // drawQuadTree(get_graphics_context(), get_quad_tree());
     if (!paused && !paused_before_user_input) {
         SM->runSystems(static_cast<float>(SDL_GetPerformanceCounter() - t0) / SDL_GetPerformanceFrequency());
         t0 = SDL_GetPerformanceCounter();
@@ -113,7 +110,6 @@ Game::~Game(void) {
     auto CM = get_manager();
 
     CM->unRegisterComponent<Entity>();
-    CM->unRegisterComponent<Alliance>();
     CM->unRegisterComponent<OffscreenBehavior>();
     CM->unRegisterComponent<ShotDelay>();
     CM->unRegisterComponent<DeathTimer>();

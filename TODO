@@ -4,7 +4,23 @@
 TODO
 ====
 
-FIX ANGLES
+configure ResourceManager so that ALL memory for components comes in one giant continugous block
+
+compute extent/local/global vertices ONE TIME at start of event.
+
+write script to open Instruments and profile code easily
+
+just keep the extent saved and transform like the vertices!
+
+CREATE DEBUG PANEL
+
+figure out why FPS calculation always says 60fps
+
+
+add 'penetration' and stuff to collisions so that more compliated behavior can be 
+done on collision, like bouncing, rather than just death
+
+separate entities for update frequency, by velocity?
 
 
 leave objects pre-created and don't recreate them in the ResourceManager each
@@ -118,3 +134,5 @@ make asteroid shards fade out
 
 rename CoreData to Entity so you can use the intuitive 'entity' variable
 name.
+
+Fix orientation system and be clear about rotation/fmod/atan/etc

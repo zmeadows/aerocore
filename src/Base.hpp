@@ -17,8 +17,6 @@ typedef double f64;
 
 float uniform_rand(float min, float max);
 
-enum class Alliance { Friend, Foe, Neutral };
-
 enum class EntityType {
     Player,
     Asteroid,
@@ -48,17 +46,28 @@ typedef std::variant<SinglePassOSB, ValidRangeOSB, WrapOSB, DiesInstantlyOSB> Of
 
 const UUID playerUUID(void);
 
+//@TODO: move to Sprite file
+struct Extent {
+    float minX = 0.f;
+    float maxX = 0.f;
+    float minY = 0.f;
+    float maxY = 0.f;
+};
+
 //@FIXME: play with size/packing of Entity
 struct Entity {
-    std::vector<v2> vertices = {};
-    SDL_Color color          = { 255, 255, 255, 255 };
-    v2 pos                   = {0.f, 0.f};
-    v2 vel                   = { 0.f, 0.f };
-    v2 acc                   = { 0.f, 0.f };
-    float angle              = 0.f;
-    float angvel             = 0.f;
-    EntityType type          = EntityType::Effect;
-    OffscreenBehavior osb    = DiesInstantlyOSB();
+    std::vector<v2> local_vertices  = {};
+    std::vector<v2> global_vertices = {};
+    OffscreenBehavior osb           = DiesInstantlyOSB();
+    Extent extent                   = Extent();
+    SDL_Color color                 = { 255, 255, 255, 255 };
+    v2 pos                          = {0.f, 0.f};
+    v2 vel                          = { 0.f, 0.f };
+    v2 acc                          = { 0.f, 0.f };
+    EntityType type                 = EntityType::Effect;
+    float angle                     = 0.f;
+    float angvel                    = 0.f;
+    bool offscreen                  = true;
 };
 
 
@@ -87,17 +96,16 @@ struct ShotDelay {
     float lastShotTime = 0.0;
 };
 
-//@TODO: move to Sprite file
-struct Extent {
-    float minX = 0.f;
-    float maxX = 0.f;
-    float minY = 0.f;
-    float maxY = 0.f;
-};
 
 Extent clip_to_screen(const Extent& ext);
 
-inline void rotate(float& angle, float delta) {
-    angle = std::fmod(angle + delta, TWOPI);
+inline float rotate(float& old_angle, float delta) {
+    const float new_angle = fmod(old_angle + delta, TWOPI);
+    return (new_angle < 0) ? new_angle + TWOPI : new_angle;
+}
+
+inline float arctan(float x, float y) {
+    float angle = atan2(y,x);
+    return (angle < 0) ? angle + TWOPI : angle;
 }
 

@@ -13,7 +13,7 @@ class MotionSystem final : public System {
         bool to_be_destroyed = false;
     };
 
-    HandleOffScreenBehaviorResult handle_offscreen_behavior(const UUID& uuid, Entity& cd, const Extent& ext);
+    HandleOffScreenBehaviorResult handle_offscreen_behavior(const UUID& uuid, Entity& cd);
 
 public:
     void run(float dt) final;

@@ -8,7 +8,7 @@
 #include "Game.hpp"
 
 int main(/* int argc, char** argv */) {
-    srand (time(NULL));
+    srand (static_cast<unsigned>(time(nullptr)));
     auto game = std::make_unique<Game>();
     game->run();
 

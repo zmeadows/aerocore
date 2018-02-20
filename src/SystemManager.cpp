@@ -1,6 +1,6 @@
 #include "SystemManager.hpp"
 
-void ParticleSystem::run(float dt) {
+void ParticleSystem::run(float) {
     auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {

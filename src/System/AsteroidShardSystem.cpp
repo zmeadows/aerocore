@@ -17,7 +17,7 @@ void AsteroidShardSystem::run(float dt) {
         }
     }
 
-    for (const UUID uuid : to_destroy)
+    for (const UUID& uuid : to_destroy)
         destroy_entity(uuid);
 }
 

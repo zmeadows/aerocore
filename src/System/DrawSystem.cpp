@@ -1,5 +1,6 @@
 #include "System/DrawSystem.hpp"
 #include "Geometry.hpp"
+#include "BoundingSurface.hpp"
 
 void DrawSystem::run(float) {
     Uint64 tmp = SDL_GetPerformanceCounter();
@@ -20,17 +21,22 @@ void DrawSystem::run(float) {
 
 
 
-        // if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
-        //     SDL_Color test;
-        //     test.r = 255;
-        //     test.g = 255;
-        //     test.b = 255;
-        //     test.a = 255;
-        //     for (const auto& tri : CM->get<CollisionData>(uuid).triangles) {
-        //         draw(GC, tri, CD.pos, CD.angle, test);
-        //     }
-        // } else {
-         draw(GC, CD.vertices, CD.pos, CD.angle, CD.color);
+        //if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
+        //    SDL_Color test;
+        //    test.r = 255;
+        //    test.g = 255;
+        //    test.b = 255;
+        //    test.a = 255;
+        //    for (const auto& tri : CM->get<CollisionData>(uuid).triangle_indices) {
+        //        std::vector<v2> triangle = {
+        //            CD.global_vertices[tri[0]],
+        //            CD.global_vertices[tri[1]],
+        //            CD.global_vertices[tri[2]]
+        //        };
+        //        draw(GC, triangle, test);
+        //    }
+        //} else {
+         draw(GC, CD.global_vertices, CD.color);
         //}
 
         //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.

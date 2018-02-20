@@ -89,25 +89,27 @@ void InputManager::processPressedKey(const Key& key) {
 
         case Key::Spacebar: {
 
-                const UUID bulletUUID = generateBullet();
                 // CM->book<Alliance>(bulletUUID, Alliance::Friend);
+                //
                 const v2& player_pos = playerCD.pos;
                 const v2& player_vel = playerCD.vel;
 
-                auto& bulletCD = CM->get<Entity>(bulletUUID);
+                v2 bullet_pos, bullet_vel;
 
-                bulletCD.pos.x = player_pos.x - 4.f * std::sin(player_angle);
-                bulletCD.pos.y = player_pos.y + 4.f * std::cos(player_angle);
+                bullet_pos.x = player_pos.x - 4.f * std::sin(player_angle);
+                bullet_pos.y = player_pos.y + 4.f * std::cos(player_angle);
 
-                bulletCD.vel.x = player_vel.x - 100.f * std::sin(player_angle);
-                bulletCD.vel.y = player_vel.y + 100.f * std::cos(player_angle);
+                bullet_vel.x = player_vel.x - 100.f * std::sin(player_angle);
+                bullet_vel.y = player_vel.y + 100.f * std::cos(player_angle);
+
+                generateBullet(bullet_pos, bullet_vel);
 
             break;
         }
 
         case Key::Shift: {
                              if (fabs(playerCD.angvel) > 0) {
-                                 playerCD.angvel = 2.5 * signum(playerCD.angvel);
+                                 playerCD.angvel = 2.5f * signum(playerCD.angvel);
                              }
                              break;
                          }
@@ -162,7 +164,7 @@ void InputManager::processReleasedKey(const Key& key) {
         case Key::Shift:
                             {
                              if (fabs(playerCD.angvel) > 0) {
-                                 playerCD.angvel = 7.0 * signum(playerCD.angvel);
+                                 playerCD.angvel = 7.f * signum(playerCD.angvel);
                              }
                              break;
                          }

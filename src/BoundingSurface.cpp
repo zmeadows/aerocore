@@ -27,11 +27,40 @@ SurfaceNormalSet::SurfaceNormalSet(const std::vector<std::vector<v2>>& vertices)
     }
 }
 
+SurfaceNormalSet::SurfaceNormalSet(const std::vector<v2>& vertices,
+                                   const std::vector<std::vector<size_t>>& triangle_indices)
+{
+    for (size_t j = 0; j < triangle_indices.size(); j++) {
+        const size_t numVertices = triangle_indices[j].size();
+        for (size_t i = 0; i < numVertices; i++) {
+            const size_t idx1 = triangle_indices[j][i];
+            const size_t idx2 = triangle_indices[j][(i + 1) % numVertices];
+            v2 ov = vertices[idx2] - vertices[idx1];
+            std::swap(ov.x, ov.y);
+            if (ov.x != 0.f)
+                ov.x *= -1.0;
+            add(ov);
+        }
+    }
+}
+
+SurfaceNormalSet& SurfaceNormalSet::operator=(const SurfaceNormalSet& other) {
+    // check for self-assignment
+    if(&other == this)
+        return *this;
+    this->normals = other.normals;
+    return *this;
+}
+
 SurfaceNormalSet::SurfaceNormalSet(const SurfaceNormalSet& rhs) {
     normals.reserve(rhs.size());
     for (size_t i = 0; i < rhs.normals.size(); i++) {
         this->add(rhs.normals[i]);
     }
+}
+
+SurfaceNormalSet::SurfaceNormalSet(SurfaceNormalSet&& rhs) {
+    std::swap(this->normals, rhs.normals);
 }
 
 void SurfaceNormalSet::add(const v2& vec, float rotationAngle) {
@@ -68,8 +97,8 @@ void SurfaceNormalSet::add(const SurfaceNormalSet* rhs, float rotationAngle) {
 bool overlaps(const CollisionData& colA, const Entity& entityA,
               const CollisionData& colB, const Entity& entityB)
 {
-    const Extent extA = extent_of(entityA);
-    const Extent extB = extent_of(entityB);
+    const Extent extA = entityA.extent;
+    const Extent extB = entityB.extent;
 
     // @REMINDER: currently collisions are not processed offscreen (could change)
     if (is_offscreen(extA) || is_offscreen(extB))
@@ -81,24 +110,32 @@ bool overlaps(const CollisionData& colA, const Entity& entityA,
     if (extA.minY > extB.maxY || extB.minY > extB.maxY)
         return false;
 
-    // combine surface normals into one SurfaceNormalSet so that
-    // duplicates are removed, rather than separately looping over both sets
-    SurfaceNormalSet combinedSurfaceNormals;
-    combinedSurfaceNormals.add(colA.normals, entityA.angle);
-    combinedSurfaceNormals.add(colB.normals, entityB.angle);
+    for (const std::vector<size_t>& trA : colA.triangle_indices) {
+        for (const std::vector<size_t>& trB : colB.triangle_indices) {
+            bool these_triangles_separated = false;
 
-    for (const std::vector<v2>& trA : colA.triangles) {
-        for (const std::vector<v2>& trB : colB.triangles) {
-            bool collided = true;
-            for (const v2& axis : combinedSurfaceNormals) {
-                AxisProjection projA = project_on(trA, axis, entityA.pos, entityA.angle);
-                AxisProjection projB = project_on(trB, axis, entityB.pos, entityB.angle);
+            for (const v2& axis : colA.normals) {
+                AxisProjection projA = project_on(entityA.global_vertices, trA, axis);
+                AxisProjection projB = project_on(entityB.global_vertices, trB, axis);
                 if (!(projA.max >= projB.min && projB.max >= projA.min)) {
-                    collided = false;
+                    these_triangles_separated = true;
                     break;
                 }
             }
-            if (collided) return true;
+
+            if (these_triangles_separated)
+                continue;
+
+            for (const v2& axis : colB.normals) {
+                AxisProjection projA = project_on(entityA.global_vertices, trA, axis);
+                AxisProjection projB = project_on(entityB.global_vertices, trB, axis);
+                if (!(projA.max >= projB.min && projB.max >= projA.min)) {
+                    these_triangles_separated = true;
+                    break;
+                }
+            }
+
+            if (!these_triangles_separated) return true;
         }
     }
 
@@ -106,15 +143,20 @@ bool overlaps(const CollisionData& colA, const Entity& entityA,
 }
 
 AxisProjection
-project_on(const std::vector<v2>& vertices, const v2& axis, const v2& pos, const float rot) {
+project_on(const std::vector<v2>& global_vertices, const std::vector<size_t>& indices, const v2& axis) {
     float minProjection = std::numeric_limits<float>::max();
     float maxProjection = std::numeric_limits<float>::lowest();
 
-    for (const v2& vtx : transform_vertices(vertices, pos, rot)) {
-        const float projection = vtx.dot(axis);
+    for (const size_t idx : indices) {
+        const float projection = global_vertices[idx].dot(axis);
         minProjection = std::min(projection, minProjection);
         maxProjection = std::max(projection, maxProjection);
     }
 
     return AxisProjection({minProjection, maxProjection});
 }
+
+CollisionData::CollisionData(const Entity& entity)
+    : triangle_indices(decompose_into_triangle_indices(entity.local_vertices))
+    , normals(SurfaceNormalSet(entity.local_vertices, triangle_indices))
+{ }

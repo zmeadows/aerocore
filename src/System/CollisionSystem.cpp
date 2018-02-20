@@ -20,7 +20,7 @@ bool CollisionSystem::are_colliding(const UUID& uuidA, const UUID& uuidB) {
     }
 }
 
-void CollisionSystem::run(float dt) {
+void CollisionSystem::run(float) {
     std::set<std::pair<UUID, UUID>> collisions;
 
     auto CM = get_manager();

@@ -36,18 +36,23 @@ std::vector<v2> transform_vertices(const std::vector<v2>& vertices,
     return tmpVertices;
 }
 
-std::vector<v2> transform_vertices(const Entity& CD) {
-    return transform_vertices(CD.vertices, CD.pos, CD.angle);
+std::vector<std::vector<v2>> transform_nested_vertices(
+    const std::vector<std::vector<v2>>& nested_vertices,
+    const v2& pos, const float angle)
+{
+    std::vector<std::vector<v2>> new_nested_vertices;
+
+    for (const std::vector<v2>& vertices : nested_vertices) {
+        new_nested_vertices.push_back(transform_vertices(vertices, pos, angle));
+    }
+
+    return new_nested_vertices;
 }
 
 void draw(GraphicsContext* GC,
-          const std::vector<v2>& vertices,
-          const v2& pos,
-          const float angle,
+          const std::vector<v2>& global_vertices,
           const SDL_Color& rgba)
 {
-    const std::vector<v2> trans_vertices = transform_vertices(vertices, pos, angle);
-    const size_t count = trans_vertices.size();
 
     // GPU_CircleFilled(GC->renderer,
     //                  GC->to_screen_coords(trans_vertices[0]).x,
@@ -55,9 +60,10 @@ void draw(GraphicsContext* GC,
     //                  20,
     //                  { 0,0,255,255});
 
-    for (size_t i = 0; i < count; i++) {
-        ScreenCoordinates sc1 = GC->to_screen_coords(trans_vertices[i]);
-        ScreenCoordinates sc2 = GC->to_screen_coords(trans_vertices[(i+1) % count]);
+    const size_t vtx_count = global_vertices.size();
+    for (size_t i = 0; i < vtx_count; i++) {
+        ScreenCoordinates sc1 = GC->to_screen_coords(global_vertices[i]);
+        ScreenCoordinates sc2 = GC->to_screen_coords(global_vertices[(i+1) % vtx_count]);
 
         GPU_Line(GC->renderer,
                  sc1.x, sc1.y,
@@ -67,10 +73,10 @@ void draw(GraphicsContext* GC,
 }
 
 Extent extent_of(const Entity& cd) {
-    return extent_at(cd.vertices, cd.pos, cd.angle);
+    return extent_at(cd.global_vertices);
 }
 
-Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float angle)
+Extent extent_at(const std::vector<v2>& global_vertices)
 {
     Extent ext;
 
@@ -79,7 +85,7 @@ Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float ang
     ext.minY = std::numeric_limits<float>::max();
     ext.maxY = std::numeric_limits<float>::lowest();
 
-    for (const v2& vtx : transform_vertices(vertices, pos, angle))
+    for (const v2& vtx : global_vertices)
     {
         ext.minX = std::min(ext.minX, vtx.x);
         ext.maxX = std::max(ext.maxX, vtx.x);
@@ -91,7 +97,7 @@ Extent extent_at(const std::vector<v2>& vertices, const v2& pos, const float ang
 }
 
 bool is_offscreen(const Entity& cd) {
-    return is_offscreen(cd.vertices, cd. pos, cd.angle);
+    return is_offscreen(cd.global_vertices);
 }
 
 bool is_offscreen(const Extent& ext) {
@@ -102,9 +108,9 @@ bool is_offscreen(const Extent& ext) {
 }
 
 
-bool is_offscreen(const std::vector<v2>& vertices, const v2& pos, const float angle)
+bool is_offscreen(const std::vector<v2>& global_vertices)
 {
-    for (const v2& vtx : transform_vertices(vertices, pos, angle))
+    for (const v2& vtx : global_vertices)
     {
         if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
             return false;

@@ -12,6 +12,7 @@ struct v2 {
     float magnitude(void) const;
     void rotate(float angle);
     void scale(float factor);
+    float angle(void);
 };
 
 v2 operator+(const v2& vecA, const v2& vecB);
