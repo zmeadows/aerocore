@@ -1,4 +1,14 @@
 #include "Geometry.hpp"
+#include "BoundingSurface.hpp"
+
+void
+recenter(LocalVertexBuffer& local_vertices)
+{
+    const v2 offset = average_vector(local_vertices.data, local_vertices.count);
+
+    for (size_t i = 0; i < local_vertices.count; i++)
+        local_vertices[i] = local_vertices[i] - offset;
+};
 
 int modulo(int num, int mod) {
     if (num < 0) {
@@ -8,23 +18,26 @@ int modulo(int num, int mod) {
     }
 }
 
+v2 average_vector(const v2* vertices, const size_t vertex_count) {
+    v2 average_vertex = { 0.f, 0.f };
 
-v2 average_vec(const std::vector<v2>& vertices) {
-    v2 avg;
+    for (size_t i = 0; i < vertex_count; i++)
+        average_vertex = average_vertex + vertices[i];
 
-    for (const v2& vec : vertices)
-        avg = avg + vec;
+    average_vertex.scale(1.f / static_cast<float>(vertex_count));
 
-    avg.scale(1.f / vertices.size());
-    return avg;
+    return average_vertex;
 }
 
-bool is_convex(const std::vector<v2>& vertices) {
-    const size_t nvert = vertices.size();
+bool
+is_convex(const LocalVertexBuffer& vertices)
+{
+    const size_t vertex_count = vertices.count;
 
-    for (int i = 0; i < static_cast<int>(vertices.size()); i++) {
-        if (cross(vertices[modulo(i-1, nvert)] - vertices[static_cast<size_t>(i)],
-                  vertices[modulo(i+1, nvert)] - vertices[static_cast<size_t>(i)]) <= 0)
+    //@FIXME: this is gross
+    for (int i = 0; i < static_cast<int>(vertex_count); i++) {
+        if (cross(vertices[modulo(i-1, static_cast<int>(vertex_count))] - vertices[static_cast<size_t>(i)],
+                  vertices[modulo(i+1, static_cast<int>(vertex_count))] - vertices[static_cast<size_t>(i)]) <= 0)
             return false;
     }
 
@@ -32,11 +45,12 @@ bool is_convex(const std::vector<v2>& vertices) {
 };
 
 // decompose a polygon into triangles if not convex.
-std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vector<v2>& vertices)
+PolygonDecomposition
+decompose_local_vertices(const LocalVertexBuffer& local_vertices)
 {
-    std::vector<std::vector<size_t>> final_indices;
+    const size_t vertex_count = local_vertices.count;
 
-    const size_t vertex_count = vertices.size();
+    std::vector<std::vector<size_t>> final_indices;
 
     std::vector<size_t> remaining_indices;
     remaining_indices.reserve(vertex_count);
@@ -44,20 +58,17 @@ std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vect
         remaining_indices.push_back(i);
     }
 
-    if (is_convex(vertices)) {
-        final_indices.push_back(remaining_indices);
-        return final_indices;
-    }
+    // if (is_convex(local_vertices, vertex_count)) {
+    //     final_indices.push_back(remaining_indices);
+    //     return final_indices;
+    // }
 
     const size_t num_expected_triangles = vertex_count - 2;
 
-    // for now we only do triangulation.
-    // final_indices.resize(num_expected_triangles);
-    // for (std::vector<size_t>& triangle : final_indices)
-    //     triangle.resize(3);
-
-    while (remaining_indices.size() > 2)
+    while (remaining_indices.size() >= 3)
     {
+        //@TODO: check if convex after each iteration!
+
         // copy so that the indices we are looping over
         // are not the same set we are removing used indices from
         const std::vector<size_t> loop_indices(remaining_indices);
@@ -80,10 +91,15 @@ std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vect
                 remaining_indices[modulo(ii + 1 , num_remaining_indices)]
             };
 
-            const std::vector<v2> candidate_triangle = {
-                vertices[candidate_indices[0]],
-                vertices[candidate_indices[1]],
-                vertices[candidate_indices[2]]
+            // std::cout << "candidates: "
+            //     << candidate_indices[0] << " "
+            //     << candidate_indices[1] << " "
+            //     << candidate_indices[2] << std::endl;
+
+            const v2 candidate_triangle[3] = {
+                local_vertices[candidate_indices[0]],
+                local_vertices[candidate_indices[1]],
+                local_vertices[candidate_indices[2]]
             };
 
             if (cross(candidate_triangle[0] - candidate_triangle[1],
@@ -93,10 +109,9 @@ std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vect
 
             bool candidate_passes = true;
 
-            for (size_t any_idx = 0; any_idx < vertices.size(); any_idx++) {
-                if (!vector_contains(candidate_indices, any_idx)
-                    && pnpoly(candidate_triangle, vertices[any_idx]))
-                {
+            for (size_t any_idx = 0; any_idx < vertex_count; any_idx++) {
+                //@ALERT: might need
+                if (!vector_contains(candidate_indices, any_idx) && pnpoly(candidate_triangle, 3, local_vertices[any_idx])) {
                     candidate_passes = false;
                     break;
                 }
@@ -106,7 +121,7 @@ std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vect
                 final_indices.push_back(candidate_indices);
                 num_triangles_found++;
                 remaining_indices.erase(tmp_it);
-                if (num_triangles_found == vertices.size() - 2)
+                if (num_triangles_found == vertex_count - 2)
                     break;
             }
         }
@@ -114,13 +129,29 @@ std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vect
         if (num_triangles_found == 0) break;
     }
 
-    return final_indices;
+    PolygonDecomposition poly_decomp;
+
+    //@FIXME: doing nothing atm
+    size_t idx = 0;
+    poly_decomp.offsets[0] = 0;
+    poly_decomp.count = 0;
+    for (const std::vector<size_t>& tridxs : final_indices) {
+        poly_decomp.count++;
+        poly_decomp.offsets[poly_decomp.count] = poly_decomp.offsets[poly_decomp.count-1] + tridxs.size();
+        for (size_t tridx : tridxs) {
+            poly_decomp.indices[idx] = tridx;
+            idx++;
+        }
+    }
+
+    // dump(poly_decomp);
+
+
+    return poly_decomp;
 }
 
-bool pnpoly(const std::vector<v2>& vertices, const v2& test)
+bool pnpoly(const v2* vertices, const size_t nvert, const v2& test)
 {
-    const size_t nvert = vertices.size();
-
     int c = 0;
     size_t i, j;
 

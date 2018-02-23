@@ -4,6 +4,7 @@
 #include "Generator.hpp"
 #include "Generator/Bullet.hpp"
 #include "Globals.hpp"
+#include "Entity.hpp"
 
 void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
     const KeyState newKeyState = keyUp ? KeyState::Released : KeyState::Pressed;
@@ -56,12 +57,17 @@ void InputManager::processPressedKey(const Key& key) {
     switch (key) {
         case Key::UpArrow: {
             v2& player_acc = playerCD.acc;
-            player_acc.x = -75 * std::sin(player_angle);
-            player_acc.y = 75 * std::cos(player_angle);
+            player_acc.x = 75 * std::cos(player_angle);
+            player_acc.y = 75 * std::sin(player_angle);
             break;
         }
 
         case Key::DownArrow: {
+            if (m_keyStates[Key::UpArrow] != KeyState::Pressed) {
+                v2& player_acc = playerCD.acc;
+                player_acc.x = -75 * std::cos(player_angle);
+                player_acc.y = -75 * std::sin(player_angle);
+            }
             break;
         }
 
@@ -93,14 +99,16 @@ void InputManager::processPressedKey(const Key& key) {
                 //
                 const v2& player_pos = playerCD.pos;
                 const v2& player_vel = playerCD.vel;
+                const v2& player_orientation = orientation_of(playerCD);
 
                 v2 bullet_pos, bullet_vel;
 
-                bullet_pos.x = player_pos.x - 4.f * std::sin(player_angle);
-                bullet_pos.y = player_pos.y + 4.f * std::cos(player_angle);
+                v2 bullet_pos_offset = player_orientation;
+                bullet_pos_offset.scale(4.f);
 
-                bullet_vel.x = player_vel.x - 100.f * std::sin(player_angle);
-                bullet_vel.y = player_vel.y + 100.f * std::cos(player_angle);
+                bullet_pos = player_pos + bullet_pos_offset;
+                bullet_vel = orientation_of(playerCD);
+                bullet_vel.scale(100.f);
 
                 generateBullet(bullet_pos, bullet_vel);
 
@@ -119,6 +127,7 @@ void InputManager::processPressedKey(const Key& key) {
 void InputManager::processReleasedKey(const Key& key) {
     auto CM = get_manager();
 
+    // don't 'get' this every frame, just keep it stored.
     auto& playerCD = CM->get<Entity>(playerUUID());
 
     m_keyStates[key] = KeyState::Released;
@@ -126,11 +135,27 @@ void InputManager::processReleasedKey(const Key& key) {
     switch (key) {
 
     case Key::UpArrow: {
-        playerCD.acc.x = 0;
-        playerCD.acc.y = 0;
+        v2& player_acc = playerCD.acc;
+        const float player_angle = playerCD.angle;
+        if (m_keyStates[Key::DownArrow] != KeyState::Pressed) {
+            playerCD.acc.x = 0;
+            playerCD.acc.y = 0;
+        } else {
+            player_acc.x = -75 * std::cos(player_angle);
+            player_acc.y = -75 * std::sin(player_angle);
+        }
         break;
     }
     case Key::DownArrow: {
+        v2& player_acc = playerCD.acc;
+        const float player_angle = playerCD.angle;
+        if (m_keyStates[Key::UpArrow] != KeyState::Pressed) {
+            playerCD.acc.x = 0;
+            playerCD.acc.y = 0;
+        } else {
+            player_acc.x = 75 * std::cos(player_angle);
+            player_acc.y = 75 * std::sin(player_angle);
+        }
         break;
     }
     case Key::RightArrow: {

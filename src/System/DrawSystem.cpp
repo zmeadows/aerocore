@@ -15,29 +15,30 @@ void DrawSystem::run(float) {
     for (const UUID uuid : m_followed) {
         const Entity& CD = CM->get<Entity>(uuid);
 
-        // if (CM->has<SpriteUpdator>(uuid)) {
-        //     CM->get<SpriteUpdator>(uuid).update(spr);
-        // };
+        // if (m_modFrame % 100 < 50) {
+        //     SDL_Color test;
+        //     test.r = 255;
+        //     test.g = 0;
+        //     test.b = 255;
+        //     test.a = 255;
+        //     const PolygonDecomposition& pd = CD.poly_decomp;
+        //     for (size_t pgon = 0; pgon < pd.count; pgon++) {
+        //         PolygonRep pr = nth_polygon(pd, pgon);
+        //         const size_t vtx_count = static_cast<size_t>(pr.count);
 
+        //         for (size_t i = 0; i < vtx_count; i++) {
+        //             ScreenCoordinates sc1 = GC->to_screen_coords(CD.global_vertices[pr.indices[i]]);
+        //             ScreenCoordinates sc2 = GC->to_screen_coords(CD.global_vertices[pr.indices[(i+1) % vtx_count]]);
 
-
-        //if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
-        //    SDL_Color test;
-        //    test.r = 255;
-        //    test.g = 255;
-        //    test.b = 255;
-        //    test.a = 255;
-        //    for (const auto& tri : CM->get<CollisionData>(uuid).triangle_indices) {
-        //        std::vector<v2> triangle = {
-        //            CD.global_vertices[tri[0]],
-        //            CD.global_vertices[tri[1]],
-        //            CD.global_vertices[tri[2]]
-        //        };
-        //        draw(GC, triangle, test);
-        //    }
-        //} else {
-         draw(GC, CD.global_vertices, CD.color);
-        //}
+        //             GPU_Line(GC->renderer,
+        //                      sc1.x, sc1.y,
+        //                      sc2.x, sc2.y,
+        //                      CD.color);
+        //         }
+        //     }
+        // } else {
+            draw(*GC, CD);
+        // }
 
         //TODO: add switch to turn on/off bounding surfaces with key press in debug mode.
         // auto bs = CM->get<BoundingSurface>(uuid);

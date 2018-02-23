@@ -6,37 +6,20 @@
 
 #include <random>
 
-UUID generatePlayer() {
+void generatePlayer() {
 
     auto CM = get_manager();
 
     Entity& player = CM->book<Entity>(playerUUID());
-    player.type = EntityType::Player;
 
-    player.local_vertices = {
-        { -1.f, -2.f },
-        { -2.f, -1.f },
-        { -2.f, 0.f },
-        { -1.f, 3.f },
-        { -1.f, 0.f },
-        { 1.f, 0.f },
-        { 1.f, 3.f },
-        { 2.f, 0.f },
-        { 2.f, -1.f },
-        { 1.f, -2.f }
-    };
+    assign_iso_triangle_vertices(player, 5.f, 10.f);
+    player.poly_decomp = decompose_local_vertices(player.local_vertices);
+    recompute_global_context(playerUUID(), player);
+    assert(player.node);
 
-    for (v2& vtx : player.local_vertices)
-        vtx.scale(2.f);
 
-    reset_global_vertices(player);
-    player.extent = extent_of(player);
 
-    auto& coldat = CM->book<CollisionData>(playerUUID(), player);
-    coldat.friendly = true;
-    coldat.node = get_quad_tree()->insert_entity(playerUUID(), player.extent);
-
-    assert(coldat.node);
+    player.osb.type = OffscreenBehavior::Type::Wraps;
 
     player.color.r = 255;
     player.color.g = 255;
@@ -60,8 +43,6 @@ UUID generatePlayer() {
 
     // CM->book<SpriteUpdator>(playerUUID(), {sprUpd});
 
-    auto& osb = CM->book<OffscreenBehavior>(playerUUID());
-    osb = WrapOSB();
 
     auto& sd = CM->book<ShotDelay>(playerUUID());
     sd.delay = 1000.f;
@@ -112,6 +93,4 @@ UUID generatePlayer() {
     // };
 
     // CM->book<ParticleGenerator>(playerUUID(), pgen);
-
-    return playerUUID();
 }

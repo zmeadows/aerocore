@@ -1,122 +1,64 @@
 #include "Sprite.hpp"
+#include "Geometry.hpp"
+#include "Entity.hpp"
 
 #include <vector>
 
-std::vector<v2> make_iso_triangle_vertices(float baseWidth, float height)
+void assign_iso_triangle_vertices(Entity& entity, float base_width, float height)
 {
-    return {
-        {-baseWidth / 2.f, -height / 3.f},
-        {0.f, 2.f * height / 3.f},
-        {baseWidth / 2.f, -height / 3.f}
-    };
+    entity.local_vertices.count = 3;
+    entity.local_vertices[0] = {0.f, base_width / 2.f};
+    entity.local_vertices[1] = {height, 0.f};
+    entity.local_vertices[2] = {0.f, -base_width / 2.f};
+
+    recenter(entity.local_vertices);
 }
 
-std::vector<v2> make_square_vertices(float width)
+void populate_global_vertices(const LocalVertexBuffer& lvb, GlobalVertexBuffer& gvb,
+                              const v2 position_offset, const float rotation_angle)
 {
-    return {
-        {-width / 2.f, -width / 2.f},
-        {-width / 2.f, width / 2.f},
-        {width / 2.f, width / 2.f},
-        {width / 2.f, -width / 2.f}
-    };
+    for (size_t i = 0; i < lvb.count; i++)
+        gvb[i] = lvb[i].rotated(rotation_angle) + position_offset;
+    gvb.count = lvb.count;
 }
 
-std::vector<v2> transform_vertices(const std::vector<v2>& vertices,
-                                    const v2& pos, const float angle)
+void draw(GraphicsContext& GC, const Entity& entity)
 {
-    std::vector<v2> tmpVertices;
-    tmpVertices.reserve(vertices.size());
 
-    const v2 posVec = {pos.x, pos.y};
-
-    for (const v2& vtx : vertices) {
-        tmpVertices.push_back(vtx.rotated(angle) + posVec);
-    }
-
-    return tmpVertices;
-}
-
-std::vector<std::vector<v2>> transform_nested_vertices(
-    const std::vector<std::vector<v2>>& nested_vertices,
-    const v2& pos, const float angle)
-{
-    std::vector<std::vector<v2>> new_nested_vertices;
-
-    for (const std::vector<v2>& vertices : nested_vertices) {
-        new_nested_vertices.push_back(transform_vertices(vertices, pos, angle));
-    }
-
-    return new_nested_vertices;
-}
-
-void draw(GraphicsContext* GC,
-          const std::vector<v2>& global_vertices,
-          const SDL_Color& rgba)
-{
+    // v2 orientation = orientation_of(entity);
+    // orientation.scale(10.f);
+    // v2 orientation_dot = entity.pos + orientation;
 
     // GPU_CircleFilled(GC->renderer,
-    //                  GC->to_screen_coords(trans_vertices[0]).x,
-    //                  GC->to_screen_coords(trans_vertices[0]).y,
-    //                  20,
+    //                  GC->to_screen_coords(orientation_dot).x,
+    //                  GC->to_screen_coords(orientation_dot).y,
+    //                  4,
+    //                  { 30,225,30,175});
+
+    // GPU_Line(GC->renderer,
+    //                  GC->to_screen_coords(entity.pos).x,
+    //                  GC->to_screen_coords(entity.pos).y,
+    //                  GC->to_screen_coords(orientation_dot).x,
+    //                  GC->to_screen_coords(orientation_dot).y,
+    //                  { 30,225,30,175});
+
+    // GPU_CircleFilled(GC->renderer,
+    //                  GC->to_screen_coords(global_vertices[0]).x,
+    //                  GC->to_screen_coords(global_vertices[0]).y,
+    //                  10,
     //                  { 0,0,255,255});
 
-    const size_t vtx_count = global_vertices.size();
-    for (size_t i = 0; i < vtx_count; i++) {
-        ScreenCoordinates sc1 = GC->to_screen_coords(global_vertices[i]);
-        ScreenCoordinates sc2 = GC->to_screen_coords(global_vertices[(i+1) % vtx_count]);
+    const size_t vtx_count = entity.global_vertices.count;
 
-        GPU_Line(GC->renderer,
+    for (size_t i = 0; i < vtx_count; i++) {
+        ScreenCoordinates sc1 = GC.to_screen_coords(entity.global_vertices[i]);
+        ScreenCoordinates sc2 = GC.to_screen_coords(entity.global_vertices[(i+1) % vtx_count]);
+
+        GPU_Line(GC.renderer,
                  sc1.x, sc1.y,
                  sc2.x, sc2.y,
-                 rgba);
+                 entity.color);
     }
 }
 
-Extent extent_of(const Entity& cd) {
-    return extent_at(cd.global_vertices);
-}
-
-Extent extent_at(const std::vector<v2>& global_vertices)
-{
-    Extent ext;
-
-    ext.minX = std::numeric_limits<float>::max();
-    ext.maxX = std::numeric_limits<float>::lowest();
-    ext.minY = std::numeric_limits<float>::max();
-    ext.maxY = std::numeric_limits<float>::lowest();
-
-    for (const v2& vtx : global_vertices)
-    {
-        ext.minX = std::min(ext.minX, vtx.x);
-        ext.maxX = std::max(ext.maxX, vtx.x);
-        ext.minY = std::min(ext.minY, vtx.y);
-        ext.maxY = std::max(ext.maxY, vtx.y);
-    }
-
-    return ext;
-}
-
-bool is_offscreen(const Entity& cd) {
-    return is_offscreen(cd.global_vertices);
-}
-
-bool is_offscreen(const Extent& ext) {
-        return ext.maxX < -100.f
-            && ext.minX > 100.f
-            && ext.maxY < -100.f
-            && ext.minY > 100.f;
-}
-
-
-bool is_offscreen(const std::vector<v2>& global_vertices)
-{
-    for (const v2& vtx : global_vertices)
-    {
-        if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
-            return false;
-        }
-    }
-
-    return true;
-}
 

@@ -20,14 +20,14 @@ public:
     }
 };
 
-class ParticleSystem final : public System {
-public:
-    void run(float dt) final;
-
-    ParticleSystem() : System("Particle") {
-        get_manager()->subscribe<ParticleGenerator>(this);
-    }
-};
+// class ParticleSystem final : public System {
+// public:
+//     void run(float dt) final;
+// 
+//     ParticleSystem() : System("Particle") {
+//         get_manager()->subscribe<ParticleGenerator>(this);
+//     }
+// };
 
 
 //TODO: just remove this class entirely

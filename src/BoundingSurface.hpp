@@ -1,17 +1,8 @@
 #pragma once
 
-#include <cassert>
-#include <limits>
-#include <math.h>
-#include <memory>
-#include <vector>
+#include <cstdint>
 
 #include "Base.hpp"
-#include "Geometry.hpp"
-#include "Sprite.hpp"
-#include "GraphicsContext.hpp"
-#include "QuadTree.hpp"
-#include "Sprite.hpp"
 #include "Vector2D.hpp"
 
 struct AxisProjection {
@@ -19,43 +10,27 @@ struct AxisProjection {
     float max = 0.f;
 };
 
-AxisProjection project_on(const std::vector<v2>& global_vertices, const std::vector<size_t>& indices, const v2& axis);
 
-class SurfaceNormalSet {
-private:
-    std::vector<v2> normals;
+//@GAMEIDEA: very limited ammo! So that the player has to choose between shooting asteroids (frees up space)
+//and shooting enemies (progresses through level or gets rewards/points)
+//no points for killing asteroids!
+//... asteroids roguelike! :)
+//
 
-public:
-    SurfaceNormalSet(const std::vector<std::vector<v2>>& vertices);
-    SurfaceNormalSet(const std::vector<v2>& vertices);
 
-    SurfaceNormalSet(const std::vector<v2>& vertices,
-                     const std::vector<std::vector<size_t>>& triangle_indices);
-
-    SurfaceNormalSet(const SurfaceNormalSet& rhs);
-    SurfaceNormalSet(SurfaceNormalSet&& rhs);
-    SurfaceNormalSet& operator=(const SurfaceNormalSet& other);
-    SurfaceNormalSet(void) {}
-
-    void add(const v2& vec, float rotationAngle = 0.f);
-    void add(const SurfaceNormalSet& rhs, float rotationAngle = 0.f);
-    void add(const SurfaceNormalSet* rhs, float rotationAngle = 0.f);
-
-    std::vector<v2>::const_iterator begin(void) const { return normals.begin(); }
-    std::vector<v2>::const_iterator end(void) const { return normals.end(); }
-
-    inline size_t size(void) const { return normals.size(); }
+struct PolygonDecomposition {
+    uint_least8_t indices[256];
+    uint_least8_t offsets[127];
+    uint_least8_t count = 0;
 };
 
-struct CollisionData {
-    std::vector<std::vector<size_t>> triangle_indices;
-    SurfaceNormalSet normals;
-    QuadNode* node = nullptr;
-    bool friendly = false;
-
-    CollisionData(void) {}
-    CollisionData(const Entity& entity);
+struct PolygonRep {
+    const uint_least8_t* indices = nullptr;
+    const uint_least8_t count = 0;
 };
 
-bool overlaps(const CollisionData& colA, const Entity& cdA, const CollisionData& colB, const Entity& cdB);
 
+PolygonRep nth_polygon(const PolygonDecomposition& decomp, size_t idx);
+void fill_polygon_normals(const GlobalVertexBuffer& vertices, const PolygonRep polygon, v2* normals);
+AxisProjection project_on(const GlobalVertexBuffer& vertices, const PolygonRep polygon, const v2& axis);
+void dump(const PolygonDecomposition& decomp);

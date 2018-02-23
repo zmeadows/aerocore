@@ -2,18 +2,18 @@
 
 #include "aerocore.hpp"
 
-#include "System.hpp"
 #include "Base.hpp"
 #include "BoundingSurface.hpp"
+#include "Enemy.hpp"
 #include "Globals.hpp"
+#include "System.hpp"
 
+//@TODO: no need for inheritance.
 class CollisionSystem final : public System {
-    bool are_colliding(const UUID& uuidA, const UUID& uuidB);
-
 public:
     void run(float dt) final;
 
     CollisionSystem(void) : System("Collision") {
-        get_manager()->subscribe<Entity, CollisionData>(this);
+        get_manager()->subscribe<Entity>(this);
     }
 };

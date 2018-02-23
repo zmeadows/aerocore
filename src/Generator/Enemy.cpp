@@ -10,22 +10,20 @@ UUID generateOffscreenAsteroid(void) {
 
     Entity& asteroid = CM->book<Entity>(enemyUUID);
 
-    asteroid.type = EntityType::Asteroid;
-
     asteroid.color.r = 200;
     asteroid.color.g = 20;
     asteroid.color.b = 20;
     asteroid.color.a = 200;
 
-    asteroid.local_vertices = {
-        {-15.f + uniform_rand(-5.0,5.0), -15.f + uniform_rand(-5.0,5.0)} ,
-        {-7.f  + uniform_rand(-5.0,5.0), 0.f   + uniform_rand(-5.0,5.0)} ,
-        {-15.f + uniform_rand(-5.0,5.0), 15.f  + uniform_rand(-5.0,5.0)} ,
-        {0.f   + uniform_rand(-5.0,5.0), 25.f  + uniform_rand(-5.0,5.0)} ,
-        {15.f  + uniform_rand(-5.0,5.0), 15.f  + uniform_rand(-5.0,5.0)} ,
-        {7.f   + uniform_rand(-5.0,5.0), 0.f   + uniform_rand(-5.0,5.0)} ,
-        {15.f  + uniform_rand(-5.0,5.0), -15.f + uniform_rand(-5.0,5.0)} ,
-    };
+    asteroid.local_vertices[0] = {-15.f + uniform_rand(-5.0,5.0), -15.f + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[1] = {-7.f  + uniform_rand(-5.0,5.0), 0.f   + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[2] = {-15.f + uniform_rand(-5.0,5.0), 15.f  + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[3] = {0.f   + uniform_rand(-5.0,5.0), 25.f  + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[4] = {15.f  + uniform_rand(-5.0,5.0), 15.f  + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[5] = {7.f   + uniform_rand(-5.0,5.0), 0.f   + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices[6] = {15.f  + uniform_rand(-5.0,5.0), -15.f + uniform_rand(-5.0,5.0)};
+    asteroid.local_vertices.count = 7;
+
 
     // initially place the asteroid in a random location just off screen
 
@@ -67,17 +65,15 @@ UUID generateOffscreenAsteroid(void) {
     asteroid.vel = random_velocity;
 
     // random but slow rotation
-    asteroid.angvel = uniform_rand(-0.5, 0.5);
+    // asteroid.angvel = uniform_rand(-0.5, 0.5);
+    asteroid.friendly = false;
 
-    reset_global_vertices(asteroid);
-    asteroid.extent = extent_of(asteroid);
+    recompute_global_context(enemyUUID, asteroid);
+    asteroid.poly_decomp = decompose_local_vertices(asteroid.local_vertices);
 
-    auto& coldat = CM->book<CollisionData>(enemyUUID, asteroid);
-    coldat.friendly = false;
-    coldat.node = get_quad_tree()->insert_entity(enemyUUID, asteroid.extent);
 
-    auto& osb = CM->book<OffscreenBehavior>(enemyUUID);
-    osb = SinglePassOSB();
+    asteroid.osb.type = OffscreenBehavior::Type::SinglePassAllowed;
+    asteroid.osb.SinglePassAllowed.already_found_onscreen = false;
 
     return enemyUUID;
 }
@@ -85,42 +81,42 @@ UUID generateOffscreenAsteroid(void) {
 void generateAsteroidShards(const Entity& parent_asteroid,
                             const std::vector<std::vector<size_t>>& triangle_indices)
 {
-    assert(parent_asteroid.type == EntityType::Asteroid);
+    // assert(parent_asteroid.type == EntityType::Asteroid);
 
-    const v2 asteroid_center = average_vec(parent_asteroid.global_vertices);
+    // const v2 asteroid_center = average_vector(parent_asteroid.global_vertices,
+    //                                           parent_asteroid.vertex_count);
 
-    auto CM = get_manager();
+    // auto CM = get_manager();
 
-    for (const std::vector<size_t>& triangle : triangle_indices) {
-        UUID shardUUID;
+    // for (const std::vector<size_t>& triangle : triangle_indices) {
+    //     UUID shardUUID;
 
-        Entity& shard = CM->book<Entity>(shardUUID);
+    //     Entity& shard = CM->book<Entity>(shardUUID);
 
-        shard.pos = parent_asteroid.pos;
-        shard.angle = parent_asteroid.angle;
-        shard.color = parent_asteroid.color;
-        shard.local_vertices.resize(3);
+    //     shard.pos = parent_asteroid.pos;
+    //     shard.angle = parent_asteroid.angle;
+    //     shard.color = parent_asteroid.color;
 
-        size_t i = 0;
-        for (size_t idx : triangle) {
-            shard.local_vertices[i] = parent_asteroid.local_vertices[idx];
-            i++;
-        }
-        reset_global_vertices(shard);
-        shard.extent = extent_of(shard);
+    //     size_t i = 0;
+    //     for (size_t idx : triangle) {
+    //         shard.local_vertices[i] = parent_asteroid.local_vertices[idx];
+    //         i++;
+    //     }
+    //     reset_global_vertices(shard);
+    //     shard.extent = extent_of(shard);
 
-        // shoot the shard away from the asteroid center
-        const v2 shard_center = average_vec(shard.global_vertices);
-        v2 vel_offset = (shard_center - asteroid_center).normalized();
-        vel_offset.scale(10.f);
-        shard.vel = parent_asteroid.vel + vel_offset;
+    //     // shoot the shard away from the asteroid center
+    //     const v2 shard_center = average_vec(shard.global_vertices);
+    //     v2 vel_offset = (shard_center - asteroid_center).normalized();
+    //     vel_offset.scale(10.f);
+    //     shard.vel = parent_asteroid.vel + vel_offset;
 
-        shard.acc = parent_asteroid.acc;
-        shard.angvel = parent_asteroid.angvel + 0.5f * uniform_rand(-3.f,3.f);
-        shard.type = EntityType::Effect;
+    //     shard.acc = parent_asteroid.acc;
+    //     shard.angvel = parent_asteroid.angvel + 0.5f * uniform_rand(-3.f,3.f);
+    //     shard.type = EntityType::Effect;
 
-        CM->book<AsteroidShardData>(shardUUID, 1.f);
-    }
+    //     CM->book<AsteroidShardData>(shardUUID, 1.f);
+    // }
 }
 
 // updates shard state. returns alpha of current shard
@@ -141,31 +137,28 @@ void generateStabber(void) {
     auto CM = get_manager();
 
     Entity& entity = CM->book<Entity>(uuid);
-
     entity.pos = { uniform_rand(-80.f, 80.f), uniform_rand(-80.f, 80.f) };
+    entity.friendly = false;
 
-    entity.local_vertices = {
-        { -1.f, -2.f },
-        { -2.f, -1.f },
-        { -2.f, 0.f },
-        { -1.f, 3.f },
-        { -1.f, 0.f },
-        { 1.f, 0.f },
-        { 1.f, 3.f },
-        { 2.f, 0.f },
-        { 2.f, -1.f },
-        { 1.f, -2.f }
-    };
+    assign_iso_triangle_vertices(entity, 5.f, 10.f);
+    //entity.local_vertices = {
+    //    { -1.f, -2.f },
+    //    { -2.f, -1.f },
+    //    { -2.f, 0.f },
+    //    { -1.f, 3.f },
+    //    { -1.f, 0.f },
+    //    { 1.f, 0.f },
+    //    { 1.f, 3.f },
+    //    { 2.f, 0.f },
+    //    { 2.f, -1.f },
+    //    { 1.f, -2.f }
+    //};
 
-    reset_global_vertices(entity);
-    entity.extent = extent_of(entity);
+    entity.angle = uniform_rand(0.f, PI/2.f - 1e-3f);
+    recompute_global_context(uuid, entity);
+    entity.poly_decomp = decompose_local_vertices(entity.local_vertices);
 
     entity.color = { 15, 189, 73, 255 };
-    entity.type = EntityType::Stabber;
-
-    auto& coldat = CM->book<CollisionData>(uuid, entity);
-    coldat.friendly = false;
-    coldat.node = get_quad_tree()->insert_entity(uuid, entity.extent);
 
     auto& stabber = CM->book<StabberData>(uuid);
     set_stabber_to_relocating(entity, stabber);
@@ -176,6 +169,8 @@ void set_stabber_to_relocating(Entity& stabber, StabberData& stabber_data)
     stabber_data.idle_point = { uniform_rand(-80.f, 80.f), uniform_rand(-80.f, 80.f) };
 
     stabber_data.time_since_last_stab = 0.f;
+
+    stabber.vel.scale(0.3f);
 
     stabber.acc = (stabber_data.idle_point - stabber.pos).normalized();
     stabber.acc.scale(6.f);

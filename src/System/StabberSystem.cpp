@@ -14,12 +14,25 @@ void StabberSystem::run(float dt) {
         auto& stabber = CM->get<Entity>(uuid);
         auto& stabber_data = CM->get<StabberData>(uuid);
 
+        const v2 stabber_orientation = orientation_of(stabber);
+        const v2 stabber_to_player = (player.pos - stabber.pos).normalized();
+        const float distance_to_player = (player.pos - stabber.pos).magnitude();
+
         switch (stabber_data.state) {
 
             case StabberData::State::Stabbing: {
                 // continue flying until past goal, at which point find new goal point and switch state to relocating
-                const bool stab_missed = stabber.vel.normalized().dot( (player.pos - stabber.pos).normalized() ) < 0.25f;
-                if (stab_missed)
+                const bool stab_missed = stabber_orientation.dot(stabber_to_player) < 0.f;
+                if (stab_missed) {
+                    stabber.acc = stabber.vel.normalized();
+                    stabber.acc.scale(-30.f);
+                    stabber_data.state = StabberData::State::Stopping;
+                }
+                break;
+            }
+
+            case StabberData::State::Stopping: {
+                if (stabber.acc.dot(stabber.vel) >= 0)
                     set_stabber_to_relocating(stabber, stabber_data);
                 break;
             }
@@ -32,13 +45,10 @@ void StabberSystem::run(float dt) {
                     stabber.vel = {0.f, 0.f};
                     stabber.acc = {0.f, 0.f};
 
-                    const v2 ov = { -std::sin(stabber.angle), std::cos(stabber.angle) };
-                    const v2 stp = (player.pos - stabber.pos).normalized();
-
-                    if (stp.y * ov.x > stp.x * ov.y)
+                    if (stabber_to_player.y * stabber_orientation.x
+                        > stabber_to_player.x * stabber_orientation.y)
                         stabber.angvel = 1.5f;
-                    else
-                        stabber.angvel = -1.5f;
+                    else stabber.angvel = -1.5f;
 
                     stabber_data.state = StabberData::State::Aiming;
                 }
@@ -46,12 +56,9 @@ void StabberSystem::run(float dt) {
                 break;
             }
             case StabberData::State::Aiming: {
-                const v2 stabber_to_player = (player.pos - stabber.pos).normalized();
-                const v2 orientation_vector = { -std::sin(stabber.angle), std::cos(stabber.angle) };
-
-                if (stabber_to_player.dot(orientation_vector) > 0.99) {
+                if (stabber_to_player.dot(stabber_orientation) > 0.99) {
                     stabber.angvel = 0;
-                    // stabber.angle = angle_to_player;
+                    stabber.angle = arctan(stabber_to_player.x, stabber_to_player.y);
                     stabber.vel = (player.pos - stabber.pos).normalized();
                     stabber.vel.scale(stabber_data.speed);
                     stabber_data.state = StabberData::State::Stabbing;

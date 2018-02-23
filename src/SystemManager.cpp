@@ -1,14 +1,5 @@
 #include "SystemManager.hpp"
 
-void ParticleSystem::run(float) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : m_followed) {
-        auto pg = CM->get<ParticleGenerator>(uuid);
-        pg.generate();
-    }
-}
-
 void CleanupSystem::run(float dt) {
     UUIDSet toDestroy;
 

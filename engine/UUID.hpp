@@ -65,3 +65,4 @@ public:
     iterator begin(void) const { return iterator(m_set.begin()); }
     iterator end(void) const { return iterator(m_set.end()); }
 };
+

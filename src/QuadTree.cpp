@@ -16,31 +16,36 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     return this;
 };
 
-void QuadNode::retrieve_from_parents(std::vector<UUID>& candidates) {
+void QuadNode::retrieve_from_parents(std::vector<UUID>& candidates, const UUID collider) {
 
     if (m_parent) {
-        for (UUID uuid : m_parent->m_containedUUIDs)
-            candidates.push_back(uuid);
-        m_parent->retrieve_from_parents(candidates);
+        for (UUID uuid : m_parent->m_containedUUIDs) {
+            if (uuid != collider)
+                candidates.push_back(uuid);
+        }
+        m_parent->retrieve_from_parents(candidates, collider);
     }
 }
 
-void QuadNode::retrieve_from_children(std::vector<UUID>& candidates) {
+void QuadNode::retrieve_from_children(std::vector<UUID>& candidates, const UUID collider) {
 
-    for (UUID uuid : m_containedUUIDs)
-        candidates.push_back(uuid);
+    for (UUID uuid : m_containedUUIDs) {
+        if (uuid != collider)
+            candidates.push_back(uuid);
+    }
 
     if (m_hasChildren) {
         for (auto& node : m_childNodes) {
-            node->retrieve_from_children(candidates);
+            node->retrieve_from_children(candidates, collider);
         }
     }
 };
 
-void QuadNode::retrieve(std::vector<UUID>& candidates) {
-
-    retrieve_from_parents(candidates);
-    retrieve_from_children(candidates);
+void QuadNode::retrieve(std::vector<UUID>& candidates, const UUID collider) {
+    //@FIXME: sloppy
+    candidates.clear();
+    retrieve_from_parents(candidates, collider);
+    retrieve_from_children(candidates, collider);
 }
 
 bool QuadNode::has_parent(const QuadNode* node) const {

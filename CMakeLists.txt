@@ -26,10 +26,10 @@ ENDFOREACH()
 file(GLOB ENGINE_SOURCES "${CMAKE_SOURCE_DIR}/engine/*.cpp")
 file(GLOB GAME_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*/*.cpp")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -nostdinc++ -std=c++17 -Wall -pedantic -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/ -Wno-reserved-id-macro -Wno-padded")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++17 -Wall -pedantic -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/ -Wno-reserved-id-macro -Wno-padded -Wno-nested-anon-types")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -fprofile-instr-generate -fcoverage-mapping ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast ${CMAKE_CXX_FLAGS}")
 
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lprofiler -stdlib=libc++ -lSDL2 -lSDL2_gfx -lSDL2_gpu -L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -stdlib=libc++ -lSDL2 -lSDL2_gfx -lSDL2_gpu -lSDL2_mixer -L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib")
 add_executable(asteroids ${CMAKE_SOURCE_DIR}/src/main.cpp ${ENGINE_SOURCES} ${GAME_SOURCES})

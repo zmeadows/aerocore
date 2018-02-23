@@ -10,13 +10,16 @@
 #include "SystemManager.hpp"
 
 class Game {
-    // TODO: create custom ComponentManager?
     std::unique_ptr<SystemManager> SM;
     std::unique_ptr<InputManager> IM;
 
     bool paused = false;
 
-    
+    Uint32 m_preSystemRunTicks;
+    Uint32 m_postSystemRunTicks;
+    Uint32 m_preFlipTicks;
+    Uint32 m_postFlipTicks;
+    size_t m_frames_elapsed = 0;
 
     bool processInput(void);
     bool tick(void);

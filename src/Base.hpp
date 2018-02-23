@@ -12,80 +12,73 @@
 #include "UUID.hpp"
 #include "Vector2D.hpp"
 
-typedef float f32;
-typedef double f64;
-
 float uniform_rand(float min, float max);
 
-enum class EntityType {
-    Player,
-    Asteroid,
-    Bullet,
-    Effect,
-    Stabber
+struct GlobalVertexBuffer {
+    v2 data[1<<5];
+    size_t count = 0;
+
+    v2 operator[](size_t idx) const { return data[idx]; }
+    v2& operator[](size_t idx) { return data[idx]; }
+
+    v2* begin() { return &data[0]; }
+    v2* end() { return &data[count]; }
+    const v2* begin() const { return &data[0]; }
+    const v2* end() const { return &data[count]; }
 };
 
-enum class AIType {
+struct LocalVertexBuffer {
+    v2 data[1<<5];
+    size_t count = 0;
+
+    v2 operator[](size_t idx) const { return data[idx]; }
+    v2& operator[](size_t idx) { return data[idx]; }
+
+    v2* begin() { return &data[0]; }
+    v2* end() { return &data[count]; }
+    const v2* begin() const { return &data[0]; }
+    const v2* end() const { return &data[count]; }
 };
 
-struct DiesInstantlyOSB { };
+struct OffscreenBehavior {
+    enum class Type {
+        DiesInstantly,
+        SinglePassAllowed,
+        ValidRange,
+        Wraps
+    } type = Type::DiesInstantly;
 
-struct WrapOSB { };
+    union {
+        struct {
+            float minX = -250.f;
+            float maxX = 250.f;
+            float minY = -250.f;
+            float maxY = 250.f;
+        } ValidRange;
 
-// FIXME: rename better: already_found_onscreen_once
-struct SinglePassOSB { bool found_onscreen = false; };
+        struct {
+            bool already_found_onscreen = false;
+        } SinglePassAllowed;
+    };
 
-struct ValidRangeOSB {
-    float minx = -250.f;
-    float maxx = 250.f;
-    float miny = -250.f;
-    float maxy = 250.f;
+    OffscreenBehavior(void) {}
 };
-
-typedef std::variant<SinglePassOSB, ValidRangeOSB, WrapOSB, DiesInstantlyOSB> OffscreenBehavior;
 
 const UUID playerUUID(void);
 
 //@TODO: move to Sprite file
 struct Extent {
-    float minX = 0.f;
-    float maxX = 0.f;
-    float minY = 0.f;
-    float maxY = 0.f;
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::lowest();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::lowest();
 };
 
-//@FIXME: play with size/packing of Entity
-struct Entity {
-    std::vector<v2> local_vertices  = {};
-    std::vector<v2> global_vertices = {};
-    OffscreenBehavior osb           = DiesInstantlyOSB();
-    Extent extent                   = Extent();
-    SDL_Color color                 = { 255, 255, 255, 255 };
-    v2 pos                          = {0.f, 0.f};
-    v2 vel                          = { 0.f, 0.f };
-    v2 acc                          = { 0.f, 0.f };
-    EntityType type                 = EntityType::Effect;
-    float angle                     = 0.f;
-    float angvel                    = 0.f;
-    bool offscreen                  = true;
-};
+Extent extent_of(const GlobalVertexBuffer& global_vertices);
 
-
-inline float signum(float num) {
-    if (num > 0) {
-        return 1;
-    } else if (num < 0) {
-        return -1;
-    } else {
-        return 0;
-    }
+inline float signum(float x) {
+    return static_cast<float>(x > 0) - static_cast<float>(x < 0);
 }
-
-struct ParticleGenerator {
-    std::function<void(void)> generate;
-    ParticleGenerator(std::function<void(void)> _generate)
-        : generate(_generate) {}
-};
 
 struct DeathTimer {
     float value = 0.0;
@@ -99,13 +92,16 @@ struct ShotDelay {
 
 Extent clip_to_screen(const Extent& ext);
 
+//@TODO: make this a pure function
 inline float rotate(float& old_angle, float delta) {
     const float new_angle = fmod(old_angle + delta, TWOPI);
     return (new_angle < 0) ? new_angle + TWOPI : new_angle;
 }
 
 inline float arctan(float x, float y) {
-    float angle = atan2(y,x);
-    return (angle < 0) ? angle + TWOPI : angle;
+    return fmod(atan2(y,x) + TWOPI, TWOPI);
 }
 
+//@CLARITY: give these distinct names
+bool is_offscreen(const Extent& ext);
+bool is_offscreen(const std::vector<v2>& global_vertices);

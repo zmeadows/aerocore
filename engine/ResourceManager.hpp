@@ -59,8 +59,6 @@ public:
         m_data.release();
     }
 
-
-
     template <typename T, class... Args>
     inline Handle book(Args&&... args) {
         const Handle newHandle = this->reserve();

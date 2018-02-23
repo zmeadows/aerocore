@@ -2,4 +2,4 @@
 
 #include "QuadTree.hpp"
 
-UUID generatePlayer(void);
+void generatePlayer(void);

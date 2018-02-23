@@ -21,13 +21,13 @@ UUID generateBullet(const v2& new_bullet_position, const v2& new_bullet_velocity
     bullet.color.b = 20;
     bullet.color.a = 200;
 
-    bullet.local_vertices = make_square_vertices(0.75);
-    reset_global_vertices(bullet);
-    bullet.extent = extent_of(bullet);
+    bullet.friendly = true;
 
-    auto& coldat = CM->book<CollisionData>(bulletUUID, bullet);
-    coldat.friendly = true;
-    coldat.node = get_quad_tree()->insert_entity(bulletUUID, bullet.extent);
+    assign_iso_triangle_vertices(bullet, 2.f, 1.f);
+    bullet.poly_decomp = decompose_local_vertices(bullet.local_vertices);
+    recompute_global_context(bulletUUID, bullet);
+
+    play_sound(SoundEffect_ShotFired);
 
     return bulletUUID;
 }

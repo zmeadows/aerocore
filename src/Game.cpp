@@ -28,11 +28,8 @@ Game::Game(void)
     auto CM = get_manager();
 
     CM->registerComponent<Entity>(10000);
-    CM->registerComponent<OffscreenBehavior>(10000);
     CM->registerComponent<ShotDelay>(10000);
     CM->registerComponent<DeathTimer>(10000);
-    CM->registerComponent<ParticleGenerator>(10);
-    CM->registerComponent<CollisionData>(10000);
     CM->registerComponent<AsteroidShardData>(1000);
     CM->registerComponent<StabberData>(10000);
 
@@ -40,9 +37,8 @@ Game::Game(void)
     SM->addSystem(new CollisionSystem());
     SM->addSystem(new AsteroidShardSystem());
     SM->addSystem(new StabberSystem());
-    SM->addSystem(new ParticleSystem());
-    SM->addSystem(new CleanupSystem());
     SM->addSystem(new DrawSystem());
+    SM->addSystem(new CleanupSystem());
 
     generatePlayer();
 }
@@ -54,7 +50,6 @@ bool Game::tick(void) {
 
 
     static Uint64 t0 = SDL_GetPerformanceCounter();
-    // static Uint64 t1 = 0;
 
     auto GC = get_graphics_context();
     if (!paused) {
@@ -62,25 +57,34 @@ bool Game::tick(void) {
     }
 
     Uint32 tmp_ticks = SDL_GetTicks();
-    if (!paused && (last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 399) {
-        generateStabber();
+    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 30)) {
         last_asteroid_time = SDL_GetTicks();
         generateOffscreenAsteroid();
+        //generateStabber();
     }
-    //     last_asteroid_time = SDL_GetTicks();
-    // }
 
-    // drawQuadTree(get_graphics_context(), get_quad_tree());
     if (!paused && !paused_before_user_input) {
+        m_preSystemRunTicks = SDL_GetPerformanceCounter();
         SM->runSystems(static_cast<float>(SDL_GetPerformanceCounter() - t0) / SDL_GetPerformanceFrequency());
+        m_postSystemRunTicks = SDL_GetPerformanceCounter();
         t0 = SDL_GetPerformanceCounter();
     } else if (!paused && paused_before_user_input){
-        // @IDEA : diff gamestate after running systems with dt = 0 to check for bugs
         t0 = SDL_GetPerformanceCounter();
     }
-        GPU_Flip(GC->renderer);
+
+    // if (m_frames_elapsed % 30 == 0)
+    //     std::cout << "system update time: " << static_cast<float>(m_postSystemRunTicks - m_preSystemRunTicks) / SDL_GetPerformanceFrequency() << std::endl;
+
+    m_preFlipTicks = SDL_GetPerformanceCounter();
+    GPU_Flip(GC->renderer);
+    m_postFlipTicks = SDL_GetPerformanceCounter();
+
+    // if (m_frames_elapsed % 60 == 0)
+    //     std::cout << "buffer flip time: " << static_cast<float>(m_postFlipTicks - m_preFlipTicks) / SDL_GetPerformanceFrequency() << std::endl;
 
     quitting |= !get_manager()->has<Entity>(playerUUID());
+
+    m_frames_elapsed++;
 
     return quitting;
 }
@@ -110,11 +114,8 @@ Game::~Game(void) {
     auto CM = get_manager();
 
     CM->unRegisterComponent<Entity>();
-    CM->unRegisterComponent<OffscreenBehavior>();
     CM->unRegisterComponent<ShotDelay>();
     CM->unRegisterComponent<DeathTimer>();
-    CM->unRegisterComponent<ParticleGenerator>();
-    CM->unRegisterComponent<CollisionData>();
     CM->unRegisterComponent<AsteroidShardData>();
     CM->unRegisterComponent<StabberData>();
 }

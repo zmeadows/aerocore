@@ -2,6 +2,7 @@
 
 #include "Base.hpp"
 #include "Vector2D.hpp"
+#include "BoundingSurface.hpp"
 
 #include <algorithm>
 #include <array>
@@ -9,8 +10,21 @@
 
 int modulo(int num, int mod);
 
-v2 average_vec(const std::vector<v2>& vertices);
-std::vector<std::vector<size_t>> decompose_into_triangle_indices(const std::vector<v2>& vertices);
-bool pnpoly(const std::vector<v2>& vertices, const v2& test);
-bool is_convex(const std::vector<v2>& vertices);
+bool is_convex(const v2* vertices, const size_t vertex_count);
 
+void recenter(LocalVertexBuffer& local_vertices);
+
+v2 average_vector(const v2* vertices, const size_t vertex_count);
+
+inline v2 average_vector(const LocalVertexBuffer& global_vertices) {
+    return average_vector(global_vertices.data, global_vertices.count);
+}
+
+inline v2 average_vector(const GlobalVertexBuffer& global_vertices) {
+    return average_vector(global_vertices.data, global_vertices.count);
+}
+
+bool pnpoly(const v2* vertices, const size_t nvert, const v2& test);
+
+PolygonDecomposition
+decompose_local_vertices(const LocalVertexBuffer& local_vertices);

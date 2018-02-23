@@ -4,41 +4,37 @@
 TODO
 ====
 
-configure ResourceManager so that ALL memory for components comes in one giant continugous block
+add +=, *=, -= to v2 class
 
-compute extent/local/global vertices ONE TIME at start of event.
+combine motion and collision systems
+
+in motion system, fill delta array first, then loop fusion over to modify...?
+
+re-organize #includes
+
+configure ResourceManager so that ALL memory for the game is stored in one giant block: not sure how much this helps.
 
 write script to open Instruments and profile code easily
 
-just keep the extent saved and transform like the vertices!
+create a debug overlay
 
-CREATE DEBUG PANEL
+create dev-mode toggle so that tab key toggles between common testing scenarios
 
-figure out why FPS calculation always says 60fps
-
-
-add 'penetration' and stuff to collisions so that more compliated behavior can be 
+add 'penetration' and stuff to collisions so that more compliated behavior can be
 done on collision, like bouncing, rather than just death
 
 separate entities for update frequency, by velocity?
 
-
-leave objects pre-created and don't recreate them in the ResourceManager each
+??? leave objects pre-created and don't recreate them in the ResourceManager each
 time the space is re-booked
 
-store individual polygon decomposition elements in QuadTree, not simply entire
+??? store individual polygon decomposition elements in QuadTree, not simply entire
 polygon. right now you check all surface normals against each sub-polygon,
 which is very wasteful.
 
-print out collision candidate UUIDs to search for duplicates each frame, and
-just for curiousity.
+add item to GraphicsContext that tells you how big a pixel is in grid coordinates
 
-add item to GraphicsContext that tells you how big a pixel is in grid
-coordinates
-
-use followed UUID set special sorting procedure to determine draw order
-incrementally
-
+use followed UUID set special sorting procedure to determine draw order incrementally
 
 jonathan blow, mike acton, casey (handmade hero)
 
@@ -47,7 +43,6 @@ make global variables:
     * GraphicsContext
     * AudioContext
 
-remove STL?
 
 add basic audio
 
@@ -55,7 +50,6 @@ get font rendering working
 
 make player explode when dies and give death message and 'press spacebar to retry'
 
-write function to transform a vector set so that the origin is geometric/weighted center
 
 make debug overlay showing number of entities, fps, etc
 
@@ -69,13 +63,6 @@ set FX hotkeys to turn on/off:
     * Draw QuadTree
     * Draw Polygon Decompositions
     * Draw ECS Debug Overlay
-
-write some helper functions to return CoreData directly, as well as
-std::optional of certain types: EntityType, 
-
-write entity_exists function to add to assert statements
-
-
 
 write script to do code coverage test
 
@@ -99,10 +86,7 @@ add basic powers:
     * better ship handling/speed (add more drag to ship and increase max speed)
     * slow down time for player only (i.e. apply different dt for enemies/players)
 
-make System a struct with no virtual members, and make all other systems just contain a System instead of inherit.
 
-
-make Polygon struct to abstract over plain std::vector<v2>
 
 ====
 DONE
@@ -136,3 +120,12 @@ rename CoreData to Entity so you can use the intuitive 'entity' variable
 name.
 
 Fix orientation system and be clear about rotation/fmod/atan/etc
+
+compute extent/local/global vertices ONE TIME at start of each frame.
+
+figure out why FPS calculation always says 60fps
+
+remove STL
+
+write function to transform a vector set so that the origin is geometric/weighted center
+
