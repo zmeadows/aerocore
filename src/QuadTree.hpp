@@ -24,8 +24,12 @@ struct QuadNode {
     bool contains_entity(const UUID& uuid) const;
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext);
     QuadNode* update_entity(const UUID& uuid, const Extent& ext) {
-        m_containedUUIDs.erase(uuid);
-        return insert_entity(uuid,ext);
+        if (!is_in_node_boundary(ext)) {
+            m_containedUUIDs.erase(uuid);
+            return insert_entity(uuid,ext);
+        } else {
+            return this;
+        }
     }
 
     bool has_parent(const QuadNode* node) const;
@@ -47,7 +51,9 @@ public:
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext) { return m_top.insert_entity(uuid, ext); }
     QuadNode m_top;
 
-    void retrieve(std::vector<UUID>& candidate, const Extent& ext);
+    //@TODO: move all nodes to a single contiguous array here
+
+    // void retrieve(std::vector<UUID>& candidate, const Extent& ext);
 
     // std::vector<std::pair<UUID,UUID>> collision_candidates(void);
 

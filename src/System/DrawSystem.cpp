@@ -57,7 +57,7 @@ void DrawSystem::run(float) {
         m_currentFpsAvg = sum / 100.0;
     }
 
-    // stringColor(GC->renderer, 735, 10,
-    //             ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
-    //             0xFFFFFFFF);
+    stringColor(GC->renderer, 735, 10,
+                ("FPS: " + std::to_string(static_cast<int>(std::round(m_currentFpsAvg)))).c_str(),
+                0xFFFFFFFF);
 }

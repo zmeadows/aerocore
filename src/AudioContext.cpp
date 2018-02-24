@@ -9,6 +9,9 @@ AudioContext::AudioContext(void)
 ;
     chunks[SoundEffect_ShotFired] = Mix_LoadWAV("/Users/zac/Code/mine/aerocore-example/assets/sound/Laser_Shoot14.wav");
     chunks[SoundEffect_Explosion] = Mix_LoadWAV("/Users/zac/Code/mine/aerocore-example/assets/sound/Explosion19.wav");
+
+    for (size_t i = 0; i < NUM_SOUND_EFFECTS; i++)
+        Mix_VolumeChunk(chunks[i], MIX_MAX_VOLUME/10);
 }
 
 AudioContext::~AudioContext(void)

@@ -24,12 +24,9 @@ struct StabberData {
         Aiming
     } state = State::Relocating;
 
-    float time_since_last_stab = 0.f;
-    float wait_time = 0.f;
     float speed = 0.f;
 
     v2 idle_point;
-    v2 stab_point;
 };
 
 void set_stabber_to_relocating(Entity& stabber, StabberData& stabber_data);

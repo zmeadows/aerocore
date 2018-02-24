@@ -9,7 +9,6 @@
 #include "InputManager.hpp"
 #include "SystemManager.hpp"
 #include "System/MotionSystem.hpp"
-#include "System/CollisionSystem.hpp"
 #include "System/DrawSystem.hpp"
 #include "System/AsteroidShardSystem.hpp"
 #include "System/StabberSystem.hpp"
@@ -29,16 +28,13 @@ Game::Game(void)
 
     CM->registerComponent<Entity>(10000);
     CM->registerComponent<ShotDelay>(10000);
-    CM->registerComponent<DeathTimer>(10000);
     CM->registerComponent<AsteroidShardData>(1000);
     CM->registerComponent<StabberData>(10000);
 
     SM->addSystem(new MotionSystem());
-    SM->addSystem(new CollisionSystem());
-    SM->addSystem(new AsteroidShardSystem());
     SM->addSystem(new StabberSystem());
+    SM->addSystem(new AsteroidShardSystem());
     SM->addSystem(new DrawSystem());
-    SM->addSystem(new CleanupSystem());
 
     generatePlayer();
 }
@@ -57,10 +53,10 @@ bool Game::tick(void) {
     }
 
     Uint32 tmp_ticks = SDL_GetTicks();
-    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 30)) {
+    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 100)) {
         last_asteroid_time = SDL_GetTicks();
         generateOffscreenAsteroid();
-        //generateStabber();
+        generateStabber();
     }
 
     if (!paused && !paused_before_user_input) {
@@ -115,7 +111,6 @@ Game::~Game(void) {
 
     CM->unRegisterComponent<Entity>();
     CM->unRegisterComponent<ShotDelay>();
-    CM->unRegisterComponent<DeathTimer>();
     CM->unRegisterComponent<AsteroidShardData>();
     CM->unRegisterComponent<StabberData>();
 }

@@ -25,7 +25,6 @@ void CollisionSystem::run(float) {
             const auto& entityB = CM->get<Entity>(uuidB);
 
             if (entityA.friendly != entityB.friendly && overlaps(entityA, entityB)) {
-                // std::cout << "collides: " << uuidA << " :: " << uuidB << std::endl;
                 collisions.insert(std::make_pair(uuidA, uuidB));
                 break;
             }

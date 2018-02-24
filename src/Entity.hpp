@@ -7,8 +7,8 @@
 
 //@FIXME: play with size/packing of Entity
 struct Entity {
-    GlobalVertexBuffer global_vertices;
     LocalVertexBuffer local_vertices;
+    GlobalVertexBuffer global_vertices;
     PolygonDecomposition poly_decomp;
 
     Extent extent;

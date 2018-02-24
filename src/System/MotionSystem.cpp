@@ -71,7 +71,7 @@ MotionSystem::handle_offscreen_behavior(const UUID& uuid, Entity& entity)
 void MotionSystem::run(float dt) {
     UUIDSet toDestroy;
 
-    auto CM = get_manager();
+    static ComponentManager* CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         Entity& entity = CM->get<Entity>(uuid);
@@ -124,10 +124,32 @@ void MotionSystem::run(float dt) {
         } else {
             entity.node = entity.node->update_entity(uuid, clip_to_screen(entity.extent));
         }
+
+        // Process collisions
+
+        if (!entity.friendly || !entity.node)
+            continue;
+
+        std::vector<UUID> collision_candidates;
+        entity.node->retrieve(collision_candidates, uuid);
+
+        //@FIXME: just remove the UUID wrapper and do typedef uint32_t UUID
+        for (UUID other_uuid : collision_candidates) {
+
+            assert(other_uuid != uuid);
+
+            const auto& other_entity = CM->get<Entity>(other_uuid);
+
+            if (entity.friendly != other_entity.friendly && overlaps(entity, other_entity)) {
+                toDestroy.insert(uuid);
+                toDestroy.insert(other_uuid);
+                break;
+            }
+        }
     }
 
-    for (const UUID uuid : toDestroy)
-        destroy_entity(uuid);
+    // for (const UUID uuid : toDestroy)
+    //     destroy_entity(uuid);
 }
 
 

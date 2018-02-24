@@ -4,9 +4,23 @@
 TODO
 ====
 
+switch to OpenGL
+
+add small amount of homing to stabber? rotate towards player and slightly adjust trajectory.
+
+fix entity wrapping
+
+create package to make general parmaeterized arcs?
+
+is there an sdl-gpu function to draw a concave polygon?
+
+make asteroids bounce off each other.
+
+use std::atexit to book destructors of global SDL/font/etc.
+
 add +=, *=, -= to v2 class
 
-combine motion and collision systems
+turn resource manager into bucket array
 
 in motion system, fill delta array first, then loop fusion over to modify...?
 
@@ -28,9 +42,7 @@ separate entities for update frequency, by velocity?
 ??? leave objects pre-created and don't recreate them in the ResourceManager each
 time the space is re-booked
 
-??? store individual polygon decomposition elements in QuadTree, not simply entire
-polygon. right now you check all surface normals against each sub-polygon,
-which is very wasteful.
+store individual polygon decomposition elements in QuadTree ?
 
 add item to GraphicsContext that tells you how big a pixel is in grid coordinates
 
@@ -38,13 +50,8 @@ use followed UUID set special sorting procedure to determine draw order incremen
 
 jonathan blow, mike acton, casey (handmade hero)
 
-make global variables:
-    * ComponentManager
-    * GraphicsContext
-    * AudioContext
 
 
-add basic audio
 
 get font rendering working
 
@@ -62,7 +69,7 @@ add switch to ComponentManager to record debug information:
 set FX hotkeys to turn on/off:
     * Draw QuadTree
     * Draw Polygon Decompositions
-    * Draw ECS Debug Overlay
+    * Draw ECS Statistics Overlay
 
 write script to do code coverage test
 
@@ -129,3 +136,11 @@ remove STL
 
 write function to transform a vector set so that the origin is geometric/weighted center
 
+make global variables:
+    * ComponentManager
+    * GraphicsContext
+    * AudioContext
+
+add basic audio
+
+combine motion and collision systems

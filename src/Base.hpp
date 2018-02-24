@@ -12,6 +12,17 @@
 #include "UUID.hpp"
 #include "Vector2D.hpp"
 
+typedef unsigned long long u64;
+typedef unsigned long u32;
+typedef unsigned short u16;
+typedef unsigned char u8;
+typedef signed long long s64;
+typedef signed long s32;
+typedef signed short s16;
+typedef signed char s8;
+typedef double f64;
+typedef float f32;
+
 float uniform_rand(float min, float max);
 
 struct GlobalVertexBuffer {
@@ -89,10 +100,8 @@ struct ShotDelay {
     float lastShotTime = 0.0;
 };
 
-
 Extent clip_to_screen(const Extent& ext);
 
-//@TODO: make this a pure function
 inline float rotate(float& old_angle, float delta) {
     const float new_angle = fmod(old_angle + delta, TWOPI);
     return (new_angle < 0) ? new_angle + TWOPI : new_angle;

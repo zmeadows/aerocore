@@ -38,7 +38,7 @@ void StabberSystem::run(float dt) {
             }
 
             case StabberData::State::Relocating: {
-                if (stabber.vel.magnitude() >= 20.f)
+                if (stabber.vel.magnitude() >= stabber_data.speed)
                     stabber.acc = {0.f, 0.f};
 
                 if (distance(stabber.pos, stabber_data.idle_point) < 10.f) {

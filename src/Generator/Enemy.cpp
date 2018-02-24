@@ -55,7 +55,6 @@ UUID generateOffscreenAsteroid(void) {
     };
 
     // aim the asteroid roughly towards the center of the screen
-
     v2 rough_origin;
     rough_origin.x = uniform_rand(-50.f, 50.f);
     rough_origin.y = uniform_rand(-50.f, 50.f);
@@ -161,6 +160,7 @@ void generateStabber(void) {
     entity.color = { 15, 189, 73, 255 };
 
     auto& stabber = CM->book<StabberData>(uuid);
+    stabber.speed = uniform_rand(75,100);
     set_stabber_to_relocating(entity, stabber);
 }
 
@@ -168,10 +168,7 @@ void set_stabber_to_relocating(Entity& stabber, StabberData& stabber_data)
 {
     stabber_data.idle_point = { uniform_rand(-80.f, 80.f), uniform_rand(-80.f, 80.f) };
 
-    stabber_data.time_since_last_stab = 0.f;
-
     stabber.vel.scale(0.3f);
-
     stabber.acc = (stabber_data.idle_point - stabber.pos).normalized();
     stabber.acc.scale(6.f);
 

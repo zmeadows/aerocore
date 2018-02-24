@@ -17,6 +17,8 @@ struct AxisProjection {
 //... asteroids roguelike! :)
 //
 
+//@GAMEIDEA: paint with your ship  somehow? screen full of asteroids, invinclbe, piercing bullets?
+
 
 struct PolygonDecomposition {
     uint_least8_t indices[256];

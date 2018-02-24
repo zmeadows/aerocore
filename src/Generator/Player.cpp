@@ -8,7 +8,7 @@
 
 void generatePlayer() {
 
-    auto CM = get_manager();
+    ComponentManager* CM = get_manager();
 
     Entity& player = CM->book<Entity>(playerUUID());
 

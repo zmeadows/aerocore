@@ -63,8 +63,8 @@ overlaps(const Entity& entityA, const Entity& entityB)
 
             bool polygon_candidates_separated = false;
 
-            PolygonRep shivA = nth_polygon(entityA.poly_decomp, polyA);
-            PolygonRep shivB = nth_polygon(entityB.poly_decomp, polyB);
+            const PolygonRep shivA = nth_polygon(entityA.poly_decomp, polyA);
+            const PolygonRep shivB = nth_polygon(entityB.poly_decomp, polyB);
             fill_polygon_normals(entityA.global_vertices, shivA, normals);
 
 
@@ -73,6 +73,7 @@ overlaps(const Entity& entityA, const Entity& entityB)
                 const AxisProjection projA = project_on(entityA.global_vertices, shivA, normals[nidxA]);
                 const AxisProjection projB = project_on(entityB.global_vertices, shivB, normals[nidxA]);
                 if (!(projA.max >= projB.min && projB.max >= projA.min)) {
+                    //@TODO: at this point, swap separating axis to front of polygon decomp to save time next iteration.
                     polygon_candidates_separated = true;
                     break;
                 }
