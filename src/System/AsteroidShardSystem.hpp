@@ -1,7 +1,5 @@
 #pragma once
 
-#include "aerocore.hpp"
-
 #include "Base.hpp"
 #include "Globals.hpp"
 #include "Generator/Enemy.hpp"

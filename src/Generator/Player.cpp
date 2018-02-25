@@ -1,8 +1,8 @@
-#include "Generator.hpp"
 #include "Generator/Player.hpp"
 #include "Geometry.hpp"
 #include "Globals.hpp"
 #include "Entity.hpp"
+#include "Sprite.hpp"
 
 #include <random>
 
@@ -12,12 +12,21 @@ void generatePlayer() {
 
     Entity& player = CM->book<Entity>(playerUUID());
 
+
     assign_iso_triangle_vertices(player, 5.f, 10.f);
+    auto parse_result = parse_svg_path(asset_path("sprites/player/path").c_str());
+    player.local_vertices = parse_result.vertices;
+    player.sprite_offset = parse_result.sprite_offset;
+    //recenter(player.local_vertices);
+    // for (v2& vtx : player.local_vertices)
+    //     vtx.scale(0.25f);
+    // for (v2& vtx : player.local_vertices)
+    //     vtx.rotate(PI/2.f);
     player.poly_decomp = decompose_local_vertices(player.local_vertices);
     recompute_global_context(playerUUID(), player);
     assert(player.node);
 
-
+    player.sprite = GPU_LoadImage(asset_path("sprites/player/player.png").c_str());
 
     player.osb.type = OffscreenBehavior::Type::Wraps;
 

@@ -2,7 +2,7 @@
 
 #include "UUID.hpp"
 
-class ComponentManager;
+#include <string>
 
 class System {
 protected:

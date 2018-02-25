@@ -1,34 +1,8 @@
 #pragma once
 
-#include "Base.hpp"
-#include "Sprite.hpp"
-#include "Globals.hpp"
-
-#include "aerocore.hpp"
-
 #include <array>
 #include <memory>
 #include <string>
-
-
-class CleanupSystem final : public System {
-public:
-    void run(float dt) final;
-
-    CleanupSystem() : System("Cleanup") {
-        get_manager()->subscribe<DeathTimer>(this);
-    }
-};
-
-// class ParticleSystem final : public System {
-// public:
-//     void run(float dt) final;
-// 
-//     ParticleSystem() : System("Particle") {
-//         get_manager()->subscribe<ParticleGenerator>(this);
-//     }
-// };
-
 
 //TODO: just remove this class entirely
 class SystemManager {

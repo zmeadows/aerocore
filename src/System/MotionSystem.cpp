@@ -4,11 +4,9 @@
 #include "Entity.hpp"
 
 bool
-MotionSystem::handle_offscreen_behavior(const UUID& uuid, Entity& entity)
+MotionSystem::handle_offscreen_behavior(Entity& entity)
 {
     const Extent& ext = entity.extent;
-
-    auto CM = get_manager();
 
     auto& osb = entity.osb;
 
@@ -76,7 +74,7 @@ void MotionSystem::run(float dt) {
     for (const UUID uuid : m_followed) {
         Entity& entity = CM->get<Entity>(uuid);
 
-        bool entity_should_be_destroyed = is_offscreen(entity) ? handle_offscreen_behavior(uuid, entity) : false;
+        bool entity_should_be_destroyed = is_offscreen(entity) ? handle_offscreen_behavior(entity) : false;
 
         if (entity_should_be_destroyed) {
             toDestroy.insert(uuid);
@@ -91,8 +89,8 @@ void MotionSystem::run(float dt) {
         entity.pos.y += dy;
         entity.angle = rotate(entity.angle, dtheta);
 
-        entity.vel.x += dt * (entity.acc.x - signum(entity.vel.x) * 0.3f);
-        entity.vel.y += dt * (entity.acc.y - signum(entity.vel.y) * 0.3f);
+        entity.vel.x += dt * (entity.acc.x - signum(entity.vel.x) * entity.drag);
+        entity.vel.y += dt * (entity.acc.y - signum(entity.vel.y) * entity.drag);
 
         entity.extent.minX = std::numeric_limits<float>::max();
         entity.extent.maxX = std::numeric_limits<float>::lowest();
@@ -111,13 +109,6 @@ void MotionSystem::run(float dt) {
             entity.extent.minX = std::min(entity.extent.minX, entity.global_vertices[i].x);
             entity.extent.minY = std::min(entity.extent.minY, entity.global_vertices[i].y);
         }
-
-        // if (uuid == playerUUID()) {
-        //     std::cout << "entity.extent.maxX: " << entity.extent.maxX << std::endl;
-        //     std::cout << "entity.extent.maxY: " << entity.extent.maxY << std::endl;
-        //     std::cout << "entity.extent.minX: " << entity.extent.minX << std::endl;
-        //     std::cout << "entity.extent.minY: " << entity.extent.minY << std::endl;
-        // }
 
         if (!entity.node) {
             entity.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
@@ -141,15 +132,15 @@ void MotionSystem::run(float dt) {
             const auto& other_entity = CM->get<Entity>(other_uuid);
 
             if (entity.friendly != other_entity.friendly && overlaps(entity, other_entity)) {
-                toDestroy.insert(uuid);
+                // toDestroy.insert(uuid);
                 toDestroy.insert(other_uuid);
                 break;
             }
         }
     }
 
-    // for (const UUID uuid : toDestroy)
-    //     destroy_entity(uuid);
+    for (const UUID uuid : toDestroy)
+        destroy_entity(uuid);
 }
 
 

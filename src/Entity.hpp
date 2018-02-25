@@ -1,15 +1,21 @@
 #pragma once
 
-#include "aerocore.hpp"
 #include "Base.hpp"
-#include "BoundingSurface.hpp"
-#include "QuadTree.hpp"
+#include "PolygonDecomposition.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_gpu.h>
+
+struct QuadNode;
 
 //@FIXME: play with size/packing of Entity
 struct Entity {
     LocalVertexBuffer local_vertices;
     GlobalVertexBuffer global_vertices;
     PolygonDecomposition poly_decomp;
+    GPU_Image* sprite;
+    v2 sprite_offset;
+
+
 
     Extent extent;
     OffscreenBehavior osb;

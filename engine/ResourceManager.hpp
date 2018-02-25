@@ -78,7 +78,8 @@ public:
 
     inline void release(Handle handle) {
         release_func(handle);
-        const bool releaseSuccess = m_inactive.insert(handle).second;
-        assert(releaseSuccess && "Attempted to release inactive data in ResourceManager for type: ");
+        // const bool releaseSuccess = m_inactive.insert(handle).second;
+        static_cast<void>(m_inactive.insert(handle).second);
+        // assert(releaseSuccess && "Attempted to release inactive data in ResourceManager for type: ");
     }
 };

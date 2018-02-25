@@ -1,5 +1,7 @@
 #include "Base.hpp"
 
+#include "UUID.hpp"
+
 const UUID playerUUID(void) {
     static UUID id;
     return id;
@@ -42,19 +44,7 @@ Extent extent_of(const GlobalVertexBuffer& global_vertices)
 
 bool is_offscreen(const Extent& ext) {
         return ext.maxX < -100.f
-            && ext.minX > 100.f
-            && ext.maxY < -100.f
-            && ext.minY > 100.f;
-}
-
-bool is_offscreen(const std::vector<v2>& global_vertices)
-{
-    for (const v2& vtx : global_vertices)
-    {
-        if (std::abs(vtx.x) < 100.f && std::abs(vtx.y) < 100.f) {
-            return false;
-        }
-    }
-
-    return true;
+            || ext.minX > 100.f
+            || ext.maxY < -100.f
+            || ext.minY > 100.f;
 }

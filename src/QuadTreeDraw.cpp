@@ -3,6 +3,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gpu.h>
 
+#include "GraphicsContext.hpp"
+#include "QuadTree.hpp"
+#include "Typedef.hpp"
+#include "Vector2D.hpp"
+
 void drawQuadTree(GraphicsContext* GC, const QuadTree* quadTree) {
     drawQuadNodes(GC, &(quadTree->m_top), true);
     drawQuadNodes(GC, &(quadTree->m_top), false);
@@ -10,7 +15,7 @@ void drawQuadTree(GraphicsContext* GC, const QuadTree* quadTree) {
 
 void drawQuadNodes(GraphicsContext* GC, const QuadNode* node, const bool draw_empty) {
 
-    const size_t num_entities = node->m_containedUUIDs.size();
+    const u32 num_entities = node->m_containedUUIDs.size();
 
     if (
         (!draw_empty && num_entities > 0)

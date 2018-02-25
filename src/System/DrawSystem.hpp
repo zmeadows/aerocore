@@ -5,8 +5,6 @@
 #include "GraphicsContext.hpp"
 #include "Sprite.hpp"
 
-#include "aerocore.hpp"
-
 class DrawSystem final : public System {
     std::array<double, 100> m_fpsHistory;
     Uint64 m_lastFrameTicks;

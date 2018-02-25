@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 
 struct v2 {
     float x = 0.f;
@@ -17,6 +16,9 @@ struct v2 {
 
 v2 operator+(const v2& vecA, const v2& vecB);
 v2 operator-(const v2& vecA, const v2& vecB);
+
+v2 operator*(const v2& vec, float scale);
+v2 operator*(float scale, const v2& vec);
 
 bool operator==(const v2& vecA, const v2& vecB);
 bool operator==(const v2& vecA, v2& vecB);

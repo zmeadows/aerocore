@@ -1,8 +1,10 @@
 #pragma once
 
 #include <string>
-#include <math.h>
 #include <algorithm>
+#include <cmath>
+
+#include "Typedef.hpp"
 
 #ifdef DODEBUG
 #define DEBUG(x) \
@@ -11,8 +13,22 @@
 #define DEBUG(x)
 #endif
 
-const float TWOPI = 2.f * static_cast<float>(M_PI);
-const float PI = static_cast<float>(M_PI);
+inline u32 modulo(s32 i, s32 n) {
+    return static_cast<u32>((i % n + n) % n);
+}
+
+inline u32 unsign(s32 x) {
+    assert(x >= 0);
+    return static_cast<u32>(x);
+}
+
+inline std::string asset_path(std::string local_path) {
+    return std::string(ASSET_PATH) + local_path;
+};
+
+inline bool rough_equals(float x, float y, float delta) {
+    return fabs(x - y) < delta;
+}
 
 template <class T>
 constexpr

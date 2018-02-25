@@ -1,4 +1,34 @@
 #include "Vector2D.hpp"
+#include "Util.hpp"
+
+#include <cmath>
+
+namespace {
+const float VEC2D_COMPARISON_DELTA = 1e-6f;
+}
+
+v2 operator*(const v2& vec, float scale) {
+    return {vec.x * scale, vec.y * scale};
+}
+
+v2 operator*(float scale, const v2& vec) {
+    return {vec.x * scale, vec.y * scale};
+}
+
+bool operator==(const v2& vecA, const v2& vecB) {
+    return rough_equals(vecA.x, vecB.x, VEC2D_COMPARISON_DELTA)
+        && rough_equals(vecA.y, vecB.y, VEC2D_COMPARISON_DELTA);
+}
+
+bool operator==(const v2& vecA, v2& vecB) {
+    return rough_equals(vecA.x, vecB.x, VEC2D_COMPARISON_DELTA)
+        && rough_equals(vecA.y, vecB.y, VEC2D_COMPARISON_DELTA);
+}
+
+bool operator==(v2& vecA, const v2& vecB) {
+    return rough_equals(vecA.x, vecB.x, VEC2D_COMPARISON_DELTA)
+        && rough_equals(vecA.y, vecB.y, VEC2D_COMPARISON_DELTA);
+}
 
 v2 operator+(const v2& vecA, const v2& vecB) {
     return {vecA.x + vecB.x, vecA.y + vecB.y};
@@ -50,8 +80,6 @@ float distance(const v2& lhs, const v2& rhs) {
     return std::sqrt( std::pow(lhs.x - rhs.x, 2.f) + std::pow(lhs.y - rhs.y, 2.f) );
 }
 
-bool operator==(const v2& vecA, v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
-bool operator==(v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
-bool operator==(const v2& vecA, const v2& vecB) { return vecA.x == vecB.x && vecA.y == vecB.y; }
+
 
 

@@ -4,8 +4,8 @@
 
 UUID generateOffscreenAsteroid(void);
 
-void generateAsteroidShards(const Entity& asteroid,
-                            const std::vector<std::vector<size_t>>& triangles_indices);
+// void generateAsteroidShards(const Entity& asteroid,
+//                             const std::vector<std::vector<size_t>>& triangles_indices);
 
 struct AsteroidShardData {
     float lifetime = 0.0;

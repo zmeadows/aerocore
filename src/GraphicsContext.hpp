@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Base.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gpu.h>
+// #include <NFont/NFont.h>
 
-#include <utility>
+struct v2;
 
 struct ScreenCoordinates {
     Sint16 x = 0;
@@ -12,8 +12,10 @@ struct ScreenCoordinates {
 };
 
 class GraphicsContext {
-    const int screen_width;
+    const Uint16 screen_width;
     const float screen_width_f;
+
+    // NFont font;
 
 public:
     GraphicsContext(void);

@@ -4,15 +4,28 @@
 TODO
 ====
 
+figure out transform from SVG path to polygon decomp (inverse of to_screen_coords)
+
+Animation FSM
+    * (time) -> Sprite*
+    * sprite change
+
+Draw stabber
+
+add 'autonomous' flag to entity for cases where they control themselves.
+
+give stabber 'valid range' OSB
+make stabber rotate while re-locating
+make stabber have different relocation and stab speed
+make stabber slightly homing towards player while stabbing
+
+replace cout with printf
+
 switch to OpenGL
 
 add small amount of homing to stabber? rotate towards player and slightly adjust trajectory.
 
-fix entity wrapping
-
 create package to make general parmaeterized arcs?
-
-is there an sdl-gpu function to draw a concave polygon?
 
 make asteroids bounce off each other.
 
@@ -24,7 +37,6 @@ turn resource manager into bucket array
 
 in motion system, fill delta array first, then loop fusion over to modify...?
 
-re-organize #includes
 
 configure ResourceManager so that ALL memory for the game is stored in one giant block: not sure how much this helps.
 
@@ -144,3 +156,11 @@ make global variables:
 add basic audio
 
 combine motion and collision systems
+
+set up #defines and whatever in CMake so that an easy-to-use asset path is defined
+
+fix clang compile warnings
+
+clean & re-organize #includes
+
+fix entity wrapping

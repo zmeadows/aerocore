@@ -1,9 +1,8 @@
-#include "BoundingSurface.hpp"
-#include "Generator.hpp"
 #include "Generator/Bullet.hpp"
 #include "Geometry.hpp"
 #include "Globals.hpp"
 #include "Entity.hpp"
+#include "Sprite.hpp"
 
 UUID generateBullet(const v2& new_bullet_position, const v2& new_bullet_velocity) {
     UUID bulletUUID;

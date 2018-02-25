@@ -1,7 +1,5 @@
 #include "Game.hpp"
 
-#include <array>
-
 #include "Globals.hpp"
 #include "Generator/Player.hpp"
 #include "Generator/Enemy.hpp"
@@ -13,8 +11,6 @@
 #include "System/AsteroidShardSystem.hpp"
 #include "System/StabberSystem.hpp"
 #include "QuadTreeDraw.hpp"
-
-#include "aerocore.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -31,10 +27,10 @@ Game::Game(void)
     CM->registerComponent<AsteroidShardData>(1000);
     CM->registerComponent<StabberData>(10000);
 
+    SM->addSystem(new DrawSystem());
     SM->addSystem(new MotionSystem());
     SM->addSystem(new StabberSystem());
     SM->addSystem(new AsteroidShardSystem());
-    SM->addSystem(new DrawSystem());
 
     generatePlayer();
 }
@@ -49,11 +45,11 @@ bool Game::tick(void) {
 
     auto GC = get_graphics_context();
     if (!paused) {
-        GPU_ClearRGB(GC->renderer, 30, 30, 30);
+        GPU_ClearRGB(GC->renderer, 50, 50, 50);
     }
 
     Uint32 tmp_ticks = SDL_GetTicks();
-    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 100)) {
+    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 2000)) {
         last_asteroid_time = SDL_GetTicks();
         generateOffscreenAsteroid();
         generateStabber();

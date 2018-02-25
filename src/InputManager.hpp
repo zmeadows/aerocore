@@ -6,9 +6,6 @@
 
 #include <SDL2/SDL.h>
 
-#include "aerocore.hpp"
-#include "QuadTree.hpp"
-
 enum class Key { LeftArrow, RightArrow, UpArrow, DownArrow, Spacebar, Shift };
 enum class KeyState { Pressed, Released };
 

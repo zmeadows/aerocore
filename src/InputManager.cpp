@@ -1,7 +1,6 @@
 #include "InputManager.hpp"
 
 #include "Base.hpp"
-#include "Generator.hpp"
 #include "Generator/Bullet.hpp"
 #include "Globals.hpp"
 #include "Entity.hpp"
@@ -107,8 +106,7 @@ void InputManager::processPressedKey(const Key& key) {
                 bullet_pos_offset.scale(4.f);
 
                 bullet_pos = player_pos + bullet_pos_offset;
-                bullet_vel = orientation_of(playerCD);
-                bullet_vel.scale(100.f);
+                bullet_vel = player_vel + 100.f * orientation_of(playerCD);
 
                 generateBullet(bullet_pos, bullet_vel);
 

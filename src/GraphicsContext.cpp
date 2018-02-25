@@ -1,8 +1,9 @@
 #include "GraphicsContext.hpp"
 
-#include <iostream>
+#include "Util.hpp"
+#include "Vector2D.hpp"
 
-GraphicsContext::GraphicsContext(void) : screen_width(1000), screen_width_f(1000.0) {
+GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     // window = SDL_CreateWindow("aerocore",

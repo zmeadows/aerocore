@@ -6,9 +6,9 @@
 
 namespace __asteroids__globals__ {
 
+extern GraphicsContext g_GC;
 extern AudioContext g_AC;
 extern ComponentManager g_CM;
-extern GraphicsContext g_GC;
 extern QuadTree g_QT;
 
 }

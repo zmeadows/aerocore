@@ -1,8 +1,8 @@
 #include "Globals.hpp"
-#include "Generator.hpp"
 #include "Geometry.hpp"
 #include "Generator/Enemy.hpp"
 #include "Entity.hpp"
+#include "Sprite.hpp"
 
 UUID generateOffscreenAsteroid(void) {
     UUID enemyUUID;
@@ -77,46 +77,48 @@ UUID generateOffscreenAsteroid(void) {
     return enemyUUID;
 }
 
+/* 
 void generateAsteroidShards(const Entity& parent_asteroid,
                             const std::vector<std::vector<size_t>>& triangle_indices)
 {
-    // assert(parent_asteroid.type == EntityType::Asteroid);
+    assert(parent_asteroid.type == EntityType::Asteroid);
 
-    // const v2 asteroid_center = average_vector(parent_asteroid.global_vertices,
-    //                                           parent_asteroid.vertex_count);
+    const v2 asteroid_center = average_vector(parent_asteroid.global_vertices,
+                                              parent_asteroid.vertex_count);
 
-    // auto CM = get_manager();
+    auto CM = get_manager();
 
-    // for (const std::vector<size_t>& triangle : triangle_indices) {
-    //     UUID shardUUID;
+    for (const std::vector<size_t>& triangle : triangle_indices) {
+        UUID shardUUID;
 
-    //     Entity& shard = CM->book<Entity>(shardUUID);
+        Entity& shard = CM->book<Entity>(shardUUID);
 
-    //     shard.pos = parent_asteroid.pos;
-    //     shard.angle = parent_asteroid.angle;
-    //     shard.color = parent_asteroid.color;
+        shard.pos = parent_asteroid.pos;
+        shard.angle = parent_asteroid.angle;
+        shard.color = parent_asteroid.color;
 
-    //     size_t i = 0;
-    //     for (size_t idx : triangle) {
-    //         shard.local_vertices[i] = parent_asteroid.local_vertices[idx];
-    //         i++;
-    //     }
-    //     reset_global_vertices(shard);
-    //     shard.extent = extent_of(shard);
+        size_t i = 0;
+        for (size_t idx : triangle) {
+            shard.local_vertices[i] = parent_asteroid.local_vertices[idx];
+            i++;
+        }
+        reset_global_vertices(shard);
+        shard.extent = extent_of(shard);
 
-    //     // shoot the shard away from the asteroid center
-    //     const v2 shard_center = average_vec(shard.global_vertices);
-    //     v2 vel_offset = (shard_center - asteroid_center).normalized();
-    //     vel_offset.scale(10.f);
-    //     shard.vel = parent_asteroid.vel + vel_offset;
+        // shoot the shard away from the asteroid center
+        const v2 shard_center = average_vec(shard.global_vertices);
+        v2 vel_offset = (shard_center - asteroid_center).normalized();
+        vel_offset.scale(10.f);
+        shard.vel = parent_asteroid.vel + vel_offset;
 
-    //     shard.acc = parent_asteroid.acc;
-    //     shard.angvel = parent_asteroid.angvel + 0.5f * uniform_rand(-3.f,3.f);
-    //     shard.type = EntityType::Effect;
+        shard.acc = parent_asteroid.acc;
+        shard.angvel = parent_asteroid.angvel + 0.5f * uniform_rand(-3.f,3.f);
+        shard.type = EntityType::Effect;
 
-    //     CM->book<AsteroidShardData>(shardUUID, 1.f);
-    // }
+        CM->book<AsteroidShardData>(shardUUID, 1.f);
+    }
 }
+*/
 
 // updates shard state. returns alpha of current shard
 Uint8 shard_tick(AsteroidShardData& shard, float dt) {
@@ -166,6 +168,7 @@ void generateStabber(void) {
 
 void set_stabber_to_relocating(Entity& stabber, StabberData& stabber_data)
 {
+    printf("relocating stabber...\n");
     stabber_data.idle_point = { uniform_rand(-80.f, 80.f), uniform_rand(-80.f, 80.f) };
 
     stabber.vel.scale(0.3f);

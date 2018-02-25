@@ -2,12 +2,10 @@
 
 #include <memory>
 
-#include "aerocore.hpp"
+#include <SDL2/SDL.h>
 
-#include "QuadTree.hpp"
-#include "GraphicsContext.hpp"
-#include "InputManager.hpp"
-#include "SystemManager.hpp"
+class InputManager;
+class SystemManager;
 
 class Game {
     std::unique_ptr<SystemManager> SM;
@@ -15,10 +13,10 @@ class Game {
 
     bool paused = false;
 
-    Uint32 m_preSystemRunTicks;
-    Uint32 m_postSystemRunTicks;
-    Uint32 m_preFlipTicks;
-    Uint32 m_postFlipTicks;
+    Uint64 m_preSystemRunTicks;
+    Uint64 m_postSystemRunTicks;
+    Uint64 m_preFlipTicks;
+    Uint64 m_postFlipTicks;
     size_t m_frames_elapsed = 0;
 
     bool processInput(void);

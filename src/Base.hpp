@@ -1,36 +1,21 @@
 #pragma once
 
-#include <cmath>
-#include <functional>
-#include <iostream>
-#include <stdlib.h>
-#include <variant>
+#include <limits>
 
-#include <SDL2/SDL.h>
-
-#include "aerocore.hpp"
-#include "UUID.hpp"
 #include "Vector2D.hpp"
+#include "Typedef.hpp"
+#include "Const.hpp"
 
-typedef unsigned long long u64;
-typedef unsigned long u32;
-typedef unsigned short u16;
-typedef unsigned char u8;
-typedef signed long long s64;
-typedef signed long s32;
-typedef signed short s16;
-typedef signed char s8;
-typedef double f64;
-typedef float f32;
+class UUID;
 
 float uniform_rand(float min, float max);
 
 struct GlobalVertexBuffer {
     v2 data[1<<5];
-    size_t count = 0;
+    u32 count = 0;
 
-    v2 operator[](size_t idx) const { return data[idx]; }
-    v2& operator[](size_t idx) { return data[idx]; }
+    v2 operator[](u32 idx) const { return data[idx]; }
+    v2& operator[](u32 idx) { return data[idx]; }
 
     v2* begin() { return &data[0]; }
     v2* end() { return &data[count]; }
@@ -40,10 +25,10 @@ struct GlobalVertexBuffer {
 
 struct LocalVertexBuffer {
     v2 data[1<<5];
-    size_t count = 0;
+    u32 count = 0;
 
-    v2 operator[](size_t idx) const { return data[idx]; }
-    v2& operator[](size_t idx) { return data[idx]; }
+    v2 operator[](u32 idx) const { return data[idx]; }
+    v2& operator[](u32 idx) { return data[idx]; }
 
     v2* begin() { return &data[0]; }
     v2* end() { return &data[count]; }
@@ -113,4 +98,3 @@ inline float arctan(float x, float y) {
 
 //@CLARITY: give these distinct names
 bool is_offscreen(const Extent& ext);
-bool is_offscreen(const std::vector<v2>& global_vertices);

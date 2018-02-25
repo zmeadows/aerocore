@@ -1,5 +1,9 @@
 #include "QuadTree.hpp"
 
+#include <vector>
+
+#include "Base.hpp"
+
 QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     if (!is_in_node_boundary(ext))
         return nullptr;
