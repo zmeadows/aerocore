@@ -4,28 +4,28 @@
 #include "Sprite.hpp"
 #include "Globals.hpp"
 
-void destroy_entity(const UUID& uuid) {
-    auto CM = get_manager();
+// void destroy_entity(const UUID& uuid) {
+//     auto CM = get_manager();
+//
+//     auto& entity = CM->get<Entity>(uuid);
+//
+//     if (entity.node)
+//             entity.node->m_containedUUIDs.erase(uuid);
+//
+//     play_sound(SoundEffect_Explosion);
+//
+//     CM->destroy(uuid);
+// }
 
-    auto& entity = CM->get<Entity>(uuid);
-
-
-    if (entity.node)
-            entity.node->release_entity(uuid);
-
-    play_sound(SoundEffect_Explosion);
-
-    CM->destroy(uuid);
-}
-
-void
-recompute_global_context(UUID uuid, Entity& entity)
-{
-    populate_global_vertices(entity.local_vertices, entity.global_vertices,
-                             entity.pos, entity.angle);
-    entity.extent = extent_of(entity.global_vertices);
-    entity.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
-}
+// void
+// recompute_global_context(UUID uuid, Entity& entity)
+// {
+//     populate_global_vertices(entity.local_vertices, entity.global_vertices,
+//                              entity.pos, entity.angle);
+//     entity.extent = extent_of(entity.global_vertices);
+//     //@TODO: apply clip_to_screen within quad tree insert function
+//     entity.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
+// }
 
 v2 orientation_of(const Entity& entity) {
     return { std::cos(entity.angle), std::sin(entity.angle) };
@@ -38,11 +38,11 @@ bool is_offscreen(const Entity& cd) {
 //@FIXME: This is still inefficient. Move individual triangles into quad tree
 //and only test surface normals from each pair of triangles.
 bool
-overlaps(const Entity& entityA, const Entity& entityB)
+overlaps( const CollisionData& entityA
+        , const CollisionData& entityB
+        , const Extent extA
+        , const Extent extB)
 {
-    const Extent extA = entityA.extent;
-    const Extent extB = entityB.extent;
-
     // 1. currently collisions are not processed offscreen (could change)
     if (is_offscreen(extA) || is_offscreen(extB))
         return false;
@@ -50,9 +50,6 @@ overlaps(const Entity& entityA, const Entity& entityB)
     // 2. check if the AABB's overlap, since this offers an early exit in many cases.
     if (  extA.minX > extB.maxX || extB.minX > extB.maxX
        || extA.minY > extB.maxY || extB.minY > extB.maxY  ) return false;
-
-            // dump(entityA.poly_decomp);
-            // dump(entityB.poly_decomp);
 
 
     // 3. otherwise, we have to check the individual polygons
