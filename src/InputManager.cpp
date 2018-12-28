@@ -48,24 +48,23 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
 void InputManager::processPressedKey(const Key& key) {
     auto CM = get_manager();
 
-    auto& playerCD = CM->get<Entity>(playerUUID());
-    const float player_angle = playerCD.angle;
+    auto& player = CM->get<Entity>(playerUUID());
+    auto& kin    = CM->get<EulerTranslation>(playerUUID());
+    auto& rot    = CM->get<EulerRotation>(playerUUID());
 
     m_keyStates[key] = KeyState::Pressed;
 
     switch (key) {
         case Key::UpArrow: {
-            v2& player_acc = playerCD.acc;
-            player_acc.x = 75 * std::cos(player_angle);
-            player_acc.y = 75 * std::sin(player_angle);
+            kin.acc.x = 75 * std::cos(player.angle);
+            kin.acc.y = 75 * std::sin(player.angle);
             break;
         }
 
         case Key::DownArrow: {
             if (m_keyStates[Key::UpArrow] != KeyState::Pressed) {
-                v2& player_acc = playerCD.acc;
-                player_acc.x = -75 * std::cos(player_angle);
-                player_acc.y = -75 * std::sin(player_angle);
+                kin.acc.x = -75 * std::cos(player.angle);
+                kin.acc.y = -75 * std::sin(player.angle);
             }
             break;
         }
@@ -73,9 +72,9 @@ void InputManager::processPressedKey(const Key& key) {
         case Key::RightArrow: {
             if (m_keyStates[Key::LeftArrow] != KeyState::Pressed) {
                 if (SDL_GetModState() & KMOD_LSHIFT) {
-                    playerCD.angvel = -2.5f;
+                    rot.vel = -2.5f;
                 } else {
-                    playerCD.angvel = -7.f;
+                    rot.vel = -7.f;
                 }
             }
             break;
@@ -84,112 +83,105 @@ void InputManager::processPressedKey(const Key& key) {
         case Key::LeftArrow: {
             if (m_keyStates[Key::RightArrow] != KeyState::Pressed) {
                 if (SDL_GetModState() & KMOD_LSHIFT) {
-                    playerCD.angvel = 2.5f;
+                    rot.vel = 2.5f;
                 } else {
-                    playerCD.angvel = 7.f;
+                    rot.vel = 7.f;
                 }
             }
             break;
         }
 
         case Key::Spacebar: {
-
-                // CM->book<Alliance>(bulletUUID, Alliance::Friend);
-                //
-                const v2& player_pos = playerCD.pos;
-                const v2& player_vel = playerCD.vel;
-                const v2& player_orientation = orientation_of(playerCD);
+                const v2& player_pos = player.pos;
+                const v2& player_vel = kin.vel;
+                const v2& player_orientation = orientation_of(player);
 
                 v2 bullet_pos, bullet_vel;
 
-                v2 bullet_pos_offset = player_orientation;
-                bullet_pos_offset.scale(4.f);
+                v2 bullet_pos_offset = 4.0 * player_orientation;
+                //bullet_pos_offset.scale(4.f);
 
                 bullet_pos = player_pos + bullet_pos_offset;
-                bullet_vel = player_vel + 100.f * orientation_of(playerCD);
+                bullet_vel = player_vel + 200.f * orientation_of(player);
 
-                generateBullet(bullet_pos, bullet_vel);
+                UUID bulletUUID = generateBullet(bullet_pos, bullet_vel, player.angle);
 
             break;
         }
 
         case Key::Shift: {
-                             if (fabs(playerCD.angvel) > 0) {
-                                 playerCD.angvel = 2.5f * signum(playerCD.angvel);
-                             }
-                             break;
-                         }
+            if (fabs(rot.vel) > 0) {
+                rot.vel = 2.5f * signum(rot.vel);
+            }
+            break;
+        }
     }
 }
 
 void InputManager::processReleasedKey(const Key& key) {
     auto CM = get_manager();
 
-    // don't 'get' this every frame, just keep it stored.
-    auto& playerCD = CM->get<Entity>(playerUUID());
+    auto& player = CM->get<Entity>(playerUUID());
+    auto& kin    = CM->get<EulerTranslation>(playerUUID());
+    auto& rot    = CM->get<EulerRotation>(playerUUID());
 
     m_keyStates[key] = KeyState::Released;
 
     switch (key) {
 
-    case Key::UpArrow: {
-        v2& player_acc = playerCD.acc;
-        const float player_angle = playerCD.angle;
-        if (m_keyStates[Key::DownArrow] != KeyState::Pressed) {
-            playerCD.acc.x = 0;
-            playerCD.acc.y = 0;
-        } else {
-            player_acc.x = -75 * std::cos(player_angle);
-            player_acc.y = -75 * std::sin(player_angle);
+        case Key::UpArrow: {
+            if (m_keyStates[Key::DownArrow] != KeyState::Pressed) {
+                kin.acc.x = 0;
+                kin.acc.y = 0;
+            } else {
+                kin.acc.x = -75 * std::cos(player.angle);
+                kin.acc.y = -75 * std::sin(player.angle);
+            }
+            break;
         }
-        break;
-    }
-    case Key::DownArrow: {
-        v2& player_acc = playerCD.acc;
-        const float player_angle = playerCD.angle;
-        if (m_keyStates[Key::UpArrow] != KeyState::Pressed) {
-            playerCD.acc.x = 0;
-            playerCD.acc.y = 0;
-        } else {
-            player_acc.x = 75 * std::cos(player_angle);
-            player_acc.y = 75 * std::sin(player_angle);
-        }
-        break;
-    }
-    case Key::RightArrow: {
-        if (m_keyStates[Key::LeftArrow] == KeyState::Pressed) {
-                if (SDL_GetModState() & KMOD_LSHIFT) {
-                    playerCD.angvel = 2.5f;
-                } else {
-                    playerCD.angvel = 7.f;
-                }
-        } else {
-            playerCD.angvel = 0.f;
-        }
-        break;
-    }
-    case Key::LeftArrow: {
-        if (m_keyStates[Key::RightArrow] == KeyState::Pressed) {
-                if (SDL_GetModState() & KMOD_LSHIFT) {
-                    playerCD.angvel = -2.5f;
-                } else {
-                    playerCD.angvel = -7.f;
-                }
-        } else {
-            playerCD.angvel = 0.f;
-        }
-        break;
-    }
-    case Key::Spacebar: {
-        break;
-    }
 
-        case Key::Shift:
-                            {
-                             if (fabs(playerCD.angvel) > 0) {
-                                 playerCD.angvel = 7.f * signum(playerCD.angvel);
-                             }
-                             break;
-                         }
+        case Key::DownArrow: {
+            if (m_keyStates[Key::UpArrow] != KeyState::Pressed) {
+                kin.acc.x = 0;
+                kin.acc.y = 0;
+            } else {
+                kin.acc.x = 75 * std::cos(player.angle);
+                kin.acc.y = 75 * std::sin(player.angle);
+            }
+            break;
+        }
+
+        case Key::RightArrow: {
+            if (m_keyStates[Key::LeftArrow] == KeyState::Pressed) {
+                    if (SDL_GetModState() & KMOD_LSHIFT) {
+                        rot.vel = 2.5f;
+                    } else {
+                        rot.vel = 7.f;
+                    }
+            } else {
+                rot.vel = 0.f;
+            }
+            break;
+        }
+
+        case Key::LeftArrow: {
+            if (m_keyStates[Key::RightArrow] == KeyState::Pressed) {
+                    if (SDL_GetModState() & KMOD_LSHIFT) {
+                        rot.vel = -2.5f;
+                    } else {
+                        rot.vel = -7.f;
+                    }
+            } else {
+                rot.vel = 0.f;
+            }
+            break;
+        }
+
+        case Key::Shift: {
+            if (fabs(rot.vel) > 0) {
+                rot.vel = 7.f * signum(rot.vel);
+            }
+            break;
+        }
     }
 }

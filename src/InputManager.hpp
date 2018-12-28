@@ -1,3 +1,10 @@
+/**
+ * File              : InputManager.hpp
+ * Author            : Zachary A. Meadows <zmeadows@gmail.com>
+ * Date              : 09.03.2018
+ * Last Modified Date: 09.03.2018
+ * Last Modified By  : Zachary A. Meadows <zmeadows@gmail.com>
+ */
 #pragma once
 
 #include <cassert>
@@ -17,11 +24,11 @@ class InputManager {
 
 public:
     InputManager() {
-        m_keyStates[Key::LeftArrow] = KeyState::Released;
+        m_keyStates[Key::LeftArrow]  = KeyState::Released;
         m_keyStates[Key::RightArrow] = KeyState::Released;
-        m_keyStates[Key::DownArrow] = KeyState::Released;
-        m_keyStates[Key::UpArrow] = KeyState::Released;
-        m_keyStates[Key::Spacebar] = KeyState::Released;
+        m_keyStates[Key::DownArrow]  = KeyState::Released;
+        m_keyStates[Key::UpArrow]    = KeyState::Released;
+        m_keyStates[Key::Spacebar]   = KeyState::Released;
     }
     void processInput(SDL_Keycode SDLkey, bool keyUp);
 };
