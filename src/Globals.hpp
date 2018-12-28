@@ -16,4 +16,5 @@ extern QuadTree g_QT;
 ComponentManager* get_manager(void);
 GraphicsContext* get_graphics_context(void);
 QuadTree* get_quad_tree(void);
+AudioContext* get_audio_context(void);
 void play_sound(SoundEffect effect);
