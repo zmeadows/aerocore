@@ -30,8 +30,9 @@ project_on(const GlobalVertexBuffer& global_vertices,
     float minProjection = std::numeric_limits<float>::max();
     float maxProjection = std::numeric_limits<float>::lowest();
 
-    //@TODO: use SIMD here, loop over entities in chunks and keep min/max of each lane in SIMD 4/8-registers
-    //       then take min/max of minmax registers at the end of everything.
+    //@OPTIMIZE: use SIMD here:
+    // loop over polygons in chunks and keep min/max in each lane of SIMD 4/8-registers
+    // then take min/max of each register at the end and compare.
     for (auto idx = 0; idx < polygon.count; idx++) {
         const float projection = global_vertices[polygon.indices[idx]].dot(axis);
         minProjection = std::min(projection, minProjection);

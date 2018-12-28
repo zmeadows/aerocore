@@ -14,16 +14,6 @@ struct AxisProjection {
     float max = 0.f;
 };
 
-
-//@GAMEIDEA: very limited ammo! So that the player has to choose between shooting asteroids (frees up space)
-//and shooting enemies (progresses through level or gets rewards/points)
-//no points for killing asteroids!
-//... asteroids roguelike! :)
-//
-
-//@GAMEIDEA: paint with your ship  somehow? screen full of asteroids, invinclbe, piercing bullets?
-
-
 struct PolygonDecomposition {
     uint_least8_t indices[256];
     uint_least8_t offsets[127];
