@@ -9,6 +9,11 @@ enum SoundEffect {
     NUM_SOUND_EFFECTS
 };
 
+struct SoundEvent {
+    SoundEvent(SoundEffect _effect) : effect(_effect) {}
+    const enum SoundEffect effect;
+};
+
 class AudioContext {
     Mix_Chunk* chunks[NUM_SOUND_EFFECTS];
 public:

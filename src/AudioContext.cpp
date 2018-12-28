@@ -13,7 +13,7 @@ AudioContext::AudioContext(void)
     chunks[SoundEffect_Explosion] = Mix_LoadWAV(asset_path("sound/Explosion19.wav").c_str());
 
     for (size_t i = 0; i < NUM_SOUND_EFFECTS; i++)
-        Mix_VolumeChunk(chunks[i], MIX_MAX_VOLUME/10);
+        Mix_VolumeChunk(chunks[i], MIX_MAX_VOLUME/20);
 }
 
 AudioContext::~AudioContext(void)
