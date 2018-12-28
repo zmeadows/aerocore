@@ -68,15 +68,15 @@ std::vector<std::string> split_string(const std::string& str,
 
 }
 
-void assign_iso_triangle_vertices(Entity& entity, float base_width, float height)
-{
-    entity.local_vertices.count = 3;
-    entity.local_vertices[0] = {0.f, base_width / 2.f};
-    entity.local_vertices[1] = {height, 0.f};
-    entity.local_vertices[2] = {0.f, -base_width / 2.f};
-
-    recenter(entity.local_vertices);
-}
+// void assign_iso_triangle_vertices(Entity& entity, float base_width, float height)
+// {
+//     entity.local_vertices.count = 3;
+//     entity.local_vertices[0] = {0.f, base_width / 2.f};
+//     entity.local_vertices[1] = {height, 0.f};
+//     entity.local_vertices[2] = {0.f, -base_width / 2.f};
+// 
+//     recenter(entity.local_vertices);
+// }
 
 void populate_global_vertices(const LocalVertexBuffer& lvb, GlobalVertexBuffer& gvb,
                               const v2 position_offset, const float rotation_angle)
@@ -86,7 +86,7 @@ void populate_global_vertices(const LocalVertexBuffer& lvb, GlobalVertexBuffer& 
     gvb.count = lvb.count;
 }
 
-void draw(GraphicsContext& GC, const Entity& entity)
+void draw(GraphicsContext& GC, const Sprite& sprite, v2 pos, float angle)
 {
 
     // v2 orientation = orientation_of(entity);
@@ -112,23 +112,25 @@ void draw(GraphicsContext& GC, const Entity& entity)
     //                  10,
     //                  { 0,0,255,255});
 
-    const size_t vtx_count = entity.global_vertices.count;
+    // const size_t vtx_count = entity.global_vertices.count;
 
-    if (entity.sprite != nullptr) {
-        ScreenCoordinates sc = GC.to_screen_coords(entity.pos);
-        const v2 offset = entity.sprite_offset.rotated(-entity.angle);
-        GPU_BlitRotate(entity.sprite, NULL, GC.renderer,
-                       sc.x - offset.x, sc.y - offset.y, - entity.angle * 180.f/PI);
-    } else {
-        for (size_t i = 0; i < vtx_count; i++) {
-            ScreenCoordinates sc1 = GC.to_screen_coords(entity.global_vertices[i]);
-            ScreenCoordinates sc2 = GC.to_screen_coords(entity.global_vertices[(i+1) % vtx_count]);
-            GPU_Line(GC.renderer,
-                     sc1.x, sc1.y,
-                     sc2.x, sc2.y,
-                     entity.color);
-        }
+    if (sprite.image != nullptr) {
+        ScreenCoordinates sc = GC.to_screen_coords(pos);
+        const v2 offset = sprite.offset.rotated(-angle);
+        GPU_BlitRotate(sprite.image, NULL, GC.renderer,
+                       sc.x - offset.x, sc.y - offset.y,
+                       - angle * 180.f/PI);
     }
+    // else {
+    //     for (size_t i = 0; i < vtx_count; i++) {
+    //         ScreenCoordinates sc1 = GC.to_screen_coords(entity.global_vertices[i]);
+    //         ScreenCoordinates sc2 = GC.to_screen_coords(entity.global_vertices[(i+1) % vtx_count]);
+    //         GPU_Line(GC.renderer,
+    //                  sc1.x, sc1.y,
+    //                  sc2.x, sc2.y,
+    //                  entity.color);
+    //     }
+    // }
 }
 
 
@@ -173,8 +175,6 @@ SVGParsePathResult parse_svg_path(const char* filepath)
     }
 
     result.sprite_offset = recenter(result.vertices);
-
-    std::cout << result.sprite_offset.x << " " << result.sprite_offset.y << std::endl;
 
     for (v2& vtx : result.vertices) {
         vtx.x = 200.f * vtx.x / 800.f;
