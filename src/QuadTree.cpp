@@ -18,7 +18,7 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
 
     m_containedUUIDs.insert(uuid);
     return this;
-};
+}
 
 void QuadNode::retrieve_from_parents(std::vector<UUID>& candidates, const UUID collider) {
 
@@ -65,20 +65,6 @@ bool QuadNode::has_parent(const QuadNode* node) const {
     return false;
 }
 
-bool QuadNode::contains_entity(const UUID& uuid) const {
-    if (m_containedUUIDs.contains(uuid))
-        return true;
-
-    if (m_hasChildren) {
-        for (auto& node : m_childNodes) {
-            if (node->contains_entity(uuid))
-                return true;
-        }
-    }
-
-    return false;
-}
-
 bool QuadNode::is_in_node_boundary(const Extent& ext) const {
     return ext.minX >= c_x
         && ext.maxX < c_x+c_w
@@ -106,8 +92,6 @@ void QuadNode::produce_children(const unsigned max_depth) {
     m_childNodes[2]->produce_children(max_depth);
     m_childNodes[3]->produce_children(max_depth);
 }
-
-
 
 QuadTree::QuadTree(unsigned max_depth) :
     c_maxDepth(max_depth),
