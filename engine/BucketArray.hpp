@@ -1,52 +1,62 @@
 #pragma once
 
-// Simple c-style bucket array. Does not manage lifetime of contained entities,
-// as this structure is only intended to store data in contiguous blocks
+// Simple c-style bucket array. Does not manage lifetime of contained data.
+// The only purpose of this data structure is to hold arbitrary data in continguous memory chunks.
+
+/*
+namespace __BucketArray__Internal__ {
+
+template <typename T>
+struct Bucket {
+    const u32 capacity;
+    bool* occupied;
+    T* data;
+    u32 occupied_count;
+
+    Bucket(u32 bucket_size, u32 item_size)
+        : capacity(bucket_size)
+          , item_size_bytes(item_size_bytes)
+          , occupied_count(0)
+          , occupied((bool*) malloc(sizeof(bool) * capacity))
+          , data((u8*) malloc(item_size_bytes * capacity))
+          , occupied_count(0)
+    {
+        assert(occupied);
+        assert(data);
+        for (u32 i = 0; i < capacity; i++) { occupied[i] = false; }
+    }
+};
+
+void add_empty_bucket(BucketArray* arr);
+void destroy_bucket(Bucket* bucket);
+
+}
 
 struct BucketIndex {
     const u32 bucket;
-    const u32 index;
-};
-
-struct Bucket {
-    bool* occupied;
-    void* data;
-    u32 alive_count;
-    const u32 capacity;
+    const u32 slot;
 };
 
 struct BucketArray {
-    Bucket* buckets;
-    u32 bucket_count;
     const u32 items_per_bucket;
     const u32 item_size_bytes;
+    Bucket** buckets;
+    u32 bucket_count;
 
-    BucketArray(const u32 bucket_size, const u32 item_size) : items_per_bucket(
+    u8* const operator[](const BucketIndex bid);
+    const u8* const operator[](const BucketIndex bid) const;
+
+    BucketArray(const u32 bucket_size, const u32 item_size)
+        : items_per_bucket(bucket_size)
+        , item_size_bytes(item_size)
+        , buckets((Bucket**) malloc(sizeof(Bucket*)))
+        , bucket_count(1)
+    {
+        buckets[0] = new Bucket(items_per_bucket, item_size_bytes);
+    }
 };
 
-template <typename T>
-void* get(BucketArray* arr, BucketIndex bid) {
-    assert(arr->buckets[bid.bucket]->occupied[bid.index]);
-    return &buckets[bid.bucket]->data[bid.index];
-}
-
-BucketIndex book(BucketArray* arr) {
-    for (u32 i = 0; i < arr->bucket_count; i++) {
-        Bucket* bucket = arr->buckets[i];
-        if (bucket->alive_count == bucket->capacity)
-            continue;
-        for (u32 j = 0; j < bucket->capacity; j++) {
-            if (!bucket->occupied[j]) {
-                bucket->alive_count++;
-                bucket->occupied[j] = true;
-                return BucketIndex({i,j});
-            }
-        }
-    }
-}
-
-template <typename T>
-BucketIndex release(BucketArray* arr, BucketIndex idx) {
-    assert(arr->buckets[bid.bucket]->occupied[bid.index]);
-}
-
+void destroy_bucket_array(BucketArray* arr);
+BucketIndex reserve_empty_slot(BucketArray* arr);
+void* release_slot_and_get_data(BucketArray* arr, BucketIndex bid);
+*/

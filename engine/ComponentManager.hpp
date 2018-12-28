@@ -196,6 +196,7 @@ void ComponentManager::remove(const UUID& uuid) {
 
     compMap.erase(oldValue);
 
+    //TODO: just template the release function in the ResourceManager
     m_pools[compID]->release(oldHandle);
 
     alertSystemsOldComponentRemoved<TyComponent>(uuid);

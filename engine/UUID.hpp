@@ -15,6 +15,7 @@ public:
     UUID(UUID&& rhs) : m_ID(rhs.m_ID) {}
     inline rep unwrap(void) const { return m_ID; }
 
+    //@TODO: define these assignment operators
     UUID& operator=(const UUID& rhs) = delete;
     UUID& operator=(UUID&& rhs) = delete;
 
