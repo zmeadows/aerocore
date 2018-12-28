@@ -19,6 +19,6 @@ public:
         m_fpsHistory({{0.0}}),
         m_lastFrameTicks(SDL_GetPerformanceCounter()),
         m_modFrame(0) {
-        get_manager()->subscribe<Entity>(this);
+        get_manager()->subscribe<Entity,Sprite>(this);
     }
 };

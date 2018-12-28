@@ -10,7 +10,7 @@ public:
 
     StabberSystem() : System("Stabber")
     {
-        get_manager()->subscribe<StabberData>(this);
+        get_manager()->subscribe<Entity, EulerTranslation, EulerRotation, Stabber>(this);
     }
 };
 
