@@ -16,17 +16,15 @@ Uint8 shard_tick(AsteroidShardData& shard, float dt);
 
 void generateStabber(void);
 
-struct StabberData {
+struct Stabber {
     enum class State {
         Stabbing,
         Relocating,
         Stopping,
         Aiming
-    } state = State::Relocating;
+    } state = State::Stopping;
 
     float speed = 0.f;
 
     v2 idle_point;
 };
-
-void set_stabber_to_relocating(Entity& stabber, StabberData& stabber_data);
