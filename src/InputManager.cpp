@@ -104,7 +104,7 @@ void InputManager::processPressedKey(const Key& key) {
                 bullet_pos = player_pos + bullet_pos_offset;
                 bullet_vel = player_vel + 200.f * orientation_of(player);
 
-                UUID bulletUUID = generateBullet(bullet_pos, bullet_vel, player.angle);
+                generateBullet(bullet_pos, bullet_vel, player.angle);
 
             break;
         }
@@ -183,5 +183,7 @@ void InputManager::processReleasedKey(const Key& key) {
             }
             break;
         }
+
+        case Key::Spacebar: break;
     }
 }
