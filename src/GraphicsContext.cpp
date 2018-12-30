@@ -13,6 +13,9 @@ GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f
     //                           screen_width,
     //                           SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
 
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,16);
+
     renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
 
     // gfxPrimitivesSetFont(nullptr, 0, 0);
