@@ -3,11 +3,10 @@
 #include "Entity.hpp"
 
 void EulerTranslationSystem::run(float dt) {
-    static ComponentManager* CM = get_manager();
+    ComponentManager* CM = get_manager();
 
     for (const UUID uuid : m_followed) {
-        auto& entity = CM->get<Entity>(uuid);
-        auto& kin = CM->get<EulerTranslation>(uuid);
+        auto& kin    = CM->get<EulerTranslation>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 
         update.delta.x = dt * (kin.vel.x + 0.5f * kin.acc.x * dt);

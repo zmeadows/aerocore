@@ -4,7 +4,7 @@
 #include "QuadTreeDraw.hpp"
 
 void draw_background(void) {
-    static GraphicsContext* GC = get_graphics_context();
+    GraphicsContext* GC = get_graphics_context();
 
     GPU_ClearRGB(GC->renderer, 111, 50, 47);
     GPU_CircleFilled(GC->renderer,

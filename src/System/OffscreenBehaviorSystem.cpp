@@ -2,12 +2,11 @@
 
 #include "Entity.hpp"
 
-void OffscreenBehaviorSystem::run(float dt) {
-    static ComponentManager* CM = get_manager();
+void OffscreenBehaviorSystem::run(float) {
+    ComponentManager* CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         auto& entity = CM->get<Entity>(uuid);
-        const auto& kin = CM->get<EulerTranslation>(uuid);
         const Extent& ext = entity.extent;
 
         if (!is_offscreen(ext)) {
@@ -19,6 +18,7 @@ void OffscreenBehaviorSystem::run(float dt) {
             continue;
         }
 
+        const auto& kin = CM->get<EulerTranslation>(uuid);
         const auto& osb = CM->get<OffscreenBehavior>(uuid);
 
         switch (osb.type) {

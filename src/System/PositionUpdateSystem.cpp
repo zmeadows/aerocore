@@ -2,8 +2,8 @@
 
 #include "Entity.hpp"
 
-void PositionUpdateSystem::run(float dt) {
-    static ComponentManager* CM = get_manager();
+void PositionUpdateSystem::run(float) {
+    ComponentManager* CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         auto& entity = CM->get<Entity>(uuid);

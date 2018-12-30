@@ -2,10 +2,10 @@
 
 #include "Entity.hpp"
 
-void CollisionSystem::run(float dt) {
-    static ComponentManager* CM = get_manager();
+void CollisionSystem::run(float) {
+    auto CM = get_manager();
 
-    for (const UUID& uuid : m_followed) {
+    for (const UUID uuid : m_followed) {
         const auto& cdA = CM->get<CollisionData>(uuid);
         const auto& extA = CM->get<Entity>(uuid).extent;
 
