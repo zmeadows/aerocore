@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <iostream>
 
 #include "Vector2D.hpp"
 #include "Typedef.hpp"
@@ -36,6 +37,7 @@ struct LocalVertexBuffer {
     const v2* end() const { return &data[count]; }
 };
 
+//TODO: use std::variant
 struct OffscreenBehavior {
     enum class Type {
         DiesInstantly,
@@ -69,6 +71,8 @@ struct Extent {
     float minY = std::numeric_limits<float>::max();
     float maxY = std::numeric_limits<float>::lowest();
 };
+
+void dump(const Extent& extent);
 
 Extent extent_of(const GlobalVertexBuffer& global_vertices);
 

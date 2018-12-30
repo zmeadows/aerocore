@@ -12,6 +12,13 @@ float uniform_rand(float min, float max) {
     return min + static_cast<float>(rand())/static_cast<float>(RAND_MAX) * (max - min);
 };
 
+void dump(const Extent& extent) {
+    std::cout << "MIN X: " << extent.minX << std::endl;
+    std::cout << "MAX X: " << extent.maxX << std::endl;
+    std::cout << "MIN Y: " << extent.minY << std::endl;
+    std::cout << "MAX Y: " << extent.maxY << std::endl;
+    std::cout << std::endl;
+}
 
 Extent clip_to_screen(const Extent& ext) {
     Extent clipped_ext = ext;
