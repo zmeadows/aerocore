@@ -7,6 +7,8 @@ namespace {
 const float VEC2D_COMPARISON_DELTA = 1e-6f;
 }
 
+//@TODO: check that LLVM is vectorizing these functions when possible
+
 v2 operator*(const v2& vec, float scale) {
     return {vec.x * scale, vec.y * scale};
 }
@@ -76,10 +78,17 @@ float cross(const v2& lhs, const v2& rhs) {
     return lhs.x * rhs.y - lhs.y * rhs.x;
 }
 
+//@TODO: use fast sqrt? Or is it irrelevant with modern processors?
 float distance(const v2& lhs, const v2& rhs) {
-    return std::sqrt( std::pow(lhs.x - rhs.x, 2.f) + std::pow(lhs.y - rhs.y, 2.f) );
+    const float dx = lhs.x - rhs.x;
+    const float dy = lhs.y - rhs.y;
+    return std::sqrt( dx*dx + dy*dy );
 }
 
-
+v2& v2::operator+=(const v2& rhs){
+  this->x += rhs.x;
+  this->y += rhs.y;
+  return *this;
+}
 
 
