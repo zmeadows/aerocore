@@ -5,74 +5,82 @@
 #include "Generator/Enemy.hpp"
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
-#include "SystemManager.hpp"
-#include "System/MotionSystem.hpp"
+#include "AudioContext.hpp"
+
 #include "System/DrawSystem.hpp"
-#include "System/AsteroidShardSystem.hpp"
 #include "System/StabberSystem.hpp"
+#include "System/EulerTranslationSystem.hpp"
+#include "System/EulerRotationSystem.hpp"
+#include "System/OffscreenBehaviorSystem.hpp"
+#include "System/DestructSystem.hpp"
+#include "System/CollisionSystem.hpp"
+#include "System/VertexBufferSystem.hpp"
+#include "System/PositionUpdateSystem.hpp"
+#include "System/RotationUpdateSystem.hpp"
+#include "System/SoundSystem.hpp"
+
 #include "QuadTreeDraw.hpp"
 
 #include <SDL2/SDL.h>
 
-Game::Game(void)
-    : SM(std::make_unique<SystemManager>()),
-      IM(std::make_unique<InputManager>())
+Game::Game(void) : IM(std::make_unique<InputManager>())
 {
     // TODO: add debug mode check in aerocore that components have
     // actually been registered. Right now it just segfaults.
     auto CM = get_manager();
 
-    CM->registerComponent<Entity>(10000);
-    CM->registerComponent<ShotDelay>(10000);
-    CM->registerComponent<AsteroidShardData>(1000);
-    CM->registerComponent<StabberData>(10000);
+    CM->registerComponent<Entity>(1000);
+    CM->registerComponent<Stabber>(10000);
+    CM->registerComponent<EulerTranslation>(1000);
+    CM->registerComponent<EulerRotation>(1000);
+    CM->registerComponent<OffscreenBehavior>(1000);
+    CM->registerComponent<DestructTag>(1000);
+    CM->registerComponent<FriendlyTag>(1000);
+    CM->registerComponent<CollisionData>(1000);
+    CM->registerComponent<PositionUpdate>(1000);
+    CM->registerComponent<RotationUpdate>(1000);
+    CM->registerComponent<SoundEvent>(1000);
+    CM->registerComponent<Sprite>(1000);
 
-    SM->addSystem(new DrawSystem());
-    SM->addSystem(new MotionSystem());
-    SM->addSystem(new StabberSystem());
-    SM->addSystem(new AsteroidShardSystem());
+    //@NOTE: Order is important here!
+    this->systems.emplace_back(new EulerTranslationSystem());
+    this->systems.emplace_back(new EulerRotationSystem());
+    this->systems.emplace_back(new OffscreenBehaviorSystem());
+    this->systems.emplace_back(new PositionUpdateSystem());
+    this->systems.emplace_back(new RotationUpdateSystem());
+    this->systems.emplace_back(new VertexBufferSystem());
+    this->systems.emplace_back(new CollisionSystem());
+    this->systems.emplace_back(new SoundSystem());
+    this->systems.emplace_back(new DestructSystem());
+    this->systems.emplace_back(new StabberSystem());
+    this->systems.emplace_back(new DrawSystem());
 
     generatePlayer();
 }
 
 bool Game::tick(void) {
-
-    bool paused_before_user_input = paused;
     bool quitting = processInput();
-
-
-    static Uint64 t0 = SDL_GetPerformanceCounter();
-
     auto GC = get_graphics_context();
-    if (!paused) {
-        GPU_ClearRGB(GC->renderer, 50, 50, 50);
-    }
 
-    Uint32 tmp_ticks = SDL_GetTicks();
-    if (!paused && ((last_asteroid_time == 0) || tmp_ticks > last_asteroid_time + 2000)) {
-        last_asteroid_time = SDL_GetTicks();
-        generateOffscreenAsteroid();
+    if (SDL_GetTicks() > last_asteroid_time + 400) {
         generateStabber();
+        last_asteroid_time = SDL_GetTicks();
     }
 
-    if (!paused && !paused_before_user_input) {
-        m_preSystemRunTicks = SDL_GetPerformanceCounter();
-        SM->runSystems(static_cast<float>(SDL_GetPerformanceCounter() - t0) / SDL_GetPerformanceFrequency());
-        m_postSystemRunTicks = SDL_GetPerformanceCounter();
-        t0 = SDL_GetPerformanceCounter();
-    } else if (!paused && paused_before_user_input){
-        t0 = SDL_GetPerformanceCounter();
+    m_preSystemRunTicks = SDL_GetPerformanceCounter();
+    const float frame_time = static_cast<float>(m_preSystemRunTicks - m_postSystemRunTicks) / SDL_GetPerformanceFrequency();
+    if (frame_time < 1/62.f) {
+        const float delta = 1/62.f - frame_time;
+        SDL_Delay(static_cast<unsigned int>(1000.f * delta));
     }
 
-    // if (m_frames_elapsed % 30 == 0)
-    //     std::cout << "system update time: " << static_cast<float>(m_postSystemRunTicks - m_preSystemRunTicks) / SDL_GetPerformanceFrequency() << std::endl;
+    for (auto& sys : systems) {
+        sys->run(1/62.f);
+    }
 
-    m_preFlipTicks = SDL_GetPerformanceCounter();
+    m_postSystemRunTicks = SDL_GetPerformanceCounter();
+
     GPU_Flip(GC->renderer);
-    m_postFlipTicks = SDL_GetPerformanceCounter();
-
-    // if (m_frames_elapsed % 60 == 0)
-    //     std::cout << "buffer flip time: " << static_cast<float>(m_postFlipTicks - m_preFlipTicks) / SDL_GetPerformanceFrequency() << std::endl;
 
     quitting |= !get_manager()->has<Entity>(playerUUID());
 
@@ -106,7 +114,9 @@ Game::~Game(void) {
     auto CM = get_manager();
 
     CM->unRegisterComponent<Entity>();
-    CM->unRegisterComponent<ShotDelay>();
-    CM->unRegisterComponent<AsteroidShardData>();
-    CM->unRegisterComponent<StabberData>();
+    CM->unRegisterComponent<Stabber>();
+    CM->unRegisterComponent<EulerTranslation>();
+    CM->unRegisterComponent<EulerRotation>();
+    CM->unRegisterComponent<OffscreenBehavior>();
+    CM->unRegisterComponent<DestructTag>();
 }
