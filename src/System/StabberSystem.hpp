@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Base.hpp"
 #include "Generator/Enemy.hpp"
 #include "Globals.hpp"
 

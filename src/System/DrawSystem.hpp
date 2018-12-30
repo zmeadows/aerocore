@@ -1,9 +1,6 @@
 #pragma once
 
-
 #include "Globals.hpp"
-#include "GraphicsContext.hpp"
-#include "Sprite.hpp"
 
 class DrawSystem final : public System {
     std::array<double, 100> m_fpsHistory;
@@ -22,3 +19,5 @@ public:
         get_manager()->subscribe<Entity,Sprite>(this);
     }
 };
+
+void draw_background(void);

@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Base.hpp"
 #include "Entity.hpp"
-#include "QuadTree.hpp"
 #include "Globals.hpp"
 
 class EulerRotationSystem final : public System {
