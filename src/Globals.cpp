@@ -5,7 +5,7 @@ namespace __asteroids__globals__ {
 GraphicsContext g_GC = GraphicsContext();
 AudioContext g_AC = AudioContext();
 ComponentManager g_CM = ComponentManager();
-QuadTree g_QT = QuadTree(4);
+QuadTree g_QT = QuadTree(3);
 
 }
 
