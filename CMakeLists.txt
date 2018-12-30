@@ -1,17 +1,21 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.7)
 project(asteroids)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_CXX_COMPILER /usr/local/Cellar/llvm/5.0.1/bin/clang++)
 #add_definitions(-DDODEBUG)
 add_definitions(-DFC_USE_SDL_GPU)
 add_definitions(-DASSET_PATH="${CMAKE_SOURCE_DIR}/assets/")
+if (APPLE)
+    link_directories("/usr/local/lib")
+    include_directories("/usr/local/include")
+endif (APPLE)
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 find_package(OpenGL REQUIRED)
+find_package(SDL2 REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 link_libraries(${OPENGL_LIBRARIES})
 
@@ -31,10 +35,10 @@ file(GLOB GEN_SOURCES "${CMAKE_SOURCE_DIR}/lib/*.cpp" "${CMAKE_SOURCE_DIR}/lib/t
 file(GLOB ENGINE_SOURCES "${CMAKE_SOURCE_DIR}/engine/*.cpp")
 file(GLOB GAME_SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*/*.cpp" "${CMAKE_SOURCE_DIR}/lib/nfont/NFont/*.cpp" "${CMAKE_SOURCE_DIR}/lib/nfont/SDL_FontCache/*.c")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++17 -Wall -pedantic -Wextra -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -I/usr/local/opt/llvm/include -I/usr/local/opt/llvm/include/c++/v1/ -Wno-reserved-id-macro -Wno-padded -Wno-nested-anon-types -Wno-global-constructors -Wno-exit-time-destructors")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++17 -Wall -pedantic -Wextra -Weverything -Wno-implicit-fallthrough -Wno-documentation -Wno-c++98-compat -Wno-c++98-compat-pedantic -I/usr/local/opt/llvm/include/c++/v1/ -Wno-reserved-id-macro -Wno-padded -Wno-nested-anon-types -Wno-global-constructors -Wno-exit-time-destructors")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -fprofile-instr-generate -fcoverage-mapping ${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 ${CMAKE_CXX_FLAGS}")
 
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -stdlib=libc++ -lSDL2 -lSDL2_gfx -lSDL2_gpu -lSDL2_mixer -lSDL2_ttf -L/usr/local/opt/llvm/lib -Wl,-rpath,/usr/local/opt/llvm/lib")
+SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto -stdlib=libc++ -L/usr/local/Cellar -lSDL2 -lSDL2_gfx -lSDL2_gpu -lSDL2_mixer -lSDL2_ttf")
 add_executable(asteroids ${CMAKE_SOURCE_DIR}/src/main.cpp ${ENGINE_SOURCES} ${GAME_SOURCES} ${GEN_SOURCES})
