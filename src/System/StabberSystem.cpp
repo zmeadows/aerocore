@@ -1,6 +1,5 @@
 #include "System/StabberSystem.hpp"
 #include "Globals.hpp"
-
 #include "Entity.hpp"
 
 #include <math.h>

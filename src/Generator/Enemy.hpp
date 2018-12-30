@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector2D.hpp"
+
 void generateStabber(void);
 
 struct Stabber {

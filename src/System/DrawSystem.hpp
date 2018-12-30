@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Entity.hpp"
 #include "Globals.hpp"
 
 class DrawSystem final : public System {

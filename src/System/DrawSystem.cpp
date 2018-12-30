@@ -1,7 +1,7 @@
 #include "Entity.hpp"
 #include "System/DrawSystem.hpp"
-#include "DebugConsole.hpp"
 #include "QuadTreeDraw.hpp"
+#include "Sprite.hpp"
 
 void draw_background(void) {
     GraphicsContext* GC = get_graphics_context();
