@@ -3,6 +3,8 @@
 #include <string>
 #include <algorithm>
 #include <cmath>
+#include <vector>
+#include <assert.h>
 
 #include "Typedef.hpp"
 
