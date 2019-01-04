@@ -2,6 +2,7 @@
 
 #include "Base.hpp"
 #include "Generator/Bullet.hpp"
+#include "Generator/Player.hpp"
 #include "Globals.hpp"
 #include "Entity.hpp"
 
@@ -44,6 +45,7 @@ void InputManager::processInput(SDL_Keycode SDLkey, bool keyUp) {
         default: { break; }
     }
 }
+
 
 void InputManager::processPressedKey(const Key& key) {
     auto CM = get_manager();
@@ -91,23 +93,9 @@ void InputManager::processPressedKey(const Key& key) {
             break;
         }
 
-        case Key::Spacebar: {
-                const v2& player_pos = player.pos;
-                const v2& player_vel = kin.vel;
-                const v2& player_orientation = orientation_of(player);
-
-                v2 bullet_pos, bullet_vel;
-
-                v2 bullet_pos_offset = 4.0 * player_orientation;
-                //bullet_pos_offset.scale(4.f);
-
-                bullet_pos = player_pos + bullet_pos_offset;
-                bullet_vel = player_vel + 200.f * orientation_of(player);
-
-                generateBullet(bullet_pos, bullet_vel, player.angle);
-
+        case Key::Spacebar:
+            generatePlayerBullet();
             break;
-        }
 
         case Key::Shift: {
             if (fabs(rot.vel) > 0) {
@@ -185,5 +173,21 @@ void InputManager::processReleasedKey(const Key& key) {
         }
 
         case Key::Spacebar: break;
+    }
+}
+
+void InputManager::processJoystickInput(void) {
+    auto CM = get_manager();
+
+    auto& kin = CM->get<EulerTranslation>(playerUUID());
+
+    kin.vel = 75.f * this->joystick;
+}
+
+void InputManager::processGamepadButtonInput(Uint8 button, bool press) {
+    switch (button) {
+        case 0:
+            generatePlayerBullet();
+            break;
     }
 }

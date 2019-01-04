@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_gpu.h>
+#include <SDL.h>
+#include <SDL_gpu.h>
 // #include <NFont/NFont.h>
 
 struct v2;
@@ -14,6 +14,8 @@ struct ScreenCoordinates {
 class GraphicsContext {
     const Uint16 screen_width;
     const float screen_width_f;
+
+	SDL_Joystick* gamepad;
 
     // NFont font;
 
