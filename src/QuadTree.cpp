@@ -1,6 +1,7 @@
 #include "QuadTree.hpp"
 
 #include <vector>
+#include <assert.h>
 
 #include "Base.hpp"
 

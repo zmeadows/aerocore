@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include <set>
+#include <vector>
 
 #include "Base.hpp"
 #include "UUID.hpp"
