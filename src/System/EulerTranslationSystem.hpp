@@ -9,6 +9,6 @@ public:
 
     EulerTranslationSystem(void) : System("EulerTranslation")
     {
-        get_manager()->subscribe<Entity,EulerTranslation,PositionUpdate>(this);
+        get_manager()->subscribe<EulerTranslation,PositionUpdate>(this);
     }
 };
