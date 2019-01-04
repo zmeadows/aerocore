@@ -17,7 +17,6 @@ struct v2 {
 v2 operator+(const v2& vecA, const v2& vecB);
 v2 operator-(const v2& vecA, const v2& vecB);
 
-
 v2 operator*(const v2& vec, float scale);
 v2 operator*(float scale, const v2& vec);
 
