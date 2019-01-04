@@ -16,8 +16,8 @@ void CollisionSystem::run(float) {
             const auto& extB = CM->get<Entity>(other_uuid).extent;
 
             if (!CM->has<FriendlyTag>(other_uuid) && overlaps(cdA, cdB, extA, extB)) {
-                //CM->book<DestructTag>(uuid);
-                //CM->book<DestructTag>(other_uuid);
+                // CM->book<DestructTag>(uuid);
+                CM->book<DestructTag>(other_uuid);
             }
         }
     }

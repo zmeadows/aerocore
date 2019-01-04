@@ -6,7 +6,7 @@
 void draw_background(void) {
     GraphicsContext* GC = get_graphics_context();
 
-    GPU_ClearRGB(GC->renderer, 111, 50, 47);
+    GPU_ClearRGB(GC->renderer, 40, 40, 40);
     GPU_CircleFilled(GC->renderer,
                      GC->to_screen_span(100.f),
                      GC->to_screen_span(100.f),
@@ -31,7 +31,9 @@ void DrawSystem::run(float) {
         const Sprite& sprite = CM->get<Sprite>(uuid);
 
         draw(*GC, sprite, entity.pos, entity.angle);
-        // if (m_modFrame % 100 < 50) {
+
+        // if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
+        //     const auto& CD = CM->get<CollisionData>(uuid);
         //     SDL_Color test;
         //     test.r = 255;
         //     test.g = 0;
