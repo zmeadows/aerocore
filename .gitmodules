@@ -1,9 +1,0 @@
-[submodule "lib/sdl-gpu"]
-	path = lib/sdl-gpu
-	url = https://github.com/grimfang4/sdl-gpu.git
-[submodule "lib/nfont"]
-	path = lib/nfont
-	url = https://github.com/grimfang4/nfont.git
-[submodule "lib/tinyxml2"]
-	path = lib/tinyxml2
-	url = https://github.com/leethomason/tinyxml2.git
