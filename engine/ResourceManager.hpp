@@ -46,7 +46,10 @@ public:
         for (Handle h = 0; h < m_capacity; h++)
             m_inactive.insert(h);
 
-        release_func = [this](Handle h) { get<T>(h).~T(); };
+        // release_func = [this](Handle h) {
+        //     T& comp = get<T>(h);
+        //    comp.~T();
+        //};
     }
 
     template <typename T>
@@ -77,7 +80,7 @@ public:
     }
 
     inline void release(Handle handle) {
-        release_func(handle);
+        //release_func(handle);
         // const bool releaseSuccess = m_inactive.insert(handle).second;
         static_cast<void>(m_inactive.insert(handle).second);
         // assert(releaseSuccess && "Attempted to release inactive data in ResourceManager for type: ");
