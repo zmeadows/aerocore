@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include <iostream>
 #include <memory>
@@ -11,9 +11,7 @@
 #include "Game.hpp"
 #include "Util.hpp"
 
-
-
-int main(/* int argc, char** argv */) {
+int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
     auto game = std::make_unique<Game>();
     game->run();
