@@ -70,7 +70,8 @@ float v2::magnitude(void) const {
 
 v2 v2::normalized(void) const {
     v2 tmp = *this;
-    tmp.scale(1.f / tmp.magnitude());
+    const float m = tmp.magnitude();
+    if (m > 0) tmp.scale(1.f / tmp.magnitude());
     return tmp;
 }
 
