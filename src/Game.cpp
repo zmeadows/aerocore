@@ -8,7 +8,7 @@
 #include "AudioContext.hpp"
 
 #include "System/DrawSystem.hpp"
-#include "System/StabberSystem.hpp"
+//#include "System/StabberSystem.hpp"
 #include "System/EulerTranslationSystem.hpp"
 #include "System/EulerRotationSystem.hpp"
 #include "System/OffscreenBehaviorSystem.hpp"
@@ -18,10 +18,13 @@
 #include "System/PositionUpdateSystem.hpp"
 #include "System/RotationUpdateSystem.hpp"
 #include "System/SoundSystem.hpp"
+#include "System/LinearPathSystem.hpp"
+
+#include "Entity/Twister.hpp"
 
 #include "QuadTreeDraw.hpp"
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 Game::Game(void) : IM(std::make_unique<InputManager>())
 {
@@ -30,7 +33,7 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     auto CM = get_manager();
 
     CM->registerComponent<Entity>(1000);
-    CM->registerComponent<Stabber>(10000);
+    //CM->registerComponent<Stabber>(1000);
     CM->registerComponent<EulerTranslation>(1000);
     CM->registerComponent<EulerRotation>(1000);
     CM->registerComponent<OffscreenBehavior>(1000);
@@ -41,10 +44,13 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     CM->registerComponent<RotationUpdate>(1000);
     CM->registerComponent<SoundEvent>(1000);
     CM->registerComponent<Sprite>(1000);
+    CM->registerComponent<LinearPath>(1000);
+    CM->registerComponent<Twister::Data>(1000);
 
     //@NOTE: Order is important here!
     this->systems.emplace_back(new EulerTranslationSystem());
     this->systems.emplace_back(new EulerRotationSystem());
+    this->systems.emplace_back(new LinearPathSystem());
     this->systems.emplace_back(new OffscreenBehaviorSystem());
     this->systems.emplace_back(new PositionUpdateSystem());
     this->systems.emplace_back(new RotationUpdateSystem());
@@ -52,8 +58,9 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     this->systems.emplace_back(new CollisionSystem());
     this->systems.emplace_back(new SoundSystem());
     this->systems.emplace_back(new DestructSystem());
-    this->systems.emplace_back(new StabberSystem());
+    //this->systems.emplace_back(new StabberSystem());
     this->systems.emplace_back(new DrawSystem());
+    this->systems.emplace_back(new Twister::System());
 
     generatePlayer();
 }
@@ -62,20 +69,16 @@ bool Game::tick(void) {
     bool quitting = processInput();
     auto GC = get_graphics_context();
 
-    if (SDL_GetTicks() > last_asteroid_time + 400) {
-        generateStabber();
+    if (SDL_GetTicks() > last_asteroid_time + 1000) {
+        Twister::generate( {76.f, 130.f } );
         last_asteroid_time = SDL_GetTicks();
     }
 
     m_preSystemRunTicks = SDL_GetPerformanceCounter();
     const float frame_time = static_cast<float>(m_preSystemRunTicks - m_postSystemRunTicks) / SDL_GetPerformanceFrequency();
-    if (frame_time < 1/62.f) {
-        const float delta = 1/62.f - frame_time;
-        SDL_Delay(static_cast<unsigned int>(1000.f * delta));
-    }
 
     for (auto& sys : systems) {
-        sys->run(1/62.f);
+        sys->run(frame_time);
     }
 
     m_postSystemRunTicks = SDL_GetPerformanceCounter();
@@ -104,6 +107,12 @@ bool Game::processInput(void) {
             }
         } else if (!paused && e.type == SDL_KEYUP && e.key.repeat == 0) {
             IM->processInput(e.key.keysym.sym, true);
+        } else if (e.type == SDL_JOYAXISMOTION && e.jaxis.which == 0 ) {
+            if ( e.jaxis.axis == 0 ) IM->updateGamepadJoystickX(e.jaxis.value);
+            if ( e.jaxis.axis == 1 ) IM->updateGamepadJoystickY(e.jaxis.value);
+            IM->processJoystickInput();
+        } else if (e.type == SDL_JOYBUTTONDOWN && e.jaxis.which == 0) {
+            IM->processGamepadButtonInput(e.jbutton.button, e.jbutton.state == SDL_PRESSED);
         }
     }
 
@@ -114,7 +123,7 @@ Game::~Game(void) {
     auto CM = get_manager();
 
     CM->unRegisterComponent<Entity>();
-    CM->unRegisterComponent<Stabber>();
+    // CM->unRegisterComponent<Stabber>();
     CM->unRegisterComponent<EulerTranslation>();
     CM->unRegisterComponent<EulerRotation>();
     CM->unRegisterComponent<OffscreenBehavior>();

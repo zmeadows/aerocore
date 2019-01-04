@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #include "System.hpp"
 

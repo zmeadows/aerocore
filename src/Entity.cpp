@@ -1,6 +1,6 @@
 #include "Entity.hpp"
 
-#include "Enemy.hpp"
+#include "Generator/Enemy.hpp"
 #include "Sprite.hpp"
 #include "Globals.hpp"
 

@@ -2,6 +2,9 @@
 
 #include "UUID.hpp"
 
+#include <algorithm>
+#include <assert.h>
+
 const UUID playerUUID(void) {
     static UUID id;
     return id;
@@ -24,7 +27,6 @@ Extent clip_to_screen(const Extent& ext) {
     Extent clipped_ext = ext;
 
     //@FIXME: avoid these deltas? or consult GraphicsContext and choose delta cleverly?
-    //@TODO: what happens when the entity is off screen completely?
     if (ext.minX < -100.f) clipped_ext.minX = -100.f + 1e-6f;
     if (ext.minY < -100.f) clipped_ext.minY = -100.f + 1e-6f;
     if (ext.maxX > 100.f) clipped_ext.maxX = 100.f - 1e-3f;

@@ -2,21 +2,10 @@
 
 #include "Base.hpp"
 #include "PolygonDecomposition.hpp"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_gpu.h>
+#include <SDL.h>
+#include <SDL_gpu.h>
 
 struct QuadNode;
-
-// struct ParametricTranslation {
-//     size_t degree;
-//     v2 P[4];
-// };
-//
-// struct ParametricRotation {
-//     size_t degree;
-//     float P[4];
-// };
-//
 
 struct DestructTag {};
 struct FriendlyTag {};
@@ -25,6 +14,11 @@ struct EulerTranslation {
     v2 vel = { 0.f, 0.f };
     v2 acc = { 0.f, 0.f };
     float drag = 0.f;
+};
+
+struct LinearPath {
+    v2 from, to;
+    f32 t_elapsed, t_total;
 };
 
 struct EulerRotation {
