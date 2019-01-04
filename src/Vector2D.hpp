@@ -20,6 +20,8 @@ v2 operator-(const v2& vecA, const v2& vecB);
 v2 operator*(const v2& vec, float scale);
 v2 operator*(float scale, const v2& vec);
 
+v2 operator/(const v2& vec, float scale);
+
 bool operator==(const v2& vecA, const v2& vecB);
 bool operator==(const v2& vecA, v2& vecB);
 bool operator==(v2& vecA, const v2& vecB);

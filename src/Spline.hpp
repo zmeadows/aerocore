@@ -53,13 +53,13 @@ struct Spline {
                 current_bin_duration -= bin_time;
                 bin_time = ts[current_bin+1] - ts[current_bin];
 
-            // case 2: transitioning out of last interpolation segment, but looping
+            // case 2: finished spline, but looping
             } else if (looping) {
                 current_bin = 0;
                 current_bin_duration -= bin_time;
                 bin_time = ts[1] - ts[0];
 
-            // case 3: finished spline, not looping (so returned unused time increment)
+            // case 3: finished spline, not looping (so return unused time increment)
             } else {
                 SplineStepResult finished;
                 finished.new_point = ps.back();
@@ -93,20 +93,20 @@ Spline make_spline(const std::vector<v2>& ps, const std::vector<f32>& ts) {
     if (looping) {
         float t1 = ts[1] - ts[0];
         float t2 = ts[N-1] - ts[N-2];
-        ms.push_back( (ps[1] - ps.back()) * (1.0 / (t1 + t2)) );
+        ms.push_back( (ps[1] - ps.back()) / (t1 + t2) );
     } else {
-        ms.push_back( (ps[1] - ps[0]) * (1.0 / (ts[1] - ts[0])) );
+        ms.push_back( (ps[1] - ps[0]) / (ts[1] - ts[0]) );
     }
 
     for (u32 k = 1; k < N - 1; k++) {
-        v2 slope = (ps[k+1] - ps[k-1]) * (1.0 / (ts[k+1] - ts[k-1]));
+        v2 slope = (ps[k+1] - ps[k-1]) / (ts[k+1] - ts[k-1]);
         ms.push_back(slope);
     }
 
     if (looping) {
         ms.push_back( ms[0] );
     } else {
-        ms.push_back( (ps[N-1] - ps[N-2]) * (1.0 / (ts[N-1] - ts[N-2])) );
+        ms.push_back( (ps[N-1] - ps[N-2]) / (ts[N-1] - ts[N-2]) );
     }
 
     assert(ms.size() == N);

@@ -9,6 +9,10 @@ const float VEC2D_COMPARISON_DELTA = 1e-6f;
 
 //@TODO: check that LLVM is vectorizing these functions when possible
 
+v2 operator/(const v2& vec, float scale) {
+    return {vec.x / scale, vec.y / scale};
+}
+
 v2 operator*(const v2& vec, float scale) {
     return {vec.x * scale, vec.y * scale};
 }
