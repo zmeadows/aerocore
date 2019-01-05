@@ -10,11 +10,6 @@ const UUID playerUUID(void) {
     return id;
 }
 
-float uniform_rand(float min, float max) {
-    assert( max > min );
-    return min + static_cast<float>(rand())/static_cast<float>(RAND_MAX) * (max - min);
-};
-
 void dump(const Extent& extent) {
     std::cout << "MIN X: " << extent.minX << std::endl;
     std::cout << "MAX X: " << extent.maxX << std::endl;
