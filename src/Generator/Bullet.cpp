@@ -40,8 +40,8 @@ UUID generate_bullet_enemy(const v2 new_bullet_position,
 
     generate_enemy_skeleton(uuid,
                             new_bullet_position,
-                            "sprites/playerbullet/playerbullet.png",
-                            "sprites/playerbullet/path"
+                            "sprites/enemybullet/enemybullet.png",
+                            "sprites/enemybullet/path"
                             );
 
     auto CM = get_manager();

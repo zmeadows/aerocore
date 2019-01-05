@@ -61,9 +61,23 @@ public:
                     if (data.shot_delay < 0) {
                         const auto& entity = CM->get<Entity>(uuid);
 
-                        const v2 bullet_offset = {0.0, entity.extent.minY - entity.extent.maxY};
+                        const v2 bullet_offsets[4] = {
+                            { 0.0, 0.7 * (entity.extent.minY - entity.extent.maxY) },
+                            { 0.0, - 0.7 * (entity.extent.minY - entity.extent.maxY) },
+                            { 0.7 * (entity.extent.minY - entity.extent.maxY) , 0.0 },
+                            { - 0.7 * (entity.extent.minY - entity.extent.maxY), 0.0 }
+                        };
 
-                        generate_bullet_enemy(entity.pos - bullet_offset, {0.0 , -80}, 3.0 * PI / 2.0);
+                        const v2 bullet_velocities[4] = {
+                            { 0, -100 },
+                            { 0, 100 },
+                            { -100, 0 },
+                            { 100, 0 }
+                        };
+
+                        for (auto i = 0; i < 4; i++) {
+                            generate_bullet_enemy(entity.pos + bullet_offsets[i], bullet_velocities[i], 0);
+                        }
 
                         data.shot_delay = data.shot_delay + 1.0;
                     }
