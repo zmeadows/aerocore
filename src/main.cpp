@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     auto s = make_spline(ps, ts);
 
     while (true) {
-        SplineStepResult result = s.step(0.05);
+        SplineStepResult result = s.step(0.05, false);
 
         std::cout << result.new_point.x << " " << result.new_point.y << std::endl;
 

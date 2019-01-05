@@ -29,15 +29,13 @@ struct Spline {
     // and it is assumed that ts[0] == 0
     std::vector<f32> ts;
 
-    // which segment of interpolation currently underway
+    // which segment of interpolation is currently underway
     u32 current_bin = 0;
 
     // time elapsed within the current interpolation segment
     f32 current_bin_duration = 0;
 
-    bool looping = false;
-
-    SplineStepResult step(const f32 dt) {
+    SplineStepResult step(f32 dt, bool looping) {
         f32 bin_time = ts[current_bin+1] - ts[current_bin]; // total duration of current interpolation segment
 
         current_bin_duration += dt;
@@ -116,7 +114,6 @@ Spline make_spline(const std::vector<v2>& ps, const std::vector<f32>& ts) {
     s.ps = ps;
     s.ts = ts;
     s.ms = ms;
-    s.looping = looping;
 
     return s;
 }
