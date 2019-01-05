@@ -11,7 +11,7 @@
 #include "Game.hpp"
 #include "Util.hpp"
 #include "Spline.hpp"
-#include "random.hpp"
+#include "Random.hpp"
 
 int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
