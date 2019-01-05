@@ -142,6 +142,7 @@ void ComponentManager::unRegisterComponent(void) {
 }
 
 template <typename TyComponent>
+//OPTIMIZE: defer this check when building entities?
 void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>())) {
         if (sys->isFollowing(uuid))
