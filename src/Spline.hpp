@@ -22,7 +22,7 @@ struct Spline {
     // points to interpolate through
     std::vector<v2> ps;
 
-    // slopes at each point, determined via Catmull-Rom method
+    // derivatives at each point, determined via Catmull-Rom method
     std::vector<v2> ms;
 
     // ts[i != 0] specifies the time it takes to get to each point from the start position
