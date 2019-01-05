@@ -15,7 +15,7 @@
 int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
 
-    std::vector<v2> ps = { {0,0}, {10,10}, {0, 12}, {10, -10}, {0,0} };
+    std::vector<v2> ps = { {0,0}, {10,10}, {0, 12}, {10, -10}, {0,-4} };
     std::vector<f32> ts = { 0.0, 0.5, 1.3, 3.0, 5.0 };
 
     auto s = make_spline(ps, ts);
