@@ -70,8 +70,7 @@ bool Game::tick(void) {
     bool quitting = processInput();
     auto GC = get_graphics_context();
 
-    if (SDL_GetTicks() > last_asteroid_time + 30) {
-        Twister::generate( {uniform_random(-100, 100), 130.f } );
+    if (SDL_GetTicks() > last_asteroid_time + 5) {
         Twister::generate( {uniform_random(-100, 100), 130.f } );
         last_asteroid_time = SDL_GetTicks();
     }
@@ -84,6 +83,11 @@ bool Game::tick(void) {
     }
 
     m_postSystemRunTicks = SDL_GetPerformanceCounter();
+
+    if (m_frames_elapsed % 20 == 0) {
+        const float t_frame_time = static_cast<float>(m_postSystemRunTicks - m_preSystemRunTicks) / SDL_GetPerformanceFrequency();
+        std::cout << "frame time: " << t_frame_time << std::endl;
+    }
 
     GPU_Flip(GC->renderer);
 
