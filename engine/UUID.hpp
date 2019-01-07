@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <iostream>
 #include <set>
+#include <algorithm>
+#include <vector>
+#include <utility>
 
 class UUID {
 public:
@@ -15,54 +18,60 @@ public:
     UUID(UUID&& rhs) : m_ID(rhs.m_ID) {}
     inline rep unwrap(void) const { return m_ID; }
 
-    UUID& operator=(const UUID& rhs) = delete;
-    UUID& operator=(UUID&& rhs) = delete;
+	UUID& operator=(const UUID& rhs) {
+        m_ID = rhs.m_ID;
+        return *this;
+	}
+
+    UUID& operator=(UUID&& rhs) {
+        m_ID = rhs.m_ID;
+        return *this;
+    }
 
     bool operator==(const UUID& rhs) const { return m_ID == rhs.m_ID; }
     bool operator!=(const UUID& rhs) const { return m_ID != rhs.m_ID; }
     friend bool operator<(const UUID& a, const UUID& b) { return a.m_ID < b.m_ID; }
 
 private:
-    friend class UUIDSet;
-    UUID(UUID::rep value) : m_ID(value) {}
-    const rep m_ID;
+    rep m_ID;
 };
 
 std::ostream& operator<<(std::ostream& os, const UUID& stui);
 
 class UUIDSet {
-    std::set<UUID::rep> m_set;
+    std::vector<UUID> V;
+    std::less<UUID> cmp;
 
 public:
-    class iterator {
-        using myiter_t = std::set<UUID::rep>::const_iterator;
-        myiter_t m_iter;
-
-    public:
-        iterator(myiter_t i) : m_iter(i) {}
-
-        iterator operator++(void) {
-            m_iter++;
-            return *this;
-        }
-        bool operator!=(const iterator& rhs) { return m_iter != rhs.m_iter; }
-        const UUID operator*(void) { return UUID(*m_iter); }
-        friend iterator next(iterator rhs) { return ++rhs; }
-    };
-
-    UUIDSet(void) {}
+    UUIDSet(void) : V(), cmp() {}
 
     UUIDSet& operator=(const UUIDSet& rhs) = delete;
     UUIDSet& operator=(UUIDSet&& rhs) = delete;
     UUIDSet(UUIDSet&&) = delete;
     UUIDSet(const UUIDSet&) = delete;
 
-    inline void insert(const UUID& uuid) { m_set.insert(uuid.unwrap()); }
-    inline void erase(const UUID& uuid) { m_set.erase(uuid.unwrap()); }
-    inline bool contains(const UUID& uuid) const { return static_cast<bool>(m_set.count(uuid.unwrap())); }
-    inline size_t size(void) const { return m_set.size(); }
+    typedef typename std::vector<UUID>::iterator       iterator;
+    typedef typename std::vector<UUID>::const_iterator const_iterator;
+    iterator       begin()       { return V.begin(); }
+    iterator       end()         { return V.end(); }
+    const_iterator begin() const { return V.begin(); }
+    const_iterator end()   const { return V.end(); }
 
-    iterator begin(void) const { return iterator(m_set.begin()); }
-    iterator end(void) const { return iterator(m_set.end()); }
+    inline void insert(const UUID& uuid) {
+        iterator i = std::lower_bound(begin(), end(), uuid, cmp);
+        if (i == end() || cmp(uuid, *i))
+            V.insert(i, uuid);
+    }
+
+    inline void erase(UUID uuid) {
+        auto it = std::find(V.begin(), V.end(), uuid);
+        if (it != V.end()) V.erase(it);
+    }
+
+    inline bool contains(UUID uuid) const {
+		return std::find(V.begin(), V.end(), uuid) != V.end();
+    }
+
+    inline size_t size(void) const { return V.size(); }
 };
 
