@@ -12,11 +12,12 @@ struct QuadNode {
     const unsigned c_depth;
     const float c_x, c_y, c_w;
     bool m_hasChildren;
-    UUIDSet m_containedUUIDs;
+    std::vector<UUID> m_containedUUIDs;
 
     QuadNode* m_parent = nullptr;
     std::array<std::unique_ptr<QuadNode>, 4> m_childNodes;
 
+    void reset(void);
     bool is_in_node_boundary(const Extent& ext) const;
     void produce_children(const unsigned max_depth);
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext);
@@ -40,6 +41,7 @@ public:
     QuadNode m_top;
 
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext) { return m_top.insert_entity(uuid, ext); }
+    void reset(void) { m_top.reset(); }
 
     QuadTree(void) = delete;
 

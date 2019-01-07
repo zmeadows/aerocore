@@ -5,6 +5,15 @@
 
 #include "Base.hpp"
 
+void QuadNode::reset(void) {
+    m_containedUUIDs.clear();
+
+    if (m_hasChildren) {
+        for (auto& node : m_childNodes)
+            node->reset();
+    }
+}
+
 QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     if (!is_in_node_boundary(ext))
         return nullptr;
@@ -17,7 +26,7 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
         }
     }
 
-    m_containedUUIDs.insert(uuid);
+    m_containedUUIDs.push_back(uuid);
     return this;
 }
 
