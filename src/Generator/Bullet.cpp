@@ -53,7 +53,7 @@ UUID generate_bullet_enemy(const v2 new_bullet_position,
     bullet.angle = new_bullet_angle;
     kin.vel = new_bullet_velocity;
 
-    play_sound(SoundEffect_ShotFired);
+    // play_sound(SoundEffect_ShotFired);
 
     return uuid;
 }
