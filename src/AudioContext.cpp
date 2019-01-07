@@ -4,11 +4,10 @@
 
 AudioContext::AudioContext(void)
 {
-    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
-    {
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 ) {
         printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
     }
-;
+
     chunks[SoundEffect_ShotFired] = Mix_LoadWAV(asset_path("sound/Laser_Shoot14.wav").c_str());
     chunks[SoundEffect_Explosion] = Mix_LoadWAV(asset_path("sound/Explosion19.wav").c_str());
 
