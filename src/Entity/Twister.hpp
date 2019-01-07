@@ -49,7 +49,6 @@ public:
                 case State::ComingOnScreen: {
                     const auto& osb = CM->get<OffscreenBehavior>(uuid);
                     if (osb.SinglePassAllowed.already_found_onscreen) {
-                        std::cout << "found twister on screen" << std::endl;
                         data.state = State::Firing;
                         data.shot_delay = 1.0;
                     }
