@@ -23,6 +23,7 @@
 #include "Entity/Twister.hpp"
 
 #include "QuadTreeDraw.hpp"
+#include "Random.hpp"
 
 #include <SDL.h>
 
@@ -32,20 +33,20 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     // actually been registered. Right now it just segfaults.
     auto CM = get_manager();
 
-    CM->registerComponent<Entity>(1000);
-    //CM->registerComponent<Stabber>(1000);
-    CM->registerComponent<EulerTranslation>(1000);
-    CM->registerComponent<EulerRotation>(1000);
-    CM->registerComponent<OffscreenBehavior>(1000);
-    CM->registerComponent<DestructTag>(1000);
-    CM->registerComponent<FriendlyTag>(1000);
-    CM->registerComponent<CollisionData>(1000);
-    CM->registerComponent<PositionUpdate>(1000);
-    CM->registerComponent<RotationUpdate>(1000);
-    CM->registerComponent<SoundEvent>(1000);
-    CM->registerComponent<Sprite>(1000);
-    CM->registerComponent<LinearPath>(1000);
-    CM->registerComponent<Twister::Data>(1000);
+    CM->registerComponent<Entity>(10000);
+    //CM->registerComponent<Stabber>(10000);
+    CM->registerComponent<EulerTranslation>(10000);
+    CM->registerComponent<EulerRotation>(10000);
+    CM->registerComponent<OffscreenBehavior>(10000);
+    CM->registerComponent<DestructTag>(10000);
+    CM->registerComponent<FriendlyTag>(10000);
+    CM->registerComponent<CollisionData>(10000);
+    CM->registerComponent<PositionUpdate>(10000);
+    CM->registerComponent<RotationUpdate>(10000);
+    CM->registerComponent<SoundEvent>(10000);
+    CM->registerComponent<Sprite>(10000);
+    CM->registerComponent<LinearPath>(10000);
+    CM->registerComponent<Twister::Data>(10000);
 
     //@NOTE: Order is important here!
     this->systems.emplace_back(new EulerTranslationSystem());
@@ -69,8 +70,9 @@ bool Game::tick(void) {
     bool quitting = processInput();
     auto GC = get_graphics_context();
 
-    if (SDL_GetTicks() > last_asteroid_time + 1000) {
-        Twister::generate( {76.f, 130.f } );
+    if (SDL_GetTicks() > last_asteroid_time + 30) {
+        Twister::generate( {uniform_random(-100, 100), 130.f } );
+        Twister::generate( {uniform_random(-100, 100), 130.f } );
         last_asteroid_time = SDL_GetTicks();
     }
 
