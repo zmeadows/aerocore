@@ -78,14 +78,6 @@ std::vector<std::string> split_string(const std::string& str,
 //     recenter(entity.local_vertices);
 // }
 
-void populate_global_vertices(const LocalVertexBuffer& lvb, GlobalVertexBuffer& gvb,
-                              const v2 position_offset, const float rotation_angle)
-{
-    for (size_t i = 0; i < lvb.count; i++)
-        gvb[i] = lvb[i].rotated(rotation_angle) + position_offset;
-    gvb.count = lvb.count;
-}
-
 void draw(GraphicsContext& GC, const Sprite& sprite, v2 pos, float angle)
 {
 

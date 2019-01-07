@@ -10,7 +10,7 @@ public:
 
     CollisionSystem(void) : System("Collision")
     {
-        get_manager()->subscribe<CollisionData, FriendlyTag>(this);
+        get_manager()->subscribe<Entity, CollisionData, FriendlyTag>(this);
         m_candidates.reserve(256);
     }
 };

@@ -1,10 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 #include "Typedef.hpp"
 
-struct PolygonDecomposition;
-struct GlobalVertexBuffer;
 struct LocalVertexBuffer;
 struct v2;
 struct PolygonRep;
@@ -27,8 +26,11 @@ struct PolygonRep {
 
 
 PolygonRep nth_polygon(const PolygonDecomposition& decomp, u32 idx);
-void fill_polygon_normals(const GlobalVertexBuffer& vertices, const PolygonRep polygon, v2* normals);
-AxisProjection project_on(const GlobalVertexBuffer& vertices, const PolygonRep polygon, const v2& axis);
+
+void fill_polygon_normals(const std::vector<v2>& global_vertices, const PolygonRep polygon, v2* normals);
+
+AxisProjection project_on(const std::vector<v2>& global_vertices, const PolygonRep polygon, const v2& axis);
+
 void dump(const PolygonDecomposition& decomp);
 
 PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer& local_vertices);

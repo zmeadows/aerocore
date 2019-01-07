@@ -25,8 +25,7 @@ void generatePlayer() {
     cd.local_vertices = parse_result.vertices;
     sprite.offset = parse_result.sprite_offset;
     cd.poly_decomp = decompose_local_vertices(cd.local_vertices);
-    populate_global_vertices(cd.local_vertices, cd.global_vertices, player.pos, player.angle);
-    player.extent = extent_of(cd.global_vertices);
+    player.extent = extent_of(cd.local_vertices, player.pos, player.angle);
     cd.node = get_quad_tree()->insert_entity(playerUUID(), clip_to_screen(player.extent));
     assert(cd.node);
 

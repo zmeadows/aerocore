@@ -36,9 +36,6 @@ struct RotationUpdate {
 
 struct CollisionData {
     LocalVertexBuffer local_vertices;
-    GlobalVertexBuffer global_vertices;
-    //@TODO: don't *need* to make copies of polygon decompositions for each copy of a sprite
-    // maybe it is still best, since they are small?
     PolygonDecomposition poly_decomp;
     QuadNode* node = nullptr;
 };
@@ -57,6 +54,5 @@ struct Entity {
 // void destroy_entity(const UUID& uuid);
 v2 orientation_of(const Entity& entity);
 bool is_offscreen(const Entity& cd);
-bool overlaps(const CollisionData& entityA, const CollisionData& entityB,
-              const Extent extA, const Extent extB);
+bool overlaps( const Entity& entityA , const Entity& entityB , const CollisionData& cdA , const CollisionData& cdB);
 void recompute_global_context(UUID uuid, Entity& entity);

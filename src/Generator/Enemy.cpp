@@ -60,6 +60,7 @@ GPU_Image* make_sprite(const std::string& image_path) {
 
 }
 
+//TODO: define separate 'entity skeleton' classes and do multiple dispatch here on them
 void generate_enemy_skeleton(UUID uuid, v2 position, const char* sprite_file, const char* path_file) {
     auto CM = get_manager();
 
@@ -78,8 +79,8 @@ void generate_enemy_skeleton(UUID uuid, v2 position, const char* sprite_file, co
     sprite.offset = parse_result.sprite_offset;
     sprite.image = make_sprite(asset_path(sprite_file));
 
-    populate_global_vertices(cd.local_vertices, cd.global_vertices, entity.pos, entity.angle);
-    entity.extent = extent_of(cd.global_vertices);
+    // populate_global_vertices(cd.local_vertices, cd.global_vertices, entity.pos, entity.angle);
+    entity.extent = extent_of(cd.local_vertices, entity.pos, entity.angle);
     cd.poly_decomp = decompose_local_vertices(cd.local_vertices);
     cd.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
 

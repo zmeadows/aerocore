@@ -10,9 +10,6 @@ void DestructSystem::run(float) {
         m_uuid_set_copy.push_back(uuid);
 
     for (const UUID& uuid : m_uuid_set_copy) {
-        if (CM->has<CollisionData>(uuid))
-            CM->get<CollisionData>(uuid).node->m_containedUUIDs.erase(uuid);
         CM->destroy(uuid);
     }
-
 }

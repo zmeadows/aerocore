@@ -2,6 +2,7 @@
 
 #include <limits>
 #include <iostream>
+#include <vector>
 
 #include "Vector2D.hpp"
 #include "Typedef.hpp"
@@ -11,18 +12,18 @@ class UUID;
 
 float uniform_rand(float min, float max);
 
-struct GlobalVertexBuffer {
-    v2 data[1<<5];
-    u32 count = 0;
-
-    v2 operator[](u32 idx) const { return data[idx]; }
-    v2& operator[](u32 idx) { return data[idx]; }
-
-    v2* begin() { return &data[0]; }
-    v2* end() { return &data[count]; }
-    const v2* begin() const { return &data[0]; }
-    const v2* end() const { return &data[count]; }
-};
+// struct GlobalVertexBuffer {
+//     v2 data[1<<5];
+//     u32 count = 0;
+//
+//     v2 operator[](u32 idx) const { return data[idx]; }
+//     v2& operator[](u32 idx) { return data[idx]; }
+//
+//     v2* begin() { return &data[0]; }
+//     v2* end() { return &data[count]; }
+//     const v2* begin() const { return &data[0]; }
+//     const v2* end() const { return &data[count]; }
+// };
 
 struct LocalVertexBuffer {
     v2 data[1<<5];
@@ -74,7 +75,8 @@ struct Extent {
 
 void dump(const Extent& extent);
 
-Extent extent_of(const GlobalVertexBuffer& global_vertices);
+Extent extent_of(const std::vector<v2>& global_vertices);
+Extent extent_of(const LocalVertexBuffer& local_vertices, v2 position, f32 angle);
 
 inline float signum(float x) {
     return static_cast<float>(x > 0) - static_cast<float>(x < 0);
@@ -102,3 +104,8 @@ inline float arctan(float x, float y) {
 
 //@CLARITY: give these distinct names
 bool is_offscreen(const Extent& ext);
+
+std::vector<v2> compute_global_vertices( const LocalVertexBuffer& lvb
+                                       , const v2 position_offset
+                                       , const float rotation_angle);
+

@@ -9,6 +9,7 @@
 #include "Base.hpp"
 #include "Util.hpp"
 
+// test if a point lies within an arbitrary polygon
 bool pnpoly(const v2* vertices, const u32 nvert, const v2& test)
 {
     int c = 0;
@@ -24,17 +25,16 @@ bool pnpoly(const v2* vertices, const u32 nvert, const v2& test)
 }
 
 AxisProjection
-project_on(const GlobalVertexBuffer& global_vertices,
+project_on(const std::vector<v2>& global_vertices,
            const PolygonRep polygon, const v2& axis)
 {
     float minProjection = std::numeric_limits<float>::max();
     float maxProjection = std::numeric_limits<float>::lowest();
 
-    //@OPTIMIZE: use SIMD here:
-    // loop over polygons in chunks and keep min/max in each lane of SIMD 4/8-registers
-    // then take min/max of each register at the end and compare.
     for (auto idx = 0; idx < polygon.count; idx++) {
-        const float projection = global_vertices[polygon.indices[idx]].dot(axis);
+        const auto gidx = polygon.indices[idx];
+        assert(gidx < global_vertices.size());
+        const f32 projection = global_vertices[gidx].dot(axis);
         minProjection = std::min(projection, minProjection);
         maxProjection = std::max(projection, maxProjection);
     }
@@ -56,14 +56,19 @@ nth_polygon(const PolygonDecomposition& decomp, u32 idx)
 }
 
 void
-fill_polygon_normals(const GlobalVertexBuffer& global_vertices,
+fill_polygon_normals(const std::vector<v2>& global_vertices,
                      const PolygonRep polygon, v2* normals)
 {
     const uint_least8_t num_vertices = polygon.count;
 
     for (uint_least8_t i = 0; i < num_vertices; i++) {
-        v2 ov = global_vertices[polygon.indices[(i + 1) % num_vertices]]
-                - global_vertices[polygon.indices[i]];
+        const auto idx1 = polygon.indices[(i + 1) % num_vertices];
+        const auto idx2 = polygon.indices[i];
+
+        assert(idx1 < global_vertices.size());
+        assert(idx2 < global_vertices.size());
+
+        v2 ov = global_vertices[idx1] - global_vertices[idx2];
         normals[i] = { -ov.y, ov.x };
     }
 }
@@ -84,7 +89,6 @@ dump(const PolygonDecomposition& decomp)
     std::cout << std::endl;
 }
 
-// decompose a polygon into triangles if not convex.
 PolygonDecomposition
 decompose_local_vertices(const LocalVertexBuffer& local_vertices)
 {
@@ -98,6 +102,7 @@ decompose_local_vertices(const LocalVertexBuffer& local_vertices)
         remaining_indices.push_back(i);
     }
 
+    //TODO: make sure this works
     // if (is_convex(local_vertices, vertex_count)) {
     //     final_indices.push_back(remaining_indices);
     //     return final_indices;
@@ -169,7 +174,6 @@ decompose_local_vertices(const LocalVertexBuffer& local_vertices)
 
     PolygonDecomposition poly_decomp;
 
-    //@FIXME: doing nothing atm
     u32 idx = 0;
     poly_decomp.offsets[0] = 0;
     poly_decomp.count = 0;
@@ -183,9 +187,6 @@ decompose_local_vertices(const LocalVertexBuffer& local_vertices)
             idx++;
         }
     }
-
-    // dump(poly_decomp);
-
 
     return poly_decomp;
 }

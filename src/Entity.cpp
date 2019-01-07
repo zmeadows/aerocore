@@ -35,14 +35,19 @@ bool is_offscreen(const Entity& cd) {
     return is_offscreen(cd.extent);
 }
 
-//@FIXME: This is still inefficient. Move individual triangles into quad tree
-//and only test surface normals from each pair of triangles.
+namespace {
+    v2 normal_buffer[256];
+}
+
 bool
-overlaps( const CollisionData& entityA
-        , const CollisionData& entityB
-        , const Extent extA
-        , const Extent extB)
+overlaps( const Entity& entityA
+        , const Entity& entityB
+        , const CollisionData& cdA
+        , const CollisionData& cdB)
 {
+    const auto extA = entityA.extent;
+    const auto extB = entityB.extent;
+
     // 1. currently collisions are not processed offscreen (could change)
     if (is_offscreen(extA) || is_offscreen(extB))
         return false;
@@ -53,22 +58,24 @@ overlaps( const CollisionData& entityA
 
 
     // 3. otherwise, we have to check the individual polygons
-    v2 normals[256];
 
-    for (uint_least8_t polyA = 0; polyA < entityA.poly_decomp.count; polyA++) {
-        for (uint_least8_t polyB = 0; polyB < entityB.poly_decomp.count; polyB++) {
+    const std::vector<v2> gvA = compute_global_vertices(cdA.local_vertices, entityA.pos, entityA.angle);
+    const std::vector<v2> gvB = compute_global_vertices(cdB.local_vertices, entityB.pos, entityB.angle);
+
+    for (uint_least8_t polyA = 0; polyA < cdA.poly_decomp.count; polyA++) {
+        for (uint_least8_t polyB = 0; polyB < cdB.poly_decomp.count; polyB++) {
 
             bool polygon_candidates_separated = false;
 
-            const PolygonRep shivA = nth_polygon(entityA.poly_decomp, polyA);
-            const PolygonRep shivB = nth_polygon(entityB.poly_decomp, polyB);
-            fill_polygon_normals(entityA.global_vertices, shivA, normals);
+            const PolygonRep shivA = nth_polygon(cdA.poly_decomp, polyA);
+            const PolygonRep shivB = nth_polygon(cdB.poly_decomp, polyB);
+            fill_polygon_normals(gvA, shivA, normal_buffer);
 
 
             //@TODO: factor this out
             for (auto nidxA = 0; nidxA < shivA.count; nidxA++) {
-                const AxisProjection projA = project_on(entityA.global_vertices, shivA, normals[nidxA]);
-                const AxisProjection projB = project_on(entityB.global_vertices, shivB, normals[nidxA]);
+                const AxisProjection projA = project_on(gvA, shivA, normal_buffer[nidxA]);
+                const AxisProjection projB = project_on(gvB, shivB, normal_buffer[nidxA]);
                 if (!(projA.max >= projB.min && projB.max >= projA.min)) {
                     //@TODO: at this point, swap separating axis to front of polygon decomp to save time next iteration.
                     polygon_candidates_separated = true;
@@ -79,11 +86,11 @@ overlaps( const CollisionData& entityA
             if (polygon_candidates_separated)
                 continue;
 
-            fill_polygon_normals(entityB.global_vertices, shivB, normals);
+            fill_polygon_normals(gvB, shivB, normal_buffer);
 
             for (auto nidxB = 0; nidxB < shivB.count; nidxB++) {
-                const AxisProjection projA = project_on(entityA.global_vertices, shivA, normals[nidxB]);
-                const AxisProjection projB = project_on(entityB.global_vertices, shivB, normals[nidxB]);
+                const AxisProjection projA = project_on(gvA, shivA, normal_buffer[nidxB]);
+                const AxisProjection projB = project_on(gvB, shivB, normal_buffer[nidxB]);
                 if (!(projA.max >= projB.min && projB.max >= projA.min)) {
                     polygon_candidates_separated = true;
                     break;

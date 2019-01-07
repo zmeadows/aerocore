@@ -7,15 +7,15 @@ void CollisionSystem::run(float) {
 
     for (const UUID uuid : m_followed) {
         const auto& cdA = CM->get<CollisionData>(uuid);
-        const auto& extA = CM->get<Entity>(uuid).extent;
+        const auto& entityA = CM->get<Entity>(uuid);
 
         cdA.node->retrieve(m_candidates, uuid);
 
         for (UUID other_uuid : m_candidates) {
             const auto& cdB = CM->get<CollisionData>(other_uuid);
-            const auto& extB = CM->get<Entity>(other_uuid).extent;
+            const auto& entityB = CM->get<Entity>(other_uuid);
 
-            if (!CM->has<FriendlyTag>(other_uuid) && overlaps(cdA, cdB, extA, extB)) {
+            if (!CM->has<FriendlyTag>(other_uuid) && overlaps(entityA, entityB, cdA, cdB)) {
                 // CM->book<DestructTag>(uuid);
                 CM->book<DestructTag>(other_uuid);
             }

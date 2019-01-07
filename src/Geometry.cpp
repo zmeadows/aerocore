@@ -47,7 +47,3 @@ is_convex(const LocalVertexBuffer& vertices)
 v2 average_vector(const LocalVertexBuffer& global_vertices) {
     return average_vector(global_vertices.data, global_vertices.count);
 }
-
-v2 average_vector(const GlobalVertexBuffer& global_vertices) {
-    return average_vector(global_vertices.data, global_vertices.count);
-}

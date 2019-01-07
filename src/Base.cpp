@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <vector>
 
 const UUID playerUUID(void) {
     static UUID id;
@@ -30,11 +31,11 @@ Extent clip_to_screen(const Extent& ext) {
     return clipped_ext;
 }
 
-Extent extent_of(const GlobalVertexBuffer& global_vertices)
+Extent extent_of(const std::vector<v2>& global_vertices)
 {
     Extent ext;
 
-    for (size_t i = 0; i < global_vertices.count; i++)
+    for (size_t i = 0; i < global_vertices.size(); i++)
     {
         ext.minX = std::min(ext.minX, global_vertices[i].x);
         ext.maxX = std::max(ext.maxX, global_vertices[i].x);
@@ -45,6 +46,9 @@ Extent extent_of(const GlobalVertexBuffer& global_vertices)
     return ext;
 }
 
+Extent extent_of(const LocalVertexBuffer& local_vertices, v2 position, f32 angle) {
+    return extent_of(compute_global_vertices(local_vertices, position, angle));
+}
 
 bool is_offscreen(const Extent& ext) {
         return ext.maxX < -100.f
@@ -52,3 +56,18 @@ bool is_offscreen(const Extent& ext) {
             || ext.maxY < -100.f
             || ext.minY > 100.f;
 }
+
+std::vector<v2> compute_global_vertices( const LocalVertexBuffer& lvb
+                                       , const v2 position_offset
+                                       , const float rotation_angle)
+{
+    std::vector<v2> gvb;
+    gvb.reserve(lvb.count);
+
+    for (size_t i = 0; i < lvb.count; i++) {
+        gvb.push_back(lvb[i].rotated(rotation_angle) + position_offset);
+    }
+
+    return gvb;
+}
+
