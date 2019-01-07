@@ -18,7 +18,7 @@ GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f
     // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
     // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
 
-    GPU_SetPreInitFlags(GPU_INIT_ENABLE_VSYNC);
+    // GPU_SetPreInitFlags(GPU_INIT_ENABLE_VSYNC);
     renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
 
     if (SDL_NumJoysticks() < 1) {
