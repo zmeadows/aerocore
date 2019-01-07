@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UUID.hpp"
+#include "Util.hpp"
 
 #include <string>
 
@@ -13,11 +14,21 @@ protected:
 public:
     const std::string name;
 
-    void follow(const UUID& uuid);
-    void unfollow(const UUID& uuid);
-    bool isFollowing(const UUID& uuid) const;
+    inline bool isFollowing(const UUID& uuid) const {
+        return static_cast<bool>(m_followed.contains(uuid));
+    }
 
-    virtual void run(float);
+    inline void follow(const UUID& uuid) {
+        m_followed.insert(uuid);
+        DEBUG(name << " system followed UUID: " << uuid);
+    }
+
+    inline void unfollow(const UUID& uuid) {
+        m_followed.erase(uuid);
+        DEBUG(name << " system unfollowed UUID: " << uuid);
+    }
+
+    virtual void run(float) {}
 
     virtual ~System(void) {}
 };

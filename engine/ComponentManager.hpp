@@ -28,7 +28,7 @@ private:
         return idx;
     }
 
-    ComponentIndex newIndex(void) {
+    inline ComponentIndex newIndex(void) {
         ComponentIndex idx = m_nextIndex;
         m_nextIndex++;
         m_allComponentIndices.insert(idx);
@@ -57,10 +57,10 @@ private:
     void alertSystemsNewComponentAdded(const UUID& uuid);
 
     template <typename TyComponent>
-    void alertSystemsOldComponentRemoved(const UUID& uuid);
+    inline void alertSystemsOldComponentRemoved(const UUID& uuid);
 
     template <typename TyComponent>
-    bool componentIsRegistered(void) {
+    inline bool componentIsRegistered(void) {
         const ComponentIndex compID = index<TyComponent>();
         return compID < m_store.size() && compID < m_pools.size();
     }
@@ -79,7 +79,7 @@ public:
     void registerComponent(const size_t allocSize);
 
     template <typename TyComponent>
-    void unRegisterComponent(void);
+    inline void unRegisterComponent(void);
 
     template <typename TyComponent, class... Args>
     TyComponent& book(const UUID& uuid, Args&&... args);
@@ -88,10 +88,10 @@ public:
     void remove(const UUID& uuid);
 
     template <typename TyComponent>
-    TyComponent& get(const UUID& uuid);
+    inline TyComponent& get(const UUID& uuid);
 
     template <typename TyComponent>
-    const TyComponent& get(UUID uuid) const;
+    inline const TyComponent& get(UUID uuid) const;
 
     inline void destroy(const UUID& uuid);
 
@@ -135,7 +135,7 @@ void ComponentManager::registerComponent(const size_t allocSize) {
 }
 
 template <typename TyComponent>
-void ComponentManager::unRegisterComponent(void) {
+inline void ComponentManager::unRegisterComponent(void) {
     DEBUG("un-registering component: " << type_name<TyComponent>());
     const ComponentIndex compID = index<TyComponent>();
     m_pools[compID]->deallocate<TyComponent>();
@@ -163,7 +163,7 @@ void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
 }
 
 template <typename TyComponent>
-void ComponentManager::alertSystemsOldComponentRemoved(const UUID& uuid) {
+inline void ComponentManager::alertSystemsOldComponentRemoved(const UUID& uuid) {
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>()))
         sys->unfollow(uuid);
 }
@@ -204,7 +204,7 @@ void ComponentManager::remove(const UUID& uuid) {
 }
 
 template <typename TyComponent>
-TyComponent& ComponentManager::get(const UUID& uuid) {
+inline TyComponent& ComponentManager::get(const UUID& uuid) {
     assert(componentIsRegistered<TyComponent>() &&
            "Attempted to 'get' component data for un-registered component of type: ");
 
@@ -218,7 +218,7 @@ TyComponent& ComponentManager::get(const UUID& uuid) {
 }
 
 template <typename TyComponent>
-const TyComponent& ComponentManager::get(UUID uuid) const {
+inline const TyComponent& ComponentManager::get(UUID uuid) const {
     const ComponentIndex compID = index<TyComponent>();
 
     assert(compID < m_store.size() && compID < m_pools.size() &&
