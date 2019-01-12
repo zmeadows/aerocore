@@ -96,9 +96,9 @@ public:
     inline void destroy(const UUID& uuid);
 
     template <typename TyComponent>
-    bool has(UUID uuid) {
+    inline bool has(UUID uuid) {
         const ComponentIndex compID = index<TyComponent>();
-        return static_cast<bool>(m_store[compID].count(uuid.unwrap()));
+        return m_store[compID].count(uuid.unwrap()) > 0;
     }
 
     template <typename TyComponent>
