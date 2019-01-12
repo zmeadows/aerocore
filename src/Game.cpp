@@ -7,8 +7,9 @@
 #include "InputManager.hpp"
 #include "AudioContext.hpp"
 
+#include "Entity/Twister.hpp"
+
 #include "System/DrawSystem.hpp"
-//#include "System/StabberSystem.hpp"
 #include "System/EulerTranslationSystem.hpp"
 #include "System/EulerRotationSystem.hpp"
 #include "System/OffscreenBehaviorSystem.hpp"
@@ -20,10 +21,11 @@
 #include "System/SoundSystem.hpp"
 #include "System/LinearPathSystem.hpp"
 
-#include "Entity/Twister.hpp"
+#include "Behavior/Pause.hpp"
 
 #include "QuadTreeDraw.hpp"
 #include "Random.hpp"
+#include "State.hpp"
 
 #include <SDL.h>
 
@@ -33,35 +35,44 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     // actually been registered. Right now it just segfaults.
     auto CM = get_manager();
 
-    CM->registerComponent<Entity>(10000);
-    //CM->registerComponent<Stabber>(10000);
-    CM->registerComponent<EulerTranslation>(10000);
-    CM->registerComponent<EulerRotation>(10000);
-    CM->registerComponent<OffscreenBehavior>(10000);
-    CM->registerComponent<DestructTag>(10000);
-    CM->registerComponent<FriendlyTag>(10000);
-    CM->registerComponent<CollisionData>(10000);
-    CM->registerComponent<PositionUpdate>(10000);
-    CM->registerComponent<RotationUpdate>(10000);
-    CM->registerComponent<SoundEvent>(10000);
-    CM->registerComponent<Sprite>(10000);
-    CM->registerComponent<LinearPath>(10000);
-    CM->registerComponent<Twister::Data>(10000);
+    CM->registerComponent<Entity>(500);
+    CM->registerComponent<EulerTranslation>(500);
+    CM->registerComponent<EulerRotation>(500);
+    CM->registerComponent<OffscreenBehavior>(500);
+    CM->registerComponent<DestructTag>(500);
+    CM->registerComponent<FriendlyTag>(500);
+    CM->registerComponent<CollisionData>(500);
+    CM->registerComponent<PositionUpdate>(500);
+    CM->registerComponent<RotationUpdate>(500);
+    CM->registerComponent<SoundEvent>(500);
+    CM->registerComponent<Sprite>(500);
+    CM->registerComponent<StateTransition>(500);
+    CM->registerComponent<Twister::Tag>(500);
+    CM->registerComponent<TranslationSpline>(500);
+    CM->registerComponent<PauseBehavior>(500);
 
     //@NOTE: Order is important here!
+
     this->systems.emplace_back(new EulerTranslationSystem());
     this->systems.emplace_back(new EulerRotationSystem());
-    this->systems.emplace_back(new LinearPathSystem());
+
+    this->systems.emplace_back(new TranslationSplineSystem());
+
     this->systems.emplace_back(new OffscreenBehaviorSystem());
     this->systems.emplace_back(new PositionUpdateSystem());
     this->systems.emplace_back(new RotationUpdateSystem());
+
+
+    this->systems.emplace_back(new PauseSystem());
+
+    this->systems.emplace_back(new Twister::StateMachineSystem());
+    this->systems.emplace_back(new StateTransitionCleanupSystem());
+
     this->systems.emplace_back(new VertexBufferSystem());
     this->systems.emplace_back(new CollisionSystem());
     this->systems.emplace_back(new SoundSystem());
     this->systems.emplace_back(new DestructSystem());
-    //this->systems.emplace_back(new StabberSystem());
     this->systems.emplace_back(new DrawSystem());
-    this->systems.emplace_back(new Twister::System());
 
     generatePlayer();
 }
@@ -70,8 +81,15 @@ bool Game::tick(void) {
     bool quitting = processInput();
     auto GC = get_graphics_context();
 
-    if (SDL_GetTicks() > last_asteroid_time + 5) {
-        Twister::generate( {uniform_random(-100, 100), 130.f } );
+    coin_flip();
+    coin_flip();
+    coin_flip();
+    coin_flip();
+    coin_flip();
+    coin_flip();
+
+    if (SDL_GetTicks() > last_asteroid_time + 200) {
+        Twister::generate();
         last_asteroid_time = SDL_GetTicks();
     }
 
@@ -128,8 +146,8 @@ bool Game::processInput(void) {
 Game::~Game(void) {
     auto CM = get_manager();
 
+    //TODO: use destructor in ResourceManager
     CM->unRegisterComponent<Entity>();
-    // CM->unRegisterComponent<Stabber>();
     CM->unRegisterComponent<EulerTranslation>();
     CM->unRegisterComponent<EulerRotation>();
     CM->unRegisterComponent<OffscreenBehavior>();
