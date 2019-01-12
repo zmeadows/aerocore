@@ -1,90 +1,77 @@
 #pragma once
 
+#include "../Generator/Bullet.hpp"
+#include "Behavior/Pause.hpp"
 #include "Entity.hpp"
 #include "Globals.hpp"
-#include "../Generator/Bullet.hpp"
+#include "Random.hpp"
+#include "Spline.hpp"
+
 #include <string>
 
 namespace Twister {
 
-enum class State {
-    ComingOnScreen,
-    Firing
-};
+struct Tag {};
 
-struct Data {
-    State state = State::ComingOnScreen;
-    f32 shot_delay = 0;
-};
+enum State { Relocating = 0, Firing = 1 };
 
-void generate(v2 position) {
+void generate(void) {
     UUID uuid;
-    generate_enemy_skeleton(uuid, position, "sprites/twister/twister.png", "sprites/twister/path");
+
+    v2 init_position = {uniform_random(-100, 100), 130.f};
+    generate_enemy_skeleton(uuid, init_position, "sprites/twister/twister.png", "sprites/twister/path");
 
     auto CM = get_manager();
 
-    auto& kin = CM->book<EulerTranslation>(uuid);
-    kin.vel = { 0.f, -50.f };
+    CM->book<Twister::Tag>(uuid);
 
     auto& osb = CM->get<OffscreenBehavior>(uuid);
     osb.type = OffscreenBehavior::Type::SinglePassAllowed;
     osb.SinglePassAllowed.already_found_onscreen = false;
 
-    CM->book<Twister::Data>(uuid);
+    CM->book<StateTransition>(uuid).next_state_id = Relocating;
 }
 
-class System final : public ::System {
+inline v2 random_position(void) {
+    return {uniform_random(-75, 75), uniform_random(-75, 75)};
+}
+
+class StateMachineSystem final : public System {
 public:
-    System(void) : ::System("Twister") {
-        get_manager()->subscribe<Entity, OffscreenBehavior, Twister::Data>(this);
+    StateMachineSystem(void) : ::System("Twister::StateMachineSystem") {
+        get_manager()->subscribe<Entity, StateTransition, Twister::Tag>(this);
     }
 
     void run(float dt) final {
         auto CM = get_manager();
 
         for (const UUID uuid : m_followed) {
-            auto& data = CM->get<Twister::Data>(uuid);
+            auto& transition = CM->get<StateTransition>(uuid);
 
-            switch (data.state) {
-                case State::ComingOnScreen: {
-                    const auto& osb = CM->get<OffscreenBehavior>(uuid);
-                    if (osb.SinglePassAllowed.already_found_onscreen) {
-                        data.state = State::Firing;
-                        data.shot_delay = 1.0;
-                    }
-                    break;
-                }
+            switch (transition.next_state_id) {
+            case Relocating: {
+                assert(!CM->has<TranslationSpline>(uuid));
+                auto& spline = CM->book<TranslationSpline>(uuid);
+                spline.add_point(CM->get<Entity>(uuid).pos, 0.0);
+                spline.add_point(random_position(), 1.0);
+                spline.add_point(random_position(), 2.5);
+                spline.construct();
+                spline.next_state_id = Firing;
 
-                case State::Firing: {
-                    data.shot_delay -= dt;
-                    if (data.shot_delay < 0) {
-                        const auto& entity = CM->get<Entity>(uuid);
+                break;
+            }
 
-                        const v2 bullet_offsets[4] = {
-                            { 0.0, 0.7 * (entity.extent.minY - entity.extent.maxY) },
-                            { 0.0, - 0.7 * (entity.extent.minY - entity.extent.maxY) },
-                            { 0.7 * (entity.extent.minY - entity.extent.maxY) , 0.0 },
-                            { - 0.7 * (entity.extent.minY - entity.extent.maxY), 0.0 }
-                        };
+            case Firing: {
+                auto& pause = CM->book<PauseBehavior>(uuid);
+                pause.time_left = 1.0;
+                pause.next_state_id = Relocating;
+                break;
+            }
 
-                        const v2 bullet_velocities[4] = {
-                            { 0, -100 },
-                            { 0, 100 },
-                            { -100, 0 },
-                            { 100, 0 }
-                        };
-
-                        for (auto i = 0; i < 4; i++) {
-                            generate_bullet_enemy(entity.pos + bullet_offsets[i], bullet_velocities[i], 0);
-                        }
-
-                        data.shot_delay = data.shot_delay + 1.0;
-                    }
-                    break;
-                }
+            default: { break; }
             }
         }
     }
 };
 
-}
+} // namespace Twister
