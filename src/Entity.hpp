@@ -26,6 +26,8 @@ struct EulerRotation {
     float acc = 0.f;
 };
 
+//TODO: define a variant, where the position update can either
+// be a delta or an absolute
 struct PositionUpdate {
     v2 delta = { 0.f, 0.f };
 };
@@ -35,20 +37,23 @@ struct RotationUpdate {
 };
 
 struct CollisionData {
-    LocalVertexBuffer local_vertices;
-    PolygonDecomposition poly_decomp;
+    const LocalVertexBuffer* const local_vertices;
+    const PolygonDecomposition* const poly_decomp;
     QuadNode* node = nullptr;
-};
 
-struct Sprite {
-    GPU_Image* image;
-    v2 offset;
+    CollisionData(const LocalVertexBuffer* _local_vertices, const PolygonDecomposition* _poly_decomp)
+        : local_vertices(_local_vertices), poly_decomp(_poly_decomp) {}
 };
 
 struct Entity {
     Extent extent;
     v2 pos         = { 0.f, 0.f };
     float angle    = 0.f;
+};
+
+struct Sprite {
+    GPU_Image* image;
+    v2 offset;
 };
 
 // void destroy_entity(const UUID& uuid);
