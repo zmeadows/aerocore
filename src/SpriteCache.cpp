@@ -157,7 +157,7 @@ SpriteCache::~SpriteCache() {
 
 SpriteCache::SpriteCache() {
     build_sprite("twister_idle", "sprites/twister/twister.png", "sprites/twister/path");
-    build_sprite("bullet_player", "sprites/twister/twister.png", "sprites/twister/path");
-    build_sprite("bullet_enemy", "sprites/twister/twister.png", "sprites/twister/path");
+    build_sprite("bullet_player", "sprites/playerbullet/playerbullet.png", "sprites/playerbullet/path");
+    build_sprite("bullet_enemy", "sprites/enemybullet/enemybullet.png", "sprites/enemybullet/path");
     build_sprite("player_idle", "sprites/player/player.png", "sprites/player/path");
 }
