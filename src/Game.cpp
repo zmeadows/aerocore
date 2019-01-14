@@ -7,6 +7,7 @@
 #include "AudioContext.hpp"
 
 #include "Entity/Twister.hpp"
+#include "Bullet/Bullet.hpp"
 
 #include "System/DrawSystem.hpp"
 #include "System/EulerTranslationSystem.hpp"
@@ -49,6 +50,7 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     CM->registerComponent<Twister::Tag>(500);
     CM->registerComponent<TranslationSpline>(500);
     CM->registerComponent<PauseBehavior>(500);
+    CM->registerComponent<BulletStream>(500);
 
     //@NOTE: Order is important here!
 
@@ -66,6 +68,8 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
 
     this->systems.emplace_back(new Twister::StateMachineSystem());
     this->systems.emplace_back(new StateTransitionCleanupSystem());
+
+    this->systems.emplace_back(new BulletStreamSystem());
 
     this->systems.emplace_back(new VertexBufferSystem());
     this->systems.emplace_back(new CollisionSystem());
@@ -87,7 +91,7 @@ bool Game::tick(void) {
     coin_flip();
     coin_flip();
 
-    if (SDL_GetTicks() > last_asteroid_time + 200) {
+    if (SDL_GetTicks() > last_asteroid_time + 2000) {
         Twister::generate();
         last_asteroid_time = SDL_GetTicks();
     }

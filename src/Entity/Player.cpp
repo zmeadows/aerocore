@@ -36,5 +36,5 @@ void generatePlayerBullet(void) {
     bullet_pos = player_pos + bullet_pos_offset;
     bullet_vel = 200.f * orientation_of(player);
 
-    generate_bullet_player(bullet_pos, bullet_vel, player.angle);
+    generate_bullet(PLAYER_BULLET, bullet_pos, bullet_vel, true);
 }

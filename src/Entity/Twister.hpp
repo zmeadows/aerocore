@@ -22,7 +22,12 @@ namespace Twister {
 
 struct Tag {};
 
-enum State { Relocating = 0, Firing = 1 };
+enum State {
+    Relocating,
+    PauseBeforeFiring,
+    Firing,
+    PauseAfterFiring
+};
 
 void generate(void) {
     UUID uuid;
@@ -54,9 +59,10 @@ public:
         auto CM = get_manager();
 
         for (const UUID uuid : m_followed) {
-            auto& transition = CM->get<StateTransition>(uuid);
+            const auto& transition = CM->get<StateTransition>(uuid);
 
             switch (transition.next_state_id) {
+
             case Relocating: {
                 assert(!CM->has<TranslationSpline>(uuid));
                 auto& spline = CM->book<TranslationSpline>(uuid);
@@ -69,7 +75,26 @@ public:
                 break;
             }
 
+            case PauseBeforeFiring: {
+                auto& pause = CM->book<PauseBehavior>(uuid);
+                pause.time_left = 1.0;
+                pause.next_state_id = Firing;
+                break;
+            }
+
             case Firing: {
+                auto& bstream = CM->book<BulletStream>(uuid, 0.1);
+                bstream.add_bullet({ ENEMY_BULLET, {5,0}, {110, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-110, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 110} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -110} });
+                bstream.cycles_left = 4;
+
+                bstream.next_state_id = PauseAfterFiring;
+                break;
+            }
+
+            case PauseAfterFiring: {
                 auto& pause = CM->book<PauseBehavior>(uuid);
                 pause.time_left = 1.0;
                 pause.next_state_id = Relocating;

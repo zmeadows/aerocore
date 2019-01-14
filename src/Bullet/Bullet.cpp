@@ -3,9 +3,10 @@
 #include "Globals.hpp"
 #include "Entity.hpp"
 
-UUID generate_bullet_player(const v2 new_bullet_position,
-                            const v2 new_bullet_velocity,
-                            float new_bullet_angle)
+UUID generate_bullet(BulletType bullet_type,
+                     const v2 new_bullet_position,
+                     const v2 new_bullet_velocity,
+                     bool friendly)
 {
     auto CM = get_manager();
 
@@ -13,35 +14,26 @@ UUID generate_bullet_player(const v2 new_bullet_position,
 
     auto& entity = CM->book<Entity>(uuid);
     entity.pos = new_bullet_position;
-    entity.angle = new_bullet_angle;
-    CM->book<EulerTranslation>(uuid).vel = new_bullet_velocity;
-    CM->book<OffscreenBehavior>(uuid);
-
-    get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_player");
-
-    CM->book<FriendlyTag>(uuid);
-
-    play_sound(SoundEffect_ShotFired);
-
-    return uuid;
-}
-
-UUID generate_bullet_enemy(const v2 new_bullet_position,
-                           const v2 new_bullet_velocity,
-                           float new_bullet_angle)
-{
-    auto CM = get_manager();
-
-    UUID uuid;
-
-    auto& entity = CM->book<Entity>(uuid);
-    entity.pos = new_bullet_position;
-    entity.angle = new_bullet_angle;
+    entity.angle = new_bullet_velocity.angle();
 
     CM->book<EulerTranslation>(uuid).vel = new_bullet_velocity;
     CM->book<OffscreenBehavior>(uuid);
 
-    get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_enemy");
+    if (friendly) CM->book<FriendlyTag>(uuid);
+
+    switch (bullet_type) {
+        case PLAYER_BULLET: {
+            get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_player");
+            play_sound(SoundEffect_ShotFired);
+            break;
+        }
+
+        case ENEMY_BULLET: {
+            get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_enemy");
+            break;
+        }
+    }
 
     return uuid;
 }
+

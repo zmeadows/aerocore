@@ -98,9 +98,6 @@ inline float rotate(float& old_angle, float delta) {
     return (new_angle < 0) ? new_angle + TWOPI : new_angle;
 }
 
-inline float arctan(float x, float y) {
-    return fmod(atan2(y,x) + TWOPI, TWOPI);
-}
 
 //@CLARITY: give these distinct names
 bool is_offscreen(const Extent& ext);

@@ -30,10 +30,14 @@ struct EulerRotation {
 // be a delta or an absolute
 struct PositionUpdate {
     v2 delta = { 0.f, 0.f };
+
+    //TODO: add intantaneous velocity estimate?! Could be super useful...
 };
 
 struct RotationUpdate {
     float dtheta = 0.0;
+
+    //TODO: add intantaneous velocity estimate?! Could be super useful...
 };
 
 struct CollisionData {
