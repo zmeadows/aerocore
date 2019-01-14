@@ -26,7 +26,7 @@ float uniform_rand(float min, float max);
 // };
 
 struct LocalVertexBuffer {
-    v2 data[1<<5];
+    v2 data[256];
     u32 count = 0;
 
     v2 operator[](u32 idx) const { return data[idx]; }
@@ -76,7 +76,7 @@ struct Extent {
 void dump(const Extent& extent);
 
 Extent extent_of(const std::vector<v2>& global_vertices);
-Extent extent_of(const LocalVertexBuffer& local_vertices, v2 position, f32 angle);
+Extent extent_of(const LocalVertexBuffer* local_vertices, v2 position, f32 angle);
 
 inline float signum(float x) {
     return static_cast<float>(x > 0) - static_cast<float>(x < 0);
@@ -105,7 +105,7 @@ inline float arctan(float x, float y) {
 //@CLARITY: give these distinct names
 bool is_offscreen(const Extent& ext);
 
-std::vector<v2> compute_global_vertices( const LocalVertexBuffer& lvb
+std::vector<v2> compute_global_vertices( const LocalVertexBuffer* lvb
                                        , const v2 position_offset
                                        , const float rotation_angle);
 

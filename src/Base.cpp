@@ -46,7 +46,7 @@ Extent extent_of(const std::vector<v2>& global_vertices)
     return ext;
 }
 
-Extent extent_of(const LocalVertexBuffer& local_vertices, v2 position, f32 angle) {
+Extent extent_of(const LocalVertexBuffer* local_vertices, v2 position, f32 angle) {
     return extent_of(compute_global_vertices(local_vertices, position, angle));
 }
 
@@ -57,15 +57,15 @@ bool is_offscreen(const Extent& ext) {
             || ext.minY > 100.f;
 }
 
-std::vector<v2> compute_global_vertices( const LocalVertexBuffer& lvb
+std::vector<v2> compute_global_vertices( const LocalVertexBuffer* lvb
                                        , const v2 position_offset
                                        , const float rotation_angle)
 {
     std::vector<v2> gvb;
-    gvb.reserve(lvb.count);
+    gvb.reserve(lvb->count);
 
-    for (size_t i = 0; i < lvb.count; i++) {
-        gvb.push_back(lvb[i].rotated(rotation_angle) + position_offset);
+    for (size_t i = 0; i < lvb->count; i++) {
+        gvb.push_back((*lvb)[i].rotated(rotation_angle) + position_offset);
     }
 
     return gvb;

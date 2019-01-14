@@ -1,13 +1,22 @@
 #pragma once
 
-#include "../Generator/Bullet.hpp"
 #include "Behavior/Pause.hpp"
+#include "Bullet/Bullet.hpp"
 #include "Entity.hpp"
 #include "Globals.hpp"
 #include "Random.hpp"
 #include "Spline.hpp"
+#include "SpriteCache.hpp"
 
 #include <string>
+
+namespace {
+
+inline v2 random_position(void) {
+    return {uniform_random(-75, 75), uniform_random(-75, 75)};
+}
+
+}
 
 namespace Twister {
 
@@ -18,27 +27,26 @@ enum State { Relocating = 0, Firing = 1 };
 void generate(void) {
     UUID uuid;
 
-    v2 init_position = {uniform_random(-100, 100), 130.f};
-    generate_enemy_skeleton(uuid, init_position, "sprites/twister/twister.png", "sprites/twister/path");
-
     auto CM = get_manager();
+
+    auto& entity = CM->book<Entity>(uuid);
+    entity.pos = {uniform_random(-100, 100), 130.f};
+
+    get_sprite_cache()->attach_sprite_to_uuid(uuid, "twister_idle");
 
     CM->book<Twister::Tag>(uuid);
 
-    auto& osb = CM->get<OffscreenBehavior>(uuid);
+    auto& osb = CM->book<OffscreenBehavior>(uuid);
     osb.type = OffscreenBehavior::Type::SinglePassAllowed;
     osb.SinglePassAllowed.already_found_onscreen = false;
 
     CM->book<StateTransition>(uuid).next_state_id = Relocating;
 }
 
-inline v2 random_position(void) {
-    return {uniform_random(-75, 75), uniform_random(-75, 75)};
-}
 
 class StateMachineSystem final : public System {
 public:
-    StateMachineSystem(void) : ::System("Twister::StateMachineSystem") {
+    StateMachineSystem(void) : System("Twister::StateMachine") {
         get_manager()->subscribe<Entity, StateTransition, Twister::Tag>(this);
     }
 
@@ -74,4 +82,4 @@ public:
     }
 };
 
-} // namespace Twister
+}

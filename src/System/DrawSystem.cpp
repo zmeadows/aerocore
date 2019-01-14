@@ -1,7 +1,57 @@
 #include "Entity.hpp"
 #include "System/DrawSystem.hpp"
 #include "QuadTreeDraw.hpp"
-#include "Sprite.hpp"
+
+namespace {
+
+void draw_sprite(GraphicsContext& GC, const Sprite& sprite, v2 pos, float angle)
+{
+
+    // v2 orientation = orientation_of(entity);
+    // orientation.scale(10.f);
+    // v2 orientation_dot = entity.pos + orientation;
+
+    // GPU_CircleFilled(GC->renderer,
+    //                  GC->to_screen_coords(orientation_dot).x,
+    //                  GC->to_screen_coords(orientation_dot).y,
+    //                  4,
+    //                  { 30,225,30,175});
+
+    // GPU_Line(GC->renderer,
+    //                  GC->to_screen_coords(entity.pos).x,
+    //                  GC->to_screen_coords(entity.pos).y,
+    //                  GC->to_screen_coords(orientation_dot).x,
+    //                  GC->to_screen_coords(orientation_dot).y,
+    //                  { 30,225,30,175});
+
+    // GPU_CircleFilled(GC->renderer,
+    //                  GC->to_screen_coords(global_vertices[0]).x,
+    //                  GC->to_screen_coords(global_vertices[0]).y,
+    //                  10,
+    //                  { 0,0,255,255});
+
+    // const size_t vtx_count = entity.global_vertices.count;
+
+    if (sprite.image != nullptr) {
+        ScreenCoordinates sc = GC.to_screen_coords(pos);
+        const v2 offset = sprite.offset.rotated(-angle);
+        GPU_BlitRotate(sprite.image, NULL, GC.renderer,
+                       sc.x - offset.x, sc.y - offset.y,
+                       - angle * 180.f/PI);
+    }
+    // else {
+    //     for (size_t i = 0; i < vtx_count; i++) {
+    //         ScreenCoordinates sc1 = GC.to_screen_coords(entity.global_vertices[i]);
+    //         ScreenCoordinates sc2 = GC.to_screen_coords(entity.global_vertices[(i+1) % vtx_count]);
+    //         GPU_Line(GC.renderer,
+    //                  sc1.x, sc1.y,
+    //                  sc2.x, sc2.y,
+    //                  entity.color);
+    //     }
+    // }
+}
+
+}
 
 void draw_background(void) {
     GraphicsContext* GC = get_graphics_context();
@@ -24,13 +74,13 @@ void DrawSystem::run(float) {
     auto CM = get_manager();
     auto GC = get_graphics_context();
     draw_background();
-    //drawQuadTree(GC, get_quad_tree());
+    // drawQuadTree(GC, get_quad_tree());
 
     for (const UUID uuid : m_followed) {
         const Entity& entity = CM->get<Entity>(uuid);
         const Sprite& sprite = CM->get<Sprite>(uuid);
 
-        draw(*GC, sprite, entity.pos, entity.angle);
+        draw_sprite(*GC, sprite, entity.pos, entity.angle);
 
         // if (CM->has<CollisionData>(uuid) && m_modFrame % 100 < 50) {
         //     const auto& CD = CM->get<CollisionData>(uuid);
@@ -66,7 +116,7 @@ void DrawSystem::run(float) {
             sum += m_fpsHistory[i];
         }
         m_currentFpsAvg = sum / 100.0;
-        std::cout << m_currentFpsAvg << std::endl;
+        std::cout << "average fps: " << m_currentFpsAvg << std::endl;
     }
 
 

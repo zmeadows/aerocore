@@ -43,16 +43,16 @@ project_on(const std::vector<v2>& global_vertices,
 }
 
 PolygonRep
-nth_polygon(const PolygonDecomposition& decomp, u32 idx)
+nth_polygon(const PolygonDecomposition* decomp, u32 idx)
 {
-    assert(idx < decomp.count && "attempted to access polygon ID > N in an N-Polygon decomposition");
+    assert(idx < decomp->count && "attempted to access polygon ID > N in an N-Polygon decomposition");
 
-    const auto off2 = decomp.offsets[idx+1];
-    const auto off1 = decomp.offsets[idx];
+    const auto off2 = decomp->offsets[idx+1];
+    const auto off1 = decomp->offsets[idx];
 
     assert( (off2 - off1 >= 3) && "mis-assigned offsets in polygon decomposition");
 
-    return PolygonRep({ &(decomp.indices[off1]), static_cast<uint_least8_t>(off2 - off1) });
+    return PolygonRep({ &(decomp->indices[off1]), static_cast<uint_least8_t>(off2 - off1) });
 }
 
 void
@@ -74,11 +74,11 @@ fill_polygon_normals(const std::vector<v2>& global_vertices,
 }
 
 void
-dump(const PolygonDecomposition& decomp)
+dump(const PolygonDecomposition* decomp)
 {
     std::cout << std::endl;
     std::cout << "## PolygonDecomposition START ##" << std::endl;
-    for (u32 pgon = 0; pgon < decomp.count; pgon++) {
+    for (u32 pgon = 0; pgon < decomp->count; pgon++) {
         PolygonRep pr = nth_polygon(decomp, pgon);
         for (u32 i = 0; i < pr.count; i++) {
             std::cout << static_cast<u32>(pr.indices[i]) << " ";
@@ -90,9 +90,9 @@ dump(const PolygonDecomposition& decomp)
 }
 
 PolygonDecomposition
-decompose_local_vertices(const LocalVertexBuffer& local_vertices)
+decompose_local_vertices(const LocalVertexBuffer* local_vertices)
 {
-    const u32 vertex_count = local_vertices.count;
+    const u32 vertex_count = local_vertices->count;
 
     std::vector<std::vector<u32>> final_indices;
 
@@ -140,9 +140,9 @@ decompose_local_vertices(const LocalVertexBuffer& local_vertices)
             //     << candidate_indices[2] << std::endl;
 
             const v2 candidate_triangle[3] = {
-                local_vertices[candidate_indices[0]],
-                local_vertices[candidate_indices[1]],
-                local_vertices[candidate_indices[2]]
+                (*local_vertices)[candidate_indices[0]],
+                (*local_vertices)[candidate_indices[1]],
+                (*local_vertices)[candidate_indices[2]]
             };
 
             if (cross(candidate_triangle[0] - candidate_triangle[1],
@@ -154,7 +154,7 @@ decompose_local_vertices(const LocalVertexBuffer& local_vertices)
 
             for (u32 any_idx = 0; any_idx < vertex_count; any_idx++) {
                 //@ALERT: might need
-                if (!vector_contains(candidate_indices, any_idx) && pnpoly(candidate_triangle, 3, local_vertices[any_idx])) {
+                if (!vector_contains(candidate_indices, any_idx) && pnpoly(candidate_triangle, 3, (*local_vertices)[any_idx])) {
                     candidate_passes = false;
                     break;
                 }

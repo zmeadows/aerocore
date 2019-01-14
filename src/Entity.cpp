@@ -1,31 +1,6 @@
 #include "Entity.hpp"
 
-#include "Generator/Enemy.hpp"
-#include "Sprite.hpp"
 #include "Globals.hpp"
-
-// void destroy_entity(const UUID& uuid) {
-//     auto CM = get_manager();
-//
-//     auto& entity = CM->get<Entity>(uuid);
-//
-//     if (entity.node)
-//             entity.node->m_containedUUIDs.erase(uuid);
-//
-//     play_sound(SoundEffect_Explosion);
-//
-//     CM->destroy(uuid);
-// }
-
-// void
-// recompute_global_context(UUID uuid, Entity& entity)
-// {
-//     populate_global_vertices(entity.local_vertices, entity.global_vertices,
-//                              entity.pos, entity.angle);
-//     entity.extent = extent_of(entity.global_vertices);
-//     //@TODO: apply clip_to_screen within quad tree insert function
-//     entity.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
-// }
 
 v2 orientation_of(const Entity& entity) {
     return { std::cos(entity.angle), std::sin(entity.angle) };
@@ -62,8 +37,8 @@ overlaps( const Entity& entityA
     const std::vector<v2> gvA = compute_global_vertices(cdA.local_vertices, entityA.pos, entityA.angle);
     const std::vector<v2> gvB = compute_global_vertices(cdB.local_vertices, entityB.pos, entityB.angle);
 
-    for (uint_least8_t polyA = 0; polyA < cdA.poly_decomp.count; polyA++) {
-        for (uint_least8_t polyB = 0; polyB < cdB.poly_decomp.count; polyB++) {
+    for (uint_least8_t polyA = 0; polyA < cdA.poly_decomp->count; polyA++) {
+        for (uint_least8_t polyB = 0; polyB < cdB.poly_decomp->count; polyB++) {
 
             bool polygon_candidates_separated = false;
 
