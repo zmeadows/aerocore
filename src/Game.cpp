@@ -1,8 +1,7 @@
 #include "Game.hpp"
 
 #include "Globals.hpp"
-#include "Generator/Player.hpp"
-#include "Generator/Enemy.hpp"
+#include "Entity/Player.hpp"
 #include "GraphicsContext.hpp"
 #include "InputManager.hpp"
 #include "AudioContext.hpp"
