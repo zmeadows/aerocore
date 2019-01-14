@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Entity.hpp"
-#include "Generator/Enemy.hpp"
 #include "Globals.hpp"
 
 // class StabberSystem final : public System {

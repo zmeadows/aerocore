@@ -1,8 +1,8 @@
 #include "InputManager.hpp"
 
 #include "Base.hpp"
-#include "Generator/Bullet.hpp"
-#include "Generator/Player.hpp"
+#include "Bullet/Bullet.hpp"
+#include "Entity/Player.hpp"
 #include "Globals.hpp"
 #include "Entity.hpp"
 

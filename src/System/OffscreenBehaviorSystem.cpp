@@ -18,7 +18,6 @@ void OffscreenBehaviorSystem::run(float) {
             continue;
         }
 
-        const auto& kin = CM->get<EulerTranslation>(uuid);
         const auto& osb = CM->get<OffscreenBehavior>(uuid);
 
         switch (osb.type) {
@@ -28,6 +27,7 @@ void OffscreenBehaviorSystem::run(float) {
             }
 
             case OffscreenBehavior::Type::Wraps: {
+				const auto& kin = CM->get<EulerTranslation>(uuid);
                 auto& update = CM->get<PositionUpdate>(uuid);
                 if (ext.maxX > 100.f && kin.vel.x > 0.f) {
                     update.delta.x -= (ext.maxX + 100.f);
