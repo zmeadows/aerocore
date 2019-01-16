@@ -181,7 +181,7 @@ void InputManager::processJoystickInput(void) {
 
     auto& kin = CM->get<EulerTranslation>(playerUUID());
 
-    kin.vel = 75.f * this->joystick;
+    kin.vel = 120.f * this->joystick;
 }
 
 void InputManager::processGamepadButtonInput(Uint8 button, bool press) {

@@ -56,12 +56,12 @@ void draw_sprite(GraphicsContext& GC, const Sprite& sprite, v2 pos, float angle)
 void draw_background(void) {
     GraphicsContext* GC = get_graphics_context();
 
-    GPU_ClearRGB(GC->renderer, 40, 40, 40);
+    GPU_ClearRGB(GC->renderer, 20, 20, 20);
     GPU_CircleFilled(GC->renderer,
                      GC->to_screen_span(100.f),
                      GC->to_screen_span(100.f),
                      100,
-                     { 219,147,47,255});
+                     { 40,40,40,255});
 }
 
 void DrawSystem::run(float) {

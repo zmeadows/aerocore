@@ -20,6 +20,7 @@ include_directories(lib/sdl-gpu/src/externals/stb_image_write)
 include_directories(lib/nfont/NFont)
 include_directories(lib/nfont/SDL_FontCache)
 include_directories(lib/tinyxml2)
+include_directories(lib/Brofiler)
 include_directories(lib)
 
 if (WIN32)
@@ -33,14 +34,19 @@ if (WIN32)
 								 "${CMAKE_CURRENT_LIST_DIR}/lib/SDL2_ttf/WINDOWS/lib/x64/SDL2_ttf.lib;"
 								 )
 
+    string(CONCAT BROFILER_LIBRARIES "${CMAKE_CURRENT_LIST_DIR}/lib/Brofiler/ProfilerCore64.lib;")
+
 	file(GLOB SDL2_DLLS "${CMAKE_CURRENT_LIST_DIR}/lib/SDL2/WINDOWS/lib/x64/*.dll")
 	file(GLOB SDL2_MIXER_DLLS "${CMAKE_CURRENT_LIST_DIR}/lib/SDL2_mixer/WINDOWS/lib/x64/*.dll")
 	file(GLOB SDL2_TTF_DLLS "${CMAKE_CURRENT_LIST_DIR}/lib/SDL2_ttf/WINDOWS/lib/x64/*.dll")
+
+    file(GLOB BROFILER_DLLS "${CMAKE_CURRENT_LIST_DIR}/lib/Brofiler/*.dll")
 
 	add_custom_target(CopyDLL
 	   COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_DLLS} ${CMAKE_BINARY_DIR}
 	   COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_MIXER_DLLS} ${CMAKE_BINARY_DIR}
 	   COMMAND ${CMAKE_COMMAND} -E copy ${SDL2_TTF_DLLS} ${CMAKE_BINARY_DIR}
+       COMMAND ${CMAKE_COMMAND} -E copy ${BROFILER_DLLS} ${CMAKE_BINARY_DIR}
 	)
 endif (WIN32)
 
@@ -63,5 +69,5 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS}")
 SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
 add_executable(aerocore ${CMAKE_SOURCE_DIR}/src/main.cpp ${ENGINE_SOURCES} ${GAME_SOURCES} ${THIRD_PARTY_SOURCES} ${SDL_GPU_SOURCES})
 
-target_link_libraries(aerocore ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(aerocore ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${BROFILER_LIBRARIES})
 add_dependencies(aerocore CopyDLL)

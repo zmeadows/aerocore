@@ -83,18 +83,20 @@ public:
             }
 
             case Firing: {
-                auto& bstream = CM->book<BulletStream>(uuid, 0.1);
-                bstream.add_bullet({ ENEMY_BULLET, {5,0}, {110, 0} });
-                bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-110, 0} });
-                bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 110} });
-                bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -110} });
-                bstream.cycles_left = 4;
+                CM->book<EulerRotation>(uuid).vel = 3;
+                auto& bstream = CM->book<BulletStream>(uuid, 0.05);
+                bstream.add_bullet({ ENEMY_BULLET, {5,0}, {50, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-50, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 50} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -50} });
+                bstream.cycles_left = 100;
 
                 bstream.next_state_id = PauseAfterFiring;
                 break;
             }
 
             case PauseAfterFiring: {
+                CM->remove<EulerRotation>(uuid);
                 auto& pause = CM->book<PauseBehavior>(uuid);
                 pause.time_left = 1.0;
                 pause.next_state_id = Relocating;

@@ -1,6 +1,7 @@
-* create system and component to move entity along spline
-* spawn Twister on looping figure eight
 * create Stalker enemy (moves towards player for a second, stops and bobbles and shoots, moves towards player again, repeat)
 * trail of beads weapon that lags behind player and damages any enemy that touches it
 * switch to dense_hash_map for maps in ComponentManager
 * asteroids style real physics with 4 button compass rose thrusters and scren wrapping
+
+DONE
+* create system and component to move entity along spline

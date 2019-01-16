@@ -29,28 +29,30 @@
 
 #include <SDL.h>
 
+#include "Brofiler.h"
+
 Game::Game(void) : IM(std::make_unique<InputManager>())
 {
     // TODO: add debug mode check in aerocore that components have
     // actually been registered. Right now it just segfaults.
     auto CM = get_manager();
 
-    CM->registerComponent<Entity>(500);
-    CM->registerComponent<EulerTranslation>(500);
-    CM->registerComponent<EulerRotation>(500);
-    CM->registerComponent<OffscreenBehavior>(500);
-    CM->registerComponent<DestructTag>(500);
-    CM->registerComponent<FriendlyTag>(500);
-    CM->registerComponent<CollisionData>(500);
-    CM->registerComponent<PositionUpdate>(500);
-    CM->registerComponent<RotationUpdate>(500);
-    CM->registerComponent<SoundEvent>(500);
-    CM->registerComponent<Sprite>(500);
-    CM->registerComponent<StateTransition>(500);
-    CM->registerComponent<Twister::Tag>(500);
-    CM->registerComponent<TranslationSpline>(500);
-    CM->registerComponent<PauseBehavior>(500);
-    CM->registerComponent<BulletStream>(500);
+    CM->registerComponent<Entity>(10000);
+    CM->registerComponent<EulerTranslation>(10000);
+    CM->registerComponent<EulerRotation>(10000);
+    CM->registerComponent<OffscreenBehavior>(10000);
+    CM->registerComponent<DestructTag>(10000);
+    CM->registerComponent<FriendlyTag>(10000);
+    CM->registerComponent<CollisionData>(10000);
+    CM->registerComponent<PositionUpdate>(10000);
+    CM->registerComponent<RotationUpdate>(10000);
+    CM->registerComponent<SoundEvent>(10000);
+    CM->registerComponent<Sprite>(10000);
+    CM->registerComponent<StateTransition>(10000);
+    CM->registerComponent<Twister::Tag>(10000);
+    CM->registerComponent<TranslationSpline>(10000);
+    CM->registerComponent<PauseBehavior>(10000);
+    CM->registerComponent<BulletStream>(10000);
 
     //@NOTE: Order is important here!
 
@@ -78,23 +80,20 @@ Game::Game(void) : IM(std::make_unique<InputManager>())
     this->systems.emplace_back(new DrawSystem());
 
     generatePlayer();
+    Twister::generate();
 }
 
 bool Game::tick(void) {
+
+    BROFILER_FRAME("MainThread")
+
     bool quitting = processInput();
     auto GC = get_graphics_context();
 
-    coin_flip();
-    coin_flip();
-    coin_flip();
-    coin_flip();
-    coin_flip();
-    coin_flip();
-
-    if (SDL_GetTicks() > last_asteroid_time + 2000) {
-        Twister::generate();
-        last_asteroid_time = SDL_GetTicks();
-    }
+    // if (SDL_GetTicks() > last_asteroid_time + 2000) {
+    //     Twister::generate();
+    //     last_asteroid_time = SDL_GetTicks();
+    // }
 
     m_preSystemRunTicks = SDL_GetPerformanceCounter();
     const float frame_time = static_cast<float>(m_preSystemRunTicks - m_postSystemRunTicks) / SDL_GetPerformanceFrequency();
@@ -103,7 +102,7 @@ bool Game::tick(void) {
         sys->run(frame_time);
     }
 
-    m_postSystemRunTicks = SDL_GetPerformanceCounter();
+    m_postSystemRunTicks = m_preSystemRunTicks;
 
     if (m_frames_elapsed % 20 == 0) {
         const float t_frame_time = static_cast<float>(m_postSystemRunTicks - m_preSystemRunTicks) / SDL_GetPerformanceFrequency();
@@ -140,6 +139,8 @@ bool Game::processInput(void) {
             IM->processJoystickInput();
         } else if (e.type == SDL_JOYBUTTONDOWN && e.jaxis.which == 0) {
             IM->processGamepadButtonInput(e.jbutton.button, e.jbutton.state == SDL_PRESSED);
+        } else if (e.type == SDL_JOYAXISMOTION && e.jaxis.which != 0 ) {
+            std::cout << "which? " << e.jaxis.which << std::endl;
         }
     }
 
