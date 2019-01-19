@@ -30,11 +30,8 @@ v2 average_vector(const v2* vertices, const size_t vertex_count) {
 }
 
 bool
-is_convex(const LocalVertexBuffer& vertices)
+is_convex(const v2* vertices, u32 vertex_count)
 {
-    const s32 vertex_count = static_cast<s32>(vertices.count);
-    assert(vertex_count >= 0);
-
     for (s32 i = 0; i < vertex_count; i++) {
         if (cross(vertices[modulo(i-1, vertex_count)] - vertices[unsign(i)],
                   vertices[modulo(i+1, vertex_count)] - vertices[unsign(i)]) <= 0)
@@ -42,7 +39,15 @@ is_convex(const LocalVertexBuffer& vertices)
     }
 
     return true;
-};
+}
+
+bool is_convex(const LocalVertexBuffer& lvb) {
+    return is_convex(lvb.data, lvb.count);
+}
+
+bool is_convex(const std::vector<v2>& vertices) {
+    return is_convex(vertices.data(), vertices.size());
+}
 
 v2 average_vector(const LocalVertexBuffer& global_vertices) {
     return average_vector(global_vertices.data, global_vertices.count);

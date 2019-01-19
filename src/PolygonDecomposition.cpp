@@ -1,33 +1,32 @@
 #include "PolygonDecomposition.hpp"
 
-#include <limits>
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <vector>
 
-#include "Vector2D.hpp"
-#include "Util.hpp"
 #include "LocalVertexBuffer.hpp"
+#include "Util.hpp"
+#include "Vector2D.hpp"
+#include "Geometry.hpp"
 
 // test if a point lies within an arbitrary polygon
-bool pnpoly(const v2* vertices, const u32 nvert, const v2& test)
-{
+bool pnpoly(const v2* vertices, const u32 nvert, const v2& test) {
     int c = 0;
     u32 i, j;
 
-    for (i = 0, j = nvert-1; i < nvert; j = i++) {
-        if ( ((vertices[i].y>test.y) != (vertices[j].y>test.y)) &&
-            (test.x < (vertices[j].x-vertices[i].x) * (test.y-vertices[i].y) / (vertices[j].y-vertices[i].y) + vertices[i].x) )
+    for (i = 0, j = nvert - 1; i < nvert; j = i++) {
+        if (((vertices[i].y > test.y) != (vertices[j].y > test.y)) &&
+            (test.x <
+             (vertices[j].x - vertices[i].x) * (test.y - vertices[i].y) / (vertices[j].y - vertices[i].y) +
+                 vertices[i].x))
             c = !c;
     }
 
     return static_cast<bool>(c);
 }
 
-AxisProjection
-project_on(const std::vector<v2>& global_vertices,
-           const PolygonRep polygon, const v2& axis)
-{
+AxisProjection project_on(const std::vector<v2>& global_vertices, const PolygonRep polygon, const v2& axis) {
     float minProjection = std::numeric_limits<float>::max();
     float maxProjection = std::numeric_limits<float>::lowest();
 
@@ -42,23 +41,18 @@ project_on(const std::vector<v2>& global_vertices,
     return AxisProjection({minProjection, maxProjection});
 }
 
-PolygonRep
-nth_polygon(const PolygonDecomposition* decomp, u32 idx)
-{
+PolygonRep nth_polygon(const PolygonDecomposition* decomp, u32 idx) {
     assert(idx < decomp->count && "attempted to access polygon ID > N in an N-Polygon decomposition");
 
-    const auto off2 = decomp->offsets[idx+1];
+    const auto off2 = decomp->offsets[idx + 1];
     const auto off1 = decomp->offsets[idx];
 
-    assert( (off2 - off1 >= 3) && "mis-assigned offsets in polygon decomposition");
+    assert((off2 - off1 >= 3) && "mis-assigned offsets in polygon decomposition");
 
-    return PolygonRep({ &(decomp->indices[off1]), static_cast<uint_least8_t>(off2 - off1) });
+    return PolygonRep({&(decomp->indices[off1]), static_cast<uint_least8_t>(off2 - off1)});
 }
 
-void
-fill_polygon_normals(const std::vector<v2>& global_vertices,
-                     const PolygonRep polygon, v2* normals)
-{
+void fill_polygon_normals(const std::vector<v2>& global_vertices, const PolygonRep polygon, v2* normals) {
     const uint_least8_t num_vertices = polygon.count;
 
     for (uint_least8_t i = 0; i < num_vertices; i++) {
@@ -69,13 +63,11 @@ fill_polygon_normals(const std::vector<v2>& global_vertices,
         assert(idx2 < global_vertices.size());
 
         v2 ov = global_vertices[idx1] - global_vertices[idx2];
-        normals[i] = { -ov.y, ov.x };
+        normals[i] = {-ov.y, ov.x};
     }
 }
 
-void
-dump(const PolygonDecomposition* decomp)
-{
+void dump(const PolygonDecomposition* decomp) {
     std::cout << std::endl;
     std::cout << "## PolygonDecomposition START ##" << std::endl;
     for (u32 pgon = 0; pgon < decomp->count; pgon++) {
@@ -89,9 +81,7 @@ dump(const PolygonDecomposition* decomp)
     std::cout << std::endl;
 }
 
-PolygonDecomposition
-decompose_local_vertices(const LocalVertexBuffer* local_vertices)
-{
+PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_vertices) {
     const u32 vertex_count = local_vertices->count;
 
     std::vector<std::vector<u32>> final_indices;
@@ -102,14 +92,18 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
         remaining_indices.push_back(i);
     }
 
-    //TODO: try to make this work again
-    // if (is_convex(local_vertices, vertex_count)) {
-    //     final_indices.push_back(remaining_indices);
-    //     return final_indices;
-    // }
+    if (is_convex(*local_vertices)) {
+        final_indices.push_back(remaining_indices);
+        remaining_indices.clear();
+    }
 
-    while (remaining_indices.size() >= 3)
-    {
+    while (remaining_indices.size() >= 3) {
+        if (is_convex(*local_vertices)) {
+            final_indices.push_back(remaining_indices);
+            remaining_indices.clear();
+        }
+
+
         //@TODO: check if convex after each iteration!
 
         // copy so that the indices we are looping over
@@ -131,19 +125,11 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
             const std::vector<u32> candidate_indices = {
                 remaining_indices[modulo(ii - 1, static_cast<int>(num_remaining_indices))],
                 remaining_indices[static_cast<u32>(ii)],
-                remaining_indices[modulo(ii + 1 , static_cast<int>(num_remaining_indices))]
-            };
+                remaining_indices[modulo(ii + 1, static_cast<int>(num_remaining_indices))]};
 
-            // std::cout << "candidates: "
-            //     << candidate_indices[0] << " "
-            //     << candidate_indices[1] << " "
-            //     << candidate_indices[2] << std::endl;
-
-            const v2 candidate_triangle[3] = {
-                (*local_vertices)[candidate_indices[0]],
-                (*local_vertices)[candidate_indices[1]],
-                (*local_vertices)[candidate_indices[2]]
-            };
+            const v2 candidate_triangle[3] = {(*local_vertices)[candidate_indices[0]],
+                                              (*local_vertices)[candidate_indices[1]],
+                                              (*local_vertices)[candidate_indices[2]]};
 
             if (cross(candidate_triangle[0] - candidate_triangle[1],
                       candidate_triangle[2] - candidate_triangle[1]) <= 0) {
@@ -153,8 +139,8 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
             bool candidate_passes = true;
 
             for (u32 any_idx = 0; any_idx < vertex_count; any_idx++) {
-                //@ALERT: might need
-                if (!vector_contains(candidate_indices, any_idx) && pnpoly(candidate_triangle, 3, (*local_vertices)[any_idx])) {
+                if (!vector_contains(candidate_indices, any_idx) &&
+                    pnpoly(candidate_triangle, 3, (*local_vertices)[any_idx])) {
                     candidate_passes = false;
                     break;
                 }
@@ -169,7 +155,22 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
             }
         }
 
-        if (num_triangles_found == 0) break;
+        if (num_triangles_found == 0)
+            break;
+
+        {
+            std::vector<v2> convex_test_vertices;
+            convex_test_vertices.reserve(remaining_indices.size());
+
+            for (auto idx : remaining_indices) {
+                convex_test_vertices.push_back((*local_vertices)[idx]);
+            }
+
+            if (is_convex(convex_test_vertices)) {
+                final_indices.push_back(remaining_indices);
+                remaining_indices.clear();
+            }
+        }
     }
 
     PolygonDecomposition poly_decomp;
@@ -180,7 +181,8 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
     for (const std::vector<u32>& tridxs : final_indices) {
         assert(tridxs.size() <= 255);
         poly_decomp.count++;
-        poly_decomp.offsets[poly_decomp.count] = poly_decomp.offsets[poly_decomp.count-1] + static_cast<uint_least8_t>(tridxs.size());
+        poly_decomp.offsets[poly_decomp.count] =
+            poly_decomp.offsets[poly_decomp.count - 1] + static_cast<uint_least8_t>(tridxs.size());
         for (u32 tridx : tridxs) {
             assert(tridx <= 255);
             poly_decomp.indices[idx] = static_cast<uint_least8_t>(tridx);

@@ -82,7 +82,7 @@ Game::Game(void)
     this->systems.emplace_back(new CollisionSystem());
     this->systems.emplace_back(new DestructSystem());
     this->systems.emplace_back(new DrawSystem());
-    //this->systems.emplace_back(new DrawCollisionGeometrySystem());
+    this->systems.emplace_back(new DrawCollisionGeometrySystem());
 
     generate_player();
     Twister::generate();
