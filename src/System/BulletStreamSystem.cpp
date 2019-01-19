@@ -6,15 +6,11 @@
 #include "Component/BulletStream.hpp"
 #include "Component/StateTransition.hpp"
 
-#include "Brofiler.h"
-
 BulletStreamSystem::BulletStreamSystem(void) : System("BulletStream") {
     get_manager()->subscribe<Entity, BulletStream>(this);
 }
 
 void BulletStreamSystem::run(float dt) {
-	BROFILER_CATEGORY("BulletStreamSystem", Profiler::Color::Tan)
-
     auto CM = get_manager();
 
     std::vector<UUID> finished;

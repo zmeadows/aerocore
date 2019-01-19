@@ -3,16 +3,12 @@
 #include "Component/StateTransition.hpp"
 #include "Globals.hpp"
 
-#include "Brofiler.h"
-
 StateTransitionCleanupSystem::StateTransitionCleanupSystem() : System("StateTransitionCleanup")
 {
     get_manager()->subscribe<StateTransition>(this);
 }
 
 void StateTransitionCleanupSystem::run(float dt) {
-	BROFILER_CATEGORY("StateTransitionCleanupSystem", Profiler::Color::DarkRed)
-
     auto CM = get_manager();
 
     //TODO: make this a member variable

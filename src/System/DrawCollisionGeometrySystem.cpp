@@ -8,16 +8,12 @@
 
 #include <SDL.h>
 
-#include "Brofiler.h"
-
 DrawCollisionGeometrySystem::DrawCollisionGeometrySystem() : System("DrawCollisionGeometry")
 {
     get_manager()->subscribe<Entity, CollisionData>(this);
 }
 
 void DrawCollisionGeometrySystem::run(float) {
-	BROFILER_CATEGORY("DrawCollisionGeometrySystem", Profiler::Color::DarkOrange)
-
     auto CM = get_manager();
     auto GC = get_graphics_context();
 
