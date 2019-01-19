@@ -26,7 +26,7 @@
 #include "System/PositionUpdateSystem.hpp"
 #include "System/RotationUpdateSystem.hpp"
 #include "System/StateTransitionCleanupSystem.hpp"
-#include "System/VertexBufferSystem.hpp"
+#include "System/QuadTreeUpdateSystem.hpp"
 #include "System/BulletStreamSystem.hpp"
 
 #include "Behavior/Pause.hpp"
@@ -78,7 +78,7 @@ Game::Game(void)
 
     this->systems.emplace_back(new BulletStreamSystem());
 
-    this->systems.emplace_back(new VertexBufferSystem());
+    this->systems.emplace_back(new QuadTreeUpdateSystem());
     this->systems.emplace_back(new CollisionSystem());
     this->systems.emplace_back(new DestructSystem());
     this->systems.emplace_back(new DrawSystem());
