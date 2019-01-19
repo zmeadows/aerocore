@@ -103,7 +103,6 @@ PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_ver
             remaining_indices.clear();
         }
 
-
         //@TODO: check if convex after each iteration!
 
         // copy so that the indices we are looping over
@@ -159,6 +158,8 @@ PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_ver
             break;
 
         {
+			//OPTIMIZE: when/where this will find a convex sub-polygon depends on the starting point used
+			//	perhaps there is a smart way to optimize this to find the simplest polygon decomposition.
             std::vector<v2> convex_test_vertices;
             convex_test_vertices.reserve(remaining_indices.size());
 
