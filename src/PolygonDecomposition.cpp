@@ -102,7 +102,7 @@ decompose_local_vertices(const LocalVertexBuffer* local_vertices)
         remaining_indices.push_back(i);
     }
 
-    //TODO: make sure this works
+    //TODO: try to make this work again
     // if (is_convex(local_vertices, vertex_count)) {
     //     final_indices.push_back(remaining_indices);
     //     return final_indices;
