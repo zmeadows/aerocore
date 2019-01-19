@@ -5,8 +5,8 @@
 #include <set>
 #include <vector>
 
-#include "Base.hpp"
 #include "UUID.hpp"
+#include "Extent.hpp"
 
 struct QuadNode {
     const unsigned c_depth;

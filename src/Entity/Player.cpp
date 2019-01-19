@@ -2,11 +2,16 @@
 #include "Bullet/Bullet.hpp"
 #include "Geometry.hpp"
 #include "Globals.hpp"
-#include "Entity.hpp"
 
-#include <random>
+#include "Component/Common.hpp"
+#include "Component/OffscreenBehavior.hpp"
 
-void generatePlayer() {
+const UUID playerUUID(void) {
+    static UUID id;
+    return id;
+}
+
+void generate_player() {
     ComponentManager* CM = get_manager();
 
     Entity& player = CM->book<Entity>(playerUUID());
@@ -22,19 +27,15 @@ void generatePlayer() {
     osb.type = OffscreenBehavior::Type::Wraps;
 }
 
-void generatePlayerBullet(void) {
+void generate_player_bullet(v2 bullet_direction) {
     auto CM = get_manager();
 
-    const auto& player = CM->get<Entity>(playerUUID());
-    const v2& player_pos = player.pos;
-    const v2& player_orientation = orientation_of(player);
+    bullet_direction = bullet_direction.normalized();
 
-    v2 bullet_pos, bullet_vel;
-
-    v2 bullet_pos_offset = 4.0 * player_orientation;
-
-    bullet_pos = player_pos + bullet_pos_offset;
-    bullet_vel = 200.f * orientation_of(player);
+    const auto& entity = CM->get<Entity>(playerUUID());
+    const v2 bullet_pos = entity.pos + 4.0 * bullet_direction;
+    const v2 bullet_vel = 200.f * bullet_direction;
 
     generate_bullet(PLAYER_BULLET, bullet_pos, bullet_vel, true);
 }
+

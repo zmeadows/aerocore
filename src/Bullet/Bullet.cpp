@@ -1,7 +1,9 @@
 #include "Bullet/Bullet.hpp"
 #include "Geometry.hpp"
 #include "Globals.hpp"
-#include "Entity.hpp"
+
+#include "Component/Common.hpp"
+#include "Component/OffscreenBehavior.hpp"
 
 UUID generate_bullet(BulletType bullet_type,
                      const v2 new_bullet_position,

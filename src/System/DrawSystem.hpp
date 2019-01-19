@@ -1,24 +1,16 @@
 #pragma once
 
-#include "Entity.hpp"
-#include "Globals.hpp"
+#include "Typedef.hpp"
+#include "System.hpp"
 
 class DrawSystem final : public System {
-    std::array<double, 100> m_fpsHistory;
-    Uint64 m_lastFrameTicks;
-    size_t m_modFrame;
-    double m_currentFpsAvg;
+    f32 m_fpsHistory[100];
+    u64 m_lastFrameTicks;
+    u64 m_modFrame;
+    f32 m_currentFpsAvg;
 
 public:
     void run(float) final;
-
-    DrawSystem() :
-        System("Draw"),
-        m_fpsHistory({{0.0}}),
-        m_lastFrameTicks(SDL_GetPerformanceCounter()),
-        m_modFrame(0) {
-        get_manager()->subscribe<Entity,Sprite>(this);
-    }
+    DrawSystem();
 };
 
-void draw_background(void);

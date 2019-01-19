@@ -3,27 +3,25 @@
 #include <memory>
 #include <vector>
 
-#include <SDL.h>
+#include "InputManager.hpp"
+#include "Entity/Player.hpp"
 
-#include "System.hpp"
-
-class InputManager;
-class SystemManager;
+class System;
 
 class Game {
     std::vector<std::unique_ptr<System>> systems;
-    std::unique_ptr<InputManager> IM;
+    PlayerInput input;
+    PlayerState state;
 
-    bool paused = false;
+    u64 m_preSystemRunTicks;
+    u64 m_postSystemRunTicks;
+    u64 m_frames_elapsed;
+    f32 time_elapsed;
 
-    Uint64 m_preSystemRunTicks;
-    Uint64 m_postSystemRunTicks;
-    size_t m_frames_elapsed = 0;
-
-    bool processInput(void);
+    bool poll_input(void);
     bool tick(void);
 
-    Uint32 last_asteroid_time = 0;
+    u64 last_asteroid_time;
 
 public:
     Game(void);

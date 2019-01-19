@@ -1,9 +1,17 @@
 #include "System/VertexBufferSystem.hpp"
 
-#include "Entity.hpp"
+#include "Globals.hpp"
+#include "Component/Common.hpp"
+#include "Component/CollisionData.hpp"
 
-//TODO: move functionality into collision system
+VertexBufferSystem::VertexBufferSystem(void) : System("VertexBuffer")
+{
+    get_manager()->subscribe<Entity, CollisionData>(this);
+}
+
+//TODO: rename system to QuadTreeUpdateSystem
 void VertexBufferSystem::run(float) {
+
     ComponentManager* CM = get_manager();
 
     get_quad_tree()->reset();

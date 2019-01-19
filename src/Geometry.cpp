@@ -1,8 +1,8 @@
 #include "Geometry.hpp"
 
 #include "Vector2D.hpp"
-#include "Base.hpp"
 #include "Util.hpp"
+#include "LocalVertexBuffer.hpp"
 
 #include <iostream>
 
@@ -11,7 +11,7 @@ recenter(LocalVertexBuffer& local_vertices)
 {
     const v2 offset = average_vector(local_vertices.data, local_vertices.count);
 
-    for (size_t i = 0; i < local_vertices.count; i++)
+    for (auto i = 0; i < local_vertices.count; i++)
         local_vertices[i] = local_vertices[i] - offset;
 
     return offset;

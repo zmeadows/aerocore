@@ -1,6 +1,13 @@
 #include "System/OffscreenBehaviorSystem.hpp"
 
-#include "Entity.hpp"
+#include "Component/Common.hpp"
+#include "Component/OffscreenBehavior.hpp"
+#include "Globals.hpp"
+
+OffscreenBehaviorSystem::OffscreenBehaviorSystem(void) : System("OffscreenBehavior")
+{
+    get_manager()->subscribe<Entity, OffscreenBehavior, PositionUpdate>(this);
+}
 
 void OffscreenBehaviorSystem::run(float) {
     ComponentManager* CM = get_manager();

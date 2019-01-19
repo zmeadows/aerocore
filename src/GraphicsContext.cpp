@@ -5,37 +5,28 @@
 
 #include <iostream>
 
+//WARNING: parse_svg_path will break when you change screen width
+//other things might as well, grep files for '800'
 GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    // window = SDL_CreateWindow("aerocore",
-    //                           SDL_WINDOWPOS_CENTERED,
-    //                           SDL_WINDOWPOS_CENTERED,
-    //                           screen_width,
-    //                           screen_width,
-    //                           SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS);
-
-    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    // SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
-
-    // GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
     renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
 
     if (SDL_NumJoysticks() < 1) {
         std::cout << "Warning: No joysticks connected!" << std::endl;
+    } else if (!SDL_IsGameController(0)) {
+        std::cout << "Warning: No joysticks connected!" << std::endl;
     } else {
-        gamepad = SDL_JoystickOpen(0);
+        gamepad = SDL_GameControllerOpen(0);
         if (!gamepad) {
             std::cout << "Failed to load game pad!" << std::endl;
         }
     }
-
-    // gfxPrimitivesSetFont(nullptr, 0, 0);
 }
 
 GraphicsContext::~GraphicsContext(void) {
     DEBUG("Destroying GraphicsContext...");
-    SDL_JoystickClose(gamepad);
+    SDL_GameControllerClose(gamepad);
     GPU_Quit();
 }
 

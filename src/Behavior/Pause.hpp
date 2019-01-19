@@ -1,6 +1,6 @@
 #pragma once
 
-#include "State.hpp"
+#include "Component/StateTransition.hpp"
 
 struct PauseBehavior {
     f32 time_left;

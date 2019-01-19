@@ -15,7 +15,7 @@ class GraphicsContext {
     const Uint16 screen_width;
     const float screen_width_f;
 
-	SDL_Joystick* gamepad;
+    SDL_GameController* gamepad;
 
     // NFont font;
 

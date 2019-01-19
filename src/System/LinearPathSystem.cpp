@@ -1,9 +1,15 @@
 #include "System/LinearPathSystem.hpp"
 
-#include "Entity.hpp"
+#include "Globals.hpp"
+#include "Component/Common.hpp"
+
+LinearPathSystem::LinearPathSystem(void) : System("LinearPath")
+{
+    get_manager()->subscribe<Entity,LinearPath,PositionUpdate>(this);
+}
 
 void LinearPathSystem::run(float dt) {
-    ComponentManager* CM = get_manager();
+    auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         auto& entity  = CM->get<Entity>(uuid);

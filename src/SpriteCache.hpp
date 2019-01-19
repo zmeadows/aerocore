@@ -1,11 +1,19 @@
 #pragma once
 
-#include <unordered_map>
+#include "Vector2d.hpp"
+#include "PolygonDecomposition.hpp"
+#include "LocalVertexBuffer.hpp"
 
 #include <SDL_gpu.h>
 
-#include "Base.hpp"
-#include "PolygonDecomposition.hpp"
+#include <unordered_map>
+
+
+struct LocalVertexBuffer;
+struct PolygonDecomposition;
+struct v2;
+struct GPU_Image;
+class UUID;
 
 struct SpriteCache {
 

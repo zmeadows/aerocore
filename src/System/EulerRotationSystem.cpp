@@ -1,6 +1,12 @@
 #include "System/EulerRotationSystem.hpp"
 
-#include "Entity.hpp"
+#include "Globals.hpp"
+#include "Component/Common.hpp"
+
+EulerRotationSystem::EulerRotationSystem(void) : System("EulerRotation")
+{
+    get_manager()->subscribe<Entity, EulerRotation, RotationUpdate>(this);
+}
 
 void EulerRotationSystem::run(float dt) {
     ComponentManager* CM = get_manager();

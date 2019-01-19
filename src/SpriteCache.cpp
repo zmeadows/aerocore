@@ -6,9 +6,11 @@
 
 #include "tinyxml2/tinyxml2.h"
 
-#include "Entity.hpp"
 #include "Globals.hpp"
 #include "Geometry.hpp"
+
+#include "Component/Common.hpp"
+#include "Component/CollisionData.hpp"
 
 namespace {
 

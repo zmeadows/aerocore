@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "Vector2D.hpp"
-#include "Base.hpp"
 #include "Util.hpp"
+#include "LocalVertexBuffer.hpp"
 
 // test if a point lies within an arbitrary polygon
 bool pnpoly(const v2* vertices, const u32 nvert, const v2& test)

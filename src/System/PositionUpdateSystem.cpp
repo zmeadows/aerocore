@@ -1,9 +1,16 @@
 #include "System/PositionUpdateSystem.hpp"
 
-#include "Entity.hpp"
+#include "Globals.hpp"
+#include "Component/Common.hpp"
 
+PositionUpdateSystem::PositionUpdateSystem(void) : System("PositionUpdate")
+{
+    get_manager()->subscribe<Entity, PositionUpdate>(this);
+}
+
+//TODO: factor out Extent?
 void PositionUpdateSystem::run(float) {
-    ComponentManager* CM = get_manager();
+    auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {
         auto& entity = CM->get<Entity>(uuid);

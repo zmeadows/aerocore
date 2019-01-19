@@ -3,8 +3,6 @@
 #include <vector>
 #include <assert.h>
 
-#include "Base.hpp"
-
 void QuadNode::reset(void) {
     m_containedUUIDs.clear();
 

@@ -8,6 +8,10 @@
 
 #include "Typedef.hpp"
 
+const float TWOPI = 2.f * static_cast<float>(3.1415926535897932384);
+const float PI = static_cast<float>(3.1415926535897932384);
+
+//TODO: Add debug levels
 #ifdef DODEBUG
 #define DEBUG(x) \
     (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
@@ -60,8 +64,18 @@ inline bool contains(const Container& cont, const T& data) {
     return cont.find(data) != cont.end();
 }
 
+//TODO: just specialize 'contains' above for std::vector<T>
 template <typename T>
 inline bool vector_contains(const std::vector<T>& cont, const T& data) {
     return std::find(cont.begin(), cont.end(), data) != cont.end();
+}
+
+inline float signum(float x) {
+    return static_cast<float>(x > 0) - static_cast<float>(x < 0);
+}
+
+inline float rotate(float& old_angle, float delta) {
+    const float new_angle = fmod(old_angle + delta, TWOPI);
+    return (new_angle < 0) ? new_angle + TWOPI : new_angle;
 }
 

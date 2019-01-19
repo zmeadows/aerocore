@@ -2,9 +2,9 @@
 
 #include "Vector2D.hpp"
 #include "Typedef.hpp"
-#include "Entity.hpp"
+#include "Component/Common.hpp"
 #include "Globals.hpp"
-#include "State.hpp"
+#include "Component/StateTransition.hpp"
 
 #include <vector>
 #include <math.h>
@@ -139,6 +139,7 @@ struct TranslationSpline : Spline<v2> {
 //     std::optional<s32> next_state_id;
 // };
 
+//TODO: move to own file
 class TranslationSplineSystem final : public System {
 
 public:
