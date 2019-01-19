@@ -3,7 +3,7 @@
 #include "Util.hpp"
 #include "Vector2D.hpp"
 
-#include <iostream>
+#include <cstdio>
 
 //WARNING: parse_svg_path will break when you change screen width
 //other things might as well, grep files for '800'
@@ -13,13 +13,13 @@ GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f
     renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
 
     if (SDL_NumJoysticks() < 1) {
-        std::cout << "Warning: No joysticks connected!" << std::endl;
+        printf("Warning: No joysticks connected!\n");
     } else if (!SDL_IsGameController(0)) {
-        std::cout << "Warning: No joysticks connected!" << std::endl;
+        printf("Warning: Joystick is not a GameController!\n");
     } else {
         gamepad = SDL_GameControllerOpen(0);
         if (!gamepad) {
-            std::cout << "Failed to load game pad!" << std::endl;
+            printf("Error: Failed to load GameController\n");
         }
     }
 }

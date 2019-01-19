@@ -26,7 +26,7 @@ UUID generate_bullet(BulletType bullet_type,
     switch (bullet_type) {
         case PLAYER_BULLET: {
             get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_player");
-            play_sound(SoundEffect_ShotFired);
+            get_audio_context()->play(SoundEffect_ShotFired);
             break;
         }
 

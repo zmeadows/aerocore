@@ -20,4 +20,3 @@ GraphicsContext* get_graphics_context(void);
 QuadTree* get_quad_tree(void);
 AudioContext* get_audio_context(void);
 SpriteCache* get_sprite_cache(void);
-void play_sound(SoundEffect effect);

@@ -1,6 +1,6 @@
 #include "SpriteCache.hpp"
 
-#include <iostream>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -93,7 +93,7 @@ SVGParsePathResult parse_svg_path(const char* filepath) {
 
         frmt_str.erase(frmt_str.find_first_of(' '), frmt_str.size());
         if (sscanf(frmt_str.c_str(), "%f,%f", &next_vtx.x, &next_vtx.y) != 2) {
-            std::cout << "goofed." << std::endl;
+            printf("XML Parsing Error!\n");
         } else {
             result.vertices[result.vertices.count] = next_vtx;
             result.vertices.count++;

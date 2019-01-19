@@ -14,7 +14,7 @@ const float PI = static_cast<float>(3.1415926535897932384);
 //TODO: Add debug levels
 #ifdef DODEBUG
 #define DEBUG(x) \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
+    (printf("[%s :: line %s] x\n", __FILE__, __LINE__))
 #else
 #define DEBUG(x)
 #endif

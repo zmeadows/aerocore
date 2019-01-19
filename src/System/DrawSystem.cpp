@@ -51,7 +51,6 @@ void DrawSystem::run(float) {
     //         sum += m_fpsHistory[i];
     //     }
     //     m_currentFpsAvg = sum / 100.0;
-    //     std::cout << "average fps: " << m_currentFpsAvg << std::endl;
     // }
 
 

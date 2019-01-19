@@ -17,10 +17,3 @@ GraphicsContext* get_graphics_context(void) { return &g_GC; }
 QuadTree* get_quad_tree(void)               { return &g_QT; }
 AudioContext* get_audio_context(void)       { return &g_AC; }
 SpriteCache* get_sprite_cache(void)         { return &g_SC; }
-
-//TODO: just play sound, don't create this additional SoundEvent component layer?
-void play_sound(SoundEffect effect) {
-    auto CM = get_manager();
-    UUID uuid;
-    CM->book<SoundEvent>(uuid, effect);
-}

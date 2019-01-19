@@ -68,17 +68,16 @@ void fill_polygon_normals(const std::vector<v2>& global_vertices, const PolygonR
 }
 
 void dump(const PolygonDecomposition* decomp) {
-    std::cout << std::endl;
-    std::cout << "## PolygonDecomposition START ##" << std::endl;
+    printf("\n## PolygonDecomposition START ##\n");
+
     for (u32 pgon = 0; pgon < decomp->count; pgon++) {
         PolygonRep pr = nth_polygon(decomp, pgon);
         for (u32 i = 0; i < pr.count; i++) {
-            std::cout << static_cast<u32>(pr.indices[i]) << " ";
+            printf((i == pr.count - 1) ? "%u\n" : "%u ", static_cast<u32>(pr.indices[i]));
         }
-        std::cout << std::endl;
     }
-    std::cout << "## PolygonDecomposition END ##" << std::endl;
-    std::cout << std::endl;
+
+    printf("\n## PolygonDecomposition END ##\n");
 }
 
 PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_vertices) {
@@ -157,21 +156,21 @@ PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_ver
         if (num_triangles_found == 0)
             break;
 
-        {
-			//OPTIMIZE: when/where this will find a convex sub-polygon depends on the starting point used
-			//	perhaps there is a smart way to optimize this to find the simplest polygon decomposition.
-            std::vector<v2> convex_test_vertices;
-            convex_test_vertices.reserve(remaining_indices.size());
+        // {
+		// 	//OPTIMIZE: when/where this will find a convex sub-polygon depends on the starting point used
+		// 	//	        perhaps there is a smart way to optimize this to find the simplest polygon decomposition.
+        //     std::vector<v2> convex_test_vertices;
+        //     convex_test_vertices.reserve(remaining_indices.size());
 
-            for (auto idx : remaining_indices) {
-                convex_test_vertices.push_back((*local_vertices)[idx]);
-            }
+        //     for (auto idx : remaining_indices) {
+        //         convex_test_vertices.push_back((*local_vertices)[idx]);
+        //     }
 
-            if (is_convex(convex_test_vertices)) {
-                final_indices.push_back(remaining_indices);
-                remaining_indices.clear();
-            }
-        }
+        //     if (is_convex(convex_test_vertices)) {
+        //         final_indices.push_back(remaining_indices);
+        //         remaining_indices.clear();
+        //     }
+        // }
     }
 
     PolygonDecomposition poly_decomp;

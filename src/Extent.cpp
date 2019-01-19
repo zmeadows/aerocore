@@ -1,17 +1,15 @@
 #include "Extent.hpp"
 
 #include <algorithm> //TODO: remove dependence on this
-#include <iostream>
+#include <cstdio>
 
 #include "Vector2D.hpp"
 #include "LocalVertexBuffer.hpp"
 
 void dump(const Extent& extent) {
-    std::cout << "MIN X: " << extent.minX << std::endl;
-    std::cout << "MAX X: " << extent.maxX << std::endl;
-    std::cout << "MIN Y: " << extent.minY << std::endl;
-    std::cout << "MAX Y: " << extent.maxY << std::endl;
-    std::cout << std::endl;
+    printf("X: (%f, %f) Y: (%f, %f)\n",
+           extent.minX, extent.maxX,
+           extent.minY, extent.maxY);
 }
 
 Extent clip_to_screen(const Extent& ext) {
