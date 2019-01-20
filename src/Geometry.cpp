@@ -4,10 +4,7 @@
 #include "Util.hpp"
 #include "LocalVertexBuffer.hpp"
 
-#include <iostream>
-
-v2
-recenter(LocalVertexBuffer& local_vertices)
+v2 recenter(LocalVertexBuffer& local_vertices)
 {
     const v2 offset = average_vector(local_vertices.data, local_vertices.count);
 
@@ -29,8 +26,7 @@ v2 average_vector(const v2* vertices, const size_t vertex_count) {
     return average_vertex;
 }
 
-bool
-is_convex(const v2* vertices, u32 vertex_count)
+bool is_convex(const v2* vertices, u32 vertex_count)
 {
     for (s32 i = 0; i < vertex_count; i++) {
         if (cross(vertices[modulo(i-1, vertex_count)] - vertices[unsign(i)],

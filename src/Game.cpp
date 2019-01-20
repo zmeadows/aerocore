@@ -10,24 +10,27 @@
 
 #include "Bullet/Bullet.hpp"
 
+#include "Component/Common.hpp"
 #include "Component/CollisionData.hpp"
 #include "Component/StateTransition.hpp"
 #include "Component/OffscreenBehavior.hpp"
 #include "Component/BulletStream.hpp"
 
+#include "System/BulletStreamSystem.hpp"
 #include "System/CollisionSystem.hpp"
+#include "System/DamageSystem.hpp"
 #include "System/DestructSystem.hpp"
 #include "System/DrawCollisionGeometrySystem.hpp"
 #include "System/DrawSystem.hpp"
 #include "System/EulerRotationSystem.hpp"
 #include "System/EulerTranslationSystem.hpp"
+#include "System/InvincibilitySystem.hpp"
 #include "System/LinearPathSystem.hpp"
 #include "System/OffscreenBehaviorSystem.hpp"
 #include "System/PositionUpdateSystem.hpp"
+#include "System/QuadTreeUpdateSystem.hpp"
 #include "System/RotationUpdateSystem.hpp"
 #include "System/StateTransitionCleanupSystem.hpp"
-#include "System/QuadTreeUpdateSystem.hpp"
-#include "System/BulletStreamSystem.hpp"
 
 #include "Behavior/Pause.hpp"
 
@@ -48,6 +51,7 @@ Game::Game(void)
     CM->registerComponent<EulerRotation>(10000);
     CM->registerComponent<OffscreenBehavior>(10000);
     CM->registerComponent<DestructTag>(10000);
+    CM->registerComponent<BulletTag>(10000);
     CM->registerComponent<FriendlyTag>(10000);
     CM->registerComponent<CollisionData>(10000);
     CM->registerComponent<PositionUpdate>(10000);
@@ -58,6 +62,10 @@ Game::Game(void)
     CM->registerComponent<TranslationSpline>(10000);
     CM->registerComponent<PauseBehavior>(10000);
     CM->registerComponent<BulletStream>(10000);
+    CM->registerComponent<DamageEvent>(10000);
+    CM->registerComponent<Health>(10000);
+    CM->registerComponent<CollideDamage>(10000);
+    CM->registerComponent<Invincibility>(10000);
 
     //@NOTE: Order is important here!
 
@@ -78,9 +86,13 @@ Game::Game(void)
 
     this->systems.emplace_back(new BulletStreamSystem());
 
+    this->systems.emplace_back(new InvincibilitySystem());
     this->systems.emplace_back(new QuadTreeUpdateSystem());
     this->systems.emplace_back(new CollisionSystem());
+
+    this->systems.emplace_back(new DamageSystem());
     this->systems.emplace_back(new DestructSystem());
+
     this->systems.emplace_back(new DrawSystem());
     this->systems.emplace_back(new DrawCollisionGeometrySystem());
 
@@ -96,7 +108,7 @@ bool Game::tick(void) {
 
     quitting = poll_input();
 
-    if (SDL_GetTicks() > last_asteroid_time + 1000) {
+    if (SDL_GetTicks() > last_asteroid_time + 3000) {
         Twister::generate();
         last_asteroid_time = SDL_GetTicks();
     }

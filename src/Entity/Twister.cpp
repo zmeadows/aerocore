@@ -8,10 +8,9 @@
 #include "SpriteCache.hpp"
 
 #include "Component/Common.hpp"
+#include "Component/StateTransition.hpp"
 #include "Component/OffscreenBehavior.hpp"
 #include "Component/BulletStream.hpp"
-
-#include <string>
 
 namespace {
 
@@ -34,14 +33,20 @@ void generate(void) {
     get_sprite_cache()->attach_sprite_to_uuid(uuid, "twister_idle");
 
     CM->book<Twister::Tag>(uuid);
+    CM->book<Health>(uuid);
 
     auto& osb = CM->book<OffscreenBehavior>(uuid);
     osb.type = OffscreenBehavior::Type::SinglePassAllowed;
     osb.SinglePassAllowed.already_found_onscreen = false;
 
     CM->book<StateTransition>(uuid).next_state_id = Relocating;
+
+    CM->book<CollideDamage>(uuid);
 }
 
+StateMachineSystem::StateMachineSystem(void) : System("Twister::StateMachine") {
+    get_manager()->subscribe<Entity, StateTransition, Twister::Tag>(this);
+}
 
 void StateMachineSystem::run(float dt) {
     auto CM = get_manager();
@@ -72,12 +77,12 @@ void StateMachineSystem::run(float dt) {
 
         case Firing: {
             CM->book<EulerRotation>(uuid).vel = 1.3;
-            auto& bstream = CM->book<BulletStream>(uuid, 0.05);
+            auto& bstream = CM->book<BulletStream>(uuid, 0.1);
             bstream.add_bullet({ ENEMY_BULLET, {5,0}, {50, 0} });
             bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-50, 0} });
             bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 50} });
             bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -50} });
-            bstream.cycles_left = 5;
+            bstream.cycles_left = 10;
 
             bstream.next_state_id = PauseAfterFiring;
             break;

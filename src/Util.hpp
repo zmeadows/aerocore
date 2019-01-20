@@ -1,15 +1,14 @@
 #pragma once
 
 #include <string>
-#include <algorithm>
 #include <cmath>
 #include <vector>
 #include <assert.h>
 
 #include "Typedef.hpp"
 
-const float TWOPI = 2.f * static_cast<float>(3.1415926535897932384);
-const float PI = static_cast<float>(3.1415926535897932384);
+const f32 TWOPI = 2.f * static_cast<f32>(3.1415926535897932384);
+const f32 PI = static_cast<f32>(3.1415926535897932384);
 
 //TODO: Add debug levels
 #ifdef DODEBUG
@@ -32,7 +31,7 @@ inline std::string asset_path(std::string local_path) {
     return std::string(ASSET_PATH) + local_path;
 };
 
-inline bool rough_equals(float x, float y, float delta) {
+inline bool rough_equals(f32 x, f32 y, f32 delta) {
     return fabs(x - y) < delta;
 }
 
@@ -70,12 +69,22 @@ inline bool vector_contains(const std::vector<T>& cont, const T& data) {
     return std::find(cont.begin(), cont.end(), data) != cont.end();
 }
 
-inline float signum(float x) {
-    return static_cast<float>(x > 0) - static_cast<float>(x < 0);
+inline f32 signum(f32 x) {
+    return static_cast<f32>(x > 0) - static_cast<f32>(x < 0);
 }
 
-inline float rotate(float& old_angle, float delta) {
-    const float new_angle = fmod(old_angle + delta, TWOPI);
+inline f32 rotate(f32& old_angle, f32 delta) {
+    const f32 new_angle = fmod(old_angle + delta, TWOPI);
     return (new_angle < 0) ? new_angle + TWOPI : new_angle;
 }
 
+template <typename T>
+T clamp(T value, T low, T high) {
+    if (value < low) {
+        return low;
+    } else if (value > high) {
+        return high;
+    } else {
+        return value;
+    }
+}

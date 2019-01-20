@@ -21,6 +21,8 @@ void generate_player() {
     CM->book<EulerRotation>(playerUUID());
     CM->book<FriendlyTag>(playerUUID());
 
+    CM->book<Health>(playerUUID());
+
     get_sprite_cache()->attach_sprite_to_uuid(playerUUID(), "player_idle");
 
     auto& osb = CM->book<OffscreenBehavior>(playerUUID());

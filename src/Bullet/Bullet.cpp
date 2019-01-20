@@ -36,6 +36,8 @@ UUID generate_bullet(BulletType bullet_type,
         }
     }
 
+    CM->book<CollideDamage>(uuid);
+
     return uuid;
 }
 

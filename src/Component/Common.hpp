@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Util.hpp"
 #include "Extent.hpp"
 #include "Vector2D.hpp"
 
@@ -44,9 +45,40 @@ struct LinearPath {
 // COMMON TAGS
 struct DestructTag {};
 struct FriendlyTag {};
+struct BulletTag {};
+struct DestructsOnImpactTag {};
 
 struct Sprite {
     GPU_Image* image;
     v2 offset;
 };
 
+struct Health {
+    f32 maximum = 1.f;
+    f32 current = 1.f;
+
+    void modify_by(f32 delta) {
+        current = clamp(current + delta, 0.f, maximum);
+    }
+
+    void regenerate_fully(void) {
+        current = maximum;
+    }
+};
+
+struct DamageEvent {
+    f32 amount = 0.f;
+};
+
+struct CollideDamage {
+    f32 amount = 0.5f;
+};
+
+struct Invincibility {
+    f32 timer = 0.0f;
+    u32 num_flashes = 8;
+    bool is_flashing = false;
+    u8 r = 255;
+    u8 g = 0;
+    u8 b = 0;
+};

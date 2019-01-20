@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Globals.hpp"
 #include "Component/StateTransition.hpp"
 
 struct PauseBehavior {

@@ -179,6 +179,8 @@ TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
     assert(!contains(compMap, uuid.unwrap()) &&
            "Attempted to book component for entity that already posseses it");
 
+	assert(compID < m_pools.size());
+
     const ResourceManager::Handle handle = m_pools[compID]->book<TyComponent>(args...);
     compMap[uuid.unwrap()] = handle;
 

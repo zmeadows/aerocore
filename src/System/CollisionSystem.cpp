@@ -81,20 +81,38 @@ bool overlaps( const Entity& entityA
 void CollisionSystem::run(float) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
-        const auto& cdA = CM->get<CollisionData>(uuid);
-        const auto& entityA = CM->get<Entity>(uuid);
+    for (const UUID friendly_uuid : m_followed) {
+        const auto& cdA = CM->get<CollisionData>(friendly_uuid);
+        const auto& entityA = CM->get<Entity>(friendly_uuid);
 
-        cdA.node->retrieve(m_candidates, uuid);
+        cdA.node->retrieve(m_candidates, friendly_uuid);
 
-        for (const UUID other_uuid : m_candidates) {
-            const auto& cdB = CM->get<CollisionData>(other_uuid);
-            const auto& entityB = CM->get<Entity>(other_uuid);
+        for (const UUID enemy_uuid : m_candidates) {
+            const auto& cdB = CM->get<CollisionData>(enemy_uuid);
+            const auto& entityB = CM->get<Entity>(enemy_uuid);
 
-            //BUGFIX: hack of requiring no DestructTag (rare bug)
-            if (!CM->has<FriendlyTag>(other_uuid) && !CM->has<DestructTag>(other_uuid) && overlaps(entityA, entityB, cdA, cdB)) {
-                CM->book<DestructTag>(other_uuid);
-                //CM->book<DestructTag>(uuid);
+            const bool is_enemy_collider = !CM->has<FriendlyTag>(enemy_uuid);
+            const bool enemy_not_already_destructing = !CM->has<DestructTag>(enemy_uuid); // hack?
+            const bool friendly_is_bullet = CM->has<BulletTag>(friendly_uuid);
+            const bool enemy_is_bullet = CM->has<BulletTag>(enemy_uuid);
+            const bool friendly_is_invincible = CM->has<Invincibility>(friendly_uuid);
+
+            if (is_enemy_collider
+                && enemy_not_already_destructing
+                && !(friendly_is_bullet && enemy_is_bullet)
+                && overlaps(entityA, entityB, cdA, cdB))
+            {
+                if (friendly_is_bullet) {
+                    CM->book<DestructTag>(friendly_uuid);
+                    f32 damage_amount = CM->get<CollideDamage>(friendly_uuid).amount;
+                    CM->book<DamageEvent>(enemy_uuid).amount = damage_amount;
+                    CM->book<Invincibility>(enemy_uuid);
+                } else if (!friendly_is_invincible) {
+                    if (enemy_is_bullet) CM->book<DestructTag>(enemy_uuid);
+                    f32 damage_amount = CM->get<CollideDamage>(enemy_uuid).amount;
+                    CM->book<DamageEvent>(friendly_uuid).amount = damage_amount;
+                    CM->book<Invincibility>(friendly_uuid);
+                }
             }
         }
     }

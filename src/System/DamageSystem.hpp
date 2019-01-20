@@ -4,9 +4,9 @@
 
 #include <vector>
 
-class DestructSystem final : public System {
+class DamageSystem final : public System {
     std::vector<UUID> m_uuid_set_copy;
 public:
     void run(float dt) final;
-    DestructSystem(void);
+    DamageSystem(void);
 };
