@@ -11,7 +11,7 @@ void reserve(ArraySet<T>& self, u32 new_capacity) {
 }
 
 template <typename T>
-inline u32 size(const ArraySet<T>& self) {
+inline u64 size(const ArraySet<T>& self) {
     return self.arr.size;
 }
 
