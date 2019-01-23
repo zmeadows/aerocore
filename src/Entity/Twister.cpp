@@ -77,7 +77,7 @@ void StateMachineSystem::run(float dt) {
 
         case Firing: {
             CM->book<EulerRotation>(uuid).vel = 1.3;
-            auto& bstream = CM->book<BulletStream>(uuid, 0.1);
+            auto& bstream = CM->book<BulletStream>(uuid, 0.4);
             bstream.add_bullet({ ENEMY_BULLET, {5,0}, {50, 0} });
             bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-50, 0} });
             bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 50} });

@@ -13,15 +13,19 @@ BulletStreamSystem::BulletStreamSystem(void) : System("BulletStream") {
 void BulletStreamSystem::run(float dt) {
     auto CM = get_manager();
 
-    std::vector<UUID> finished;
+    UUIDSet::const_iterator it = m_followed.begin();
 
-    for (const UUID uuid : m_followed) {
+    while (it != m_followed.end()) {
+        const UUID uuid = *it;
+
         auto& entity = CM->get<Entity>(uuid);
         auto& bstream = CM->get<BulletStream>(uuid);
 
         bstream.current_countdown -= dt;
 
         if (bstream.current_countdown <= 0.f) {
+
+			// fire all the bullets
             for (u32 idx = 0; idx < bstream.num_specs; idx++) {
                 const BulletSpec& spec = bstream.specs[idx];
 
@@ -35,23 +39,21 @@ void BulletStreamSystem::run(float dt) {
                 generate_bullet(spec.type, bullet_position, bullet_velocity, friendly);
             }
 
-
             if (bstream.cycles_left > 0) bstream.cycles_left--;
 
+			// if stream is finished, cleanup
             if (bstream.cycles_left == 0) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = bstream.next_state_id;
                 transition.extra_time = -1.f * bstream.current_countdown;
-                finished.push_back(uuid);
-            } else {
+                it = CM->remove_in_system_loop<BulletStream>(it, this);
+            } else { // otherwise reset for next set of bullets
                 bstream.current_countdown += bstream.delay_per_bullet;
+                it++;
             }
+        } else {
+            it++;
         }
-    }
-
-
-    for (const UUID uuid : finished) {
-        CM->remove<BulletStream>(uuid);
     }
 }
 

@@ -3,30 +3,26 @@
 #include "Globals.hpp"
 #include "Component/Common.hpp"
 
-DamageSystem::DamageSystem(void) : System("Damage")
-{
+DamageSystem::DamageSystem(void) : System("Damage") {
     get_manager()->subscribe<Health, DamageEvent>(this);
 }
 
 void DamageSystem::run(float) {
     ComponentManager* CM = get_manager();
 
-	m_uuid_set_copy.clear();
+    UUIDSet::const_iterator it = m_followed.begin();
 
-    for (const UUID uuid : m_followed)
-        m_uuid_set_copy.push_back(uuid);
+    while (it != m_followed.end()) {
+        const UUID uuid = *it;
 
-    for (const UUID& uuid : m_followed) {
-        auto& damage = CM->get<DamageEvent>(uuid);
+        const auto& damage = CM->get<DamageEvent>(uuid);
         auto& health = CM->get<Health>(uuid);
 
         health.modify_by(-1.f * damage.amount);
 
         if (health.current <= 0.f)
             CM->book<DestructTag>(uuid);
+
+        it = CM->remove_in_system_loop<DamageEvent>(it, this);
     }
-
-    for (const UUID uuid : m_uuid_set_copy)
-        CM->remove<DamageEvent>(uuid);
-
 }

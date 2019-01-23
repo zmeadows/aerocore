@@ -20,15 +20,17 @@ public:
 
     inline void follow(const UUID& uuid) {
         m_followed.insert(uuid);
-        DEBUG(name << " system followed UUID: " << uuid);
     }
 
     inline void unfollow(const UUID& uuid) {
         m_followed.erase(uuid);
-        DEBUG(name << " system unfollowed UUID: " << uuid);
     }
 
-    virtual void run(float) {}
+    inline UUIDSet::const_iterator unfollow(UUIDSet::const_iterator uuid_iter) {
+        return m_followed.erase(uuid_iter);
+    }
+
+    virtual void run(float) = 0;
 
     virtual ~System(void) {}
 };

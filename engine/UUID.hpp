@@ -7,9 +7,11 @@
 #include <vector>
 #include <utility>
 
+#include "unstd/types.hpp"
+
 class UUID {
 public:
-    using rep = uint_fast64_t;
+    using rep = u32;
     static rep m_nextID;
 
     UUID(void) : m_ID(m_nextID++) {}
@@ -38,6 +40,14 @@ private:
 
 std::ostream& operator<<(std::ostream& os, const UUID& stui);
 
+// template<>
+// struct Hasher<UUID::rep> {
+//     static u32 hash(UUID::rep key) { return key; }
+// };
+//
+// template <typename T>
+// using UUIDMap = DenseHashTable<UUID::rep, T, Hasher<u32, UUID::rep>>;
+
 class UUIDSet {
     std::vector<UUID> V;
     std::less<UUID> cmp;
@@ -65,7 +75,14 @@ public:
 
     inline void erase(UUID uuid) {
         auto it = std::find(V.begin(), V.end(), uuid);
-        if (it != V.end()) V.erase(it);
+
+        if (it != V.end()) {
+            V.erase(it);
+        }
+    }
+
+    inline iterator erase(UUIDSet::const_iterator it) {
+        return V.erase(it);
     }
 
     inline bool contains(UUID uuid) const {

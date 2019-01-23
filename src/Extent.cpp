@@ -3,6 +3,8 @@
 #include <algorithm> //TODO: remove dependence on this
 #include <cstdio>
 
+#include "unstd/types.hpp"
+
 #include "Vector2D.hpp"
 #include "LocalVertexBuffer.hpp"
 

@@ -3,9 +3,9 @@
 #include <SDL.h>
 #include <SDL_gpu.h>
 
+#include "unstd/types.hpp"
 #include "GraphicsContext.hpp"
 #include "QuadTree.hpp"
-#include "Typedef.hpp"
 #include "Vector2D.hpp"
 
 void drawQuadTree(GraphicsContext* GC, const QuadTree* quadTree) {

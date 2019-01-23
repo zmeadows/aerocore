@@ -1,7 +1,7 @@
 #pragma once
 
+#include "unstd/types.hpp"
 #include "Vector2D.hpp"
-#include "Typedef.hpp"
 #include "Component/Common.hpp"
 #include "Globals.hpp"
 #include "Component/StateTransition.hpp"

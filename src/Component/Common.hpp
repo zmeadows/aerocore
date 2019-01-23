@@ -46,7 +46,6 @@ struct LinearPath {
 struct DestructTag {};
 struct FriendlyTag {};
 struct BulletTag {};
-struct DestructsOnImpactTag {};
 
 struct Sprite {
     GPU_Image* image;
@@ -54,16 +53,10 @@ struct Sprite {
 };
 
 struct Health {
-    f32 maximum = 1.f;
-    f32 current = 1.f;
+    f32 maximum = 5.f;
+    f32 current = 5.f;
 
-    void modify_by(f32 delta) {
-        current = clamp(current + delta, 0.f, maximum);
-    }
-
-    void regenerate_fully(void) {
-        current = maximum;
-    }
+    void modify_by(f32 delta) { current = clamp(current + delta, 0.f, maximum); }
 };
 
 struct DamageEvent {

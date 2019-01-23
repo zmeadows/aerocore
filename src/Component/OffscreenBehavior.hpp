@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Typedef.hpp"
+#include "unstd/types.hpp"
 
-//TODO: use std::variant
 struct OffscreenBehavior {
     enum class Type {
         DiesInstantly,

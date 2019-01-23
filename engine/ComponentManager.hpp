@@ -88,6 +88,9 @@ public:
     void remove(const UUID& uuid);
 
     template <typename TyComponent>
+    UUIDSet::const_iterator remove_in_system_loop(UUIDSet::const_iterator uuid_iter, System* sys);
+
+    template <typename TyComponent>
     inline TyComponent& get(const UUID& uuid);
 
     template <typename TyComponent>
@@ -202,7 +205,16 @@ void ComponentManager::remove(const UUID& uuid) {
     //TODO: just template the release function in the ResourceManager
     m_pools[compID]->release(oldHandle);
 
-    alertSystemsOldComponentRemoved<TyComponent>(uuid);
+    for (auto& sys : m_subscribedSystems.at(index<TyComponent>()))
+        sys->unfollow(uuid);
+}
+
+template <typename TyComponent>
+UUIDSet::const_iterator ComponentManager::remove_in_system_loop(UUIDSet::const_iterator uuid_iter, System* focused_system) {
+    const UUID uuid = *uuid_iter;
+    UUIDSet::const_iterator next_uuid = focused_system->unfollow(uuid_iter);
+    remove<TyComponent>(uuid);
+    return next_uuid;
 }
 
 template <typename TyComponent>

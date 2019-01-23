@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Typedef.hpp"
-
 #include <algorithm>
 #include <array>
 #include <vector>
+
+#include "unstd/types.hpp"
 
 struct LocalVertexBuffer;
 struct v2;

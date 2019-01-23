@@ -1,6 +1,5 @@
 #include "LocalVertexBuffer.hpp"
 
-
 std::vector<v2> compute_global_vertices( const LocalVertexBuffer* lvb
                                        , const v2 position_offset
                                        , const float rotation_angle)

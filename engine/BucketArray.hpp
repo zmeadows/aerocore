@@ -38,7 +38,6 @@ struct Bucket {
     Bucket& operator=(const Bucket&) = delete;
     Bucket& operator=(Bucket&&) = delete;
 
-
     void release(u32 idx) {
         assert(occupied[idx]);
         data()[idx].~T();
@@ -90,7 +89,6 @@ struct BucketArray {
     template <class... Args>
     BucketIndex insert(Args&&... args) {
         assert(count < capacity);
-
 
         for (u32 bucket_id = 0; bucket_id < buckets.size(); bucket_id++) {
             auto& bucket = buckets[i];
