@@ -33,6 +33,9 @@ public:
     bool operator==(const UUID& rhs) const { return m_ID == rhs.m_ID; }
     bool operator!=(const UUID& rhs) const { return m_ID != rhs.m_ID; }
     friend bool operator<(const UUID& a, const UUID& b) { return a.m_ID < b.m_ID; }
+    friend bool operator<=(const UUID& a, const UUID& b) { return a.m_ID <= b.m_ID; }
+    friend bool operator>(const UUID& a, const UUID& b) { return a.m_ID > b.m_ID; }
+    friend bool operator>=(const UUID& a, const UUID& b) { return a.m_ID >= b.m_ID; }
 
 private:
     rep m_ID;

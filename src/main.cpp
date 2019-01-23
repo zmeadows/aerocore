@@ -8,12 +8,30 @@
 #include "unstd/ArraySet.hpp"
 #include "unstd/DenseHashTable.hpp"
 
+#include "UUID.hpp"
+
+struct UUIDHasher {
+    static u64 hash(const UUID& uuid) { return uuid.unwrap(); }
+};
+
 struct IntHasher {
-    static int hash(int x) { return x; }
+    static u64 hash(int x) { return static_cast<u64>(x); }
 };
 
 int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
+
+	for_each(uuid_set, [](const UUID& uuid) {
+		printf("UUID: %d\n", uuid.unwrap());
+	});
+
+    printf("::\n");
+
+    remove(uuid_set, wut);
+
+	for_each(uuid_set, [](const UUID& uuid) {
+		printf("UUID: %d\n", uuid.unwrap());
+	});
 
     DenseHashTable<int, int, IntHasher> table(10, 0,1);
 

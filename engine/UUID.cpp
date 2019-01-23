@@ -1,6 +1,6 @@
 #include "UUID.hpp"
 
-UUID::rep UUID::m_nextID = 0;
+UUID::rep UUID::m_nextID = 2;
 
 std::ostream& operator<<(std::ostream& os, const UUID& stui)
 {
