@@ -15,9 +15,19 @@ struct IntHasher {
 int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
 
-    DenseHashTable<int, int, IntHasher> table(0,1);
+    DenseHashTable<int, int, IntHasher> table(10, 0,1);
 
-    insert(table, 10, 20);
+    for (int i = 2; i < 100; i++)
+        insert(table, i, i*2);
+
+    std::cout << "filled slots: " << table.filled_slots << std::endl;
+
+    assert(lookup(table,95) != nullptr);
+    remove(table, 95);
+    assert(lookup(table,95) == nullptr);
+    insert(table, 95, 1234);
+    assert(lookup(table,95) != nullptr);
+
     auto x = lookup(table, 10);
     std::cout << *x << std::endl;
 
@@ -34,6 +44,9 @@ int main(int argc, char** argv) {
     append(arr, 3);
     append(arr, 4);
     append(arr, 5);
+
+    const int q = 3;
+    append(arr, q);
 
 	printf("arr size: %d\n", arr.size);
 	for_each(arr, [](auto i) {

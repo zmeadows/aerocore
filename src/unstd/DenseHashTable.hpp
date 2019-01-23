@@ -14,6 +14,7 @@ template <typename K, typename V, typename Hasher>
 struct DenseHashTable : NonCopyable {
 	//TODO: don't use DynamicArray?
     DynamicArray<KeyValuePair<K,V>> slots;
+    u32 filled_slots;
 
     const K empty_sentinel;
     const K deleted_sentinel;
@@ -43,7 +44,7 @@ DenseHashTable<K, V, Hasher>::~DenseHashTable(void) {
 
 template <typename K, typename V, typename Hasher>
 DenseHashTable<K,V,Hasher>::DenseHashTable(u64 init_capacity, const K& empty, const K& deleted)
-    : empty_sentinel(empty), deleted_sentinel(deleted)
+    : filled_slots(0), empty_sentinel(empty), deleted_sentinel(deleted)
 {
     reserve(this->slots, init_capacity);
     this->slots.size = init_capacity;
@@ -78,13 +79,26 @@ const V* lookup(DenseHashTable<K,V,Hasher>& self, const K& lookup_key)
     }
 }
 
-
 template <typename K, typename V, typename Hasher>
 void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_value)
 {
     assert(new_key != self.empty_sentinel && new_key != self.deleted_sentinel);
-    //TODO: check if extending table is needed
-		// if so, allocate new larger buffer and re-hash
+
+    if ((float) self.filled_slots > 0.7f * (float) self.slots.size) {
+        DenseHashTable<K,V,Hasher> new_table(self.slots.size * 2, self.empty_sentinel, self.deleted_sentinel);
+
+        for (auto i = 0; i < self.slots.size; i++) {
+            const K& key = self.slots[i].key;
+            if (key != self.empty_sentinel && key != self.deleted_sentinel) {
+                insert(new_table, key, std::move(self.slots[i].value));
+                self.slots[i].value.~V();
+            }
+        }
+
+        self.slots.size = 0;
+        swap(self.slots, new_table.slots);
+        swap(self.filled_slots, new_table.filled_slots);
+    }
 
     const u64 N = self.slots.size;
     u64 probe_index = Hasher::hash(new_key) % N;
@@ -95,9 +109,11 @@ void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_val
         if (probed_pair.key == self.deleted_sentinel || probed_pair.key == self.empty_sentinel) {
             probed_pair.key = new_key;
             probed_pair.value = new_value;
+            self.filled_slots++;
             return;
         } else if (probed_pair.key == new_key) {
             probed_pair.value = new_value;
+            self.filled_slots++;
             return;
         }
 
@@ -106,21 +122,24 @@ void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_val
 }
 
 template <typename K, typename V, typename Hasher>
-void remove(DenseHashTable<K,V,Hasher>& self, const K& key)
+void remove(DenseHashTable<K,V,Hasher>& self, const K& key_to_delete)
 {
-    assert(lookup_key != self.sentinel && lookup_key != self.deleted_sentinel);
-    double_hash_probe probe = build_probe(self, new_key);
+    assert(key_to_delete != self.empty_sentinel && key_to_delete != self.deleted_sentinel);
+
+    const u64 N = self.slots.size;
+    u64 probe_index = Hasher::hash(key_to_delete) % N;
 
     while (true) {
-        const u64 probe_index = probe.next();
-
         auto& probed_KeyValuePair = self.slots[probe_index];
 
-        if (probed_KeyValuePair.key == key) {
+        if (probed_KeyValuePair.key == key_to_delete) {
             probed_KeyValuePair.key = self.deleted_sentinel;
+            self.filled_slots--;
         } else if (probed_KeyValuePair.key == self.empty_sentinel) {
             return;
         }
+
+        probe_index = (probe_index + 1) % N;
     }
 }
 
