@@ -9,7 +9,7 @@
 
 class ResourceManager final {
 public:
-    using Handle = size_t;
+    using Handle = u32;
 
 private:
     std::unique_ptr<char[]> m_data;

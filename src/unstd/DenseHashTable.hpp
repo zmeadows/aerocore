@@ -16,10 +16,10 @@ struct KeyValuePair {
 
 template <typename K, typename V, typename Hasher>
 struct DenseHashTable {
-    buffer<u8> slots = nullptr;
-    u64 size = 0; // number of filled slots
-    u64 capacity = 0; // number of slots
-    f64 rehash_load_factor = 0.7;
+    buffer<u8> slots;
+    u64 size;
+    u64 capacity;
+    f64 rehash_load_factor;
 
     const K empty_sentinel;
     const K deleted_sentinel;
@@ -33,15 +33,17 @@ struct DenseHashTable {
 };
 
 template <typename K, typename V, typename Hasher>
-DenseHashTable<K,V,Hasher>::DenseHashTable(u64 init_capacity, const K& empty, const K& deleted)
-    : count(0), empty_sentinel(empty), deleted_sentinel(deleted)
+DenseHashTable<K,V,Hasher>::DenseHashTable(u64 init_capacity, const K& empty, const K& deleted) :
+    slots(allocate_buffer<u8>(sizeof(KeyValuePair<K,V>) * init_capacity)),
+    size(0), capacity(init_capacity), rehash_load_factor(0.7),
+    empty_sentinel(empty), deleted_sentinel(deleted)
 {
-    assert(self.empty_sentinel != self.deleted_sentinel);
-    reserve(this->slots, init_capacity);
-    this->slots.size = init_capacity;
+    assert(this->empty_sentinel != this->deleted_sentinel);
+    assert(this->capacity > 0);
 
-    for (u64 i = 0; i < this->size; i++) {
-        this->slots[i].key = this->empty_sentinel;
+    KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(this->slots.get());
+    for (u64 i = 0; i < this->capacity; i++) {
+        cast_slots[i].key = this->empty_sentinel;
     }
 }
 
@@ -49,7 +51,9 @@ template <typename K, typename V, typename Hasher>
 void rehash(DenseHashTable<K,V,Hasher>& self, u64 new_capacity) {
     assert(new_capacity > self.capacity);
 
-    DenseHashTable<K,V,Hasher> new_table(new_capacity, self.empty, self.deleted);
+    std::cout << "rehashing to size: " << new_capacity << std::endl;
+
+    DenseHashTable<K,V,Hasher> new_table(new_capacity, self.empty_sentinel, self.deleted_sentinel);
 
     KeyValuePair<K,V>* old_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
 
@@ -71,11 +75,13 @@ const V* lookup(DenseHashTable<K,V,Hasher>& self, const K& lookup_key)
 {
     assert(lookup_key != self.empty_sentinel && lookup_key != self.deleted_sentinel);
 
-    const u64 N = self.size;
+    const u64 N = self.capacity;
     u64 probe_index = Hasher::hash(lookup_key) % N;
 
+    KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
+
     while (true) {
-        KeyValuePair<K,V>& probed_pair = self.slots[probe_index];
+        KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
 
         if (probed_pair.key == lookup_key) {
             return &probed_pair.value;
@@ -96,18 +102,20 @@ void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_val
 {
     assert(new_key != self.empty_sentinel && new_key != self.deleted_sentinel);
 
-    if (load_factor(self) > self.rehash_load_factor) rehash(self);
+    if (load_factor(self) > self.rehash_load_factor) rehash(self, self.capacity * 2);
 
-    const u64 N = self.slots.size;
+    const u64 N = self.capacity;
     u64 probe_index = Hasher::hash(new_key) % N;
 
+    KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
+
     while (true) {
-        KeyValuePair<K,V>& probed_pair = self.slots[probe_index];
+        KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
 
         if (probed_pair.key == self.deleted_sentinel || probed_pair.key == self.empty_sentinel) {
             probed_pair.key = new_key;
             probed_pair.value = new_value;
-            self.count++;
+            self.size++;
             return;
         } else if (probed_pair.key == new_key) {
             probed_pair.value = new_value;
@@ -123,15 +131,17 @@ void remove(DenseHashTable<K,V,Hasher>& self, const K& key_to_delete)
 {
     assert(key_to_delete != self.empty_sentinel && key_to_delete != self.deleted_sentinel);
 
-    const u64 N = self.slots.size;
+    const u64 N = self.capacity;
     u64 probe_index = Hasher::hash(key_to_delete) % N;
+    KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
 
     while (true) {
-        KeyValuePair<K,V>& probed_slot = self.slots[probe_index];
+        KeyValuePair<K,V>& probed_slot = cast_slots[probe_index];
 
         if (probed_slot.key == key_to_delete) {
             probed_slot.key = self.deleted_sentinel;
-            self.count--;
+            self.size--;
+            return;
         } else if (probed_slot.key == self.empty_sentinel) {
             return;
         }

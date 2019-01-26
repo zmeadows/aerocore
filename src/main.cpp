@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
     srand (static_cast<unsigned>(time(nullptr)));
 
     ArraySet<int> test;
-    reserve_memory(test, 50);
+    reserve_memory(test, 1);
     debug_print(test);
 
     insert(test, 1);
@@ -50,6 +50,22 @@ int main(int argc, char** argv) {
     debug_print(test);
     insert(test, 2);
     debug_print(test);
+
+    DenseHashTable<int,int,IntHasher> hash_table(100, 0, 1);
+
+    for (int i = 2; i < 1e5; i++) {
+        insert(hash_table, i, i*2);
+    }
+
+    for (int i = 2; i < 1e5; i++) {
+        assert(*lookup(hash_table, i) == i*2);
+    }
+
+    for (int i = 2; i < 1e5; i++) {
+        remove(hash_table, i);
+    }
+
+    std::cout << "TABLE SIZE: " << hash_table.size << std::endl;
 
     Game g;
     g.run();
