@@ -11,7 +11,7 @@ EulerTranslationSystem::EulerTranslationSystem(void) : System("EulerTranslation"
 void EulerTranslationSystem::run(float dt) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID& uuid : m_followed) {
         auto& kin    = CM->get<EulerTranslation>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

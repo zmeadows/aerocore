@@ -4,6 +4,12 @@
 #include "ResourceManager.hpp"
 #include "System.hpp"
 
+#include "Util.hpp"
+
+#include <istream>
+#include <string>
+#include <fstream>
+#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -179,8 +185,8 @@ TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
 
     DEBUG(uuid << " booked component: " << type_name<TyComponent>());
 
-    assert(!contains(compMap, uuid.unwrap()) &&
-           "Attempted to book component for entity that already posseses it");
+    // assert(!contains(compMap, uuid.unwrap()) &&
+    //       "Attempted to book component for entity that already posseses it");
 
 	assert(compID < m_pools.size());
 
@@ -195,6 +201,8 @@ template <typename TyComponent>
 void ComponentManager::remove(const UUID& uuid) {
     const ComponentIndex compID = index<TyComponent>();
 
+    DEBUG(uuid << "removed component: " << type_name<TyComponent>());
+
     UUIDCompMap& compMap = m_store[compID];
     auto oldValue = compMap.find(uuid.unwrap());
     assert(oldValue != compMap.end() && "Attempted to remove non-existent component from entity");
@@ -207,14 +215,6 @@ void ComponentManager::remove(const UUID& uuid) {
 
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>()))
         sys->unfollow(uuid);
-}
-
-template <typename TyComponent>
-UUIDSet::const_iterator ComponentManager::remove_in_system_loop(UUIDSet::const_iterator uuid_iter, System* focused_system) {
-    const UUID uuid = *uuid_iter;
-    UUIDSet::const_iterator next_uuid = focused_system->unfollow(uuid_iter);
-    remove<TyComponent>(uuid);
-    return next_uuid;
 }
 
 template <typename TyComponent>

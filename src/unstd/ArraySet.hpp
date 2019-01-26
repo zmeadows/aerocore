@@ -1,92 +1,128 @@
 #pragma once
 
+#include "unstd/DynamicArray.hpp"
+#include "unstd/unstdlib.hpp"
+#include "unstd/Maybe.hpp"
+
 template <typename T>
-struct ArraySet : NonCopyable {
+struct ArraySet {
     DynamicArray<T> arr;
+
+    T* begin(void) { return arr.begin(); }
+    T* end(void) { return arr.end(); }
+    const T* const begin(void) const { return arr.begin(); }
+    const T* const end(void) const { return arr.end(); }
+};
+
+namespace {
+
+struct BinarySearchResult {
+    enum class Type {
+        End,
+        InsertIndex,
+        AlreadyExists
+    } type;
+
+    s64 index = -1;
 };
 
 template <typename T>
-void reserve(ArraySet<T>& self, u32 new_capacity) {
-    reserve(self.arr, new_capacity);
+void debug_print(const ArraySet<T>& self) {
+    debug_print(self.arr);
 }
 
 template <typename T>
-inline u64 size(const ArraySet<T>& self) {
+BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
+    BinarySearchResult result;
+
+    if (self.arr.size == 0) {
+            result.type = BinarySearchResult::Type::End;
+            return result;
+    }
+
+    if (item > self.arr[self.arr.size-1]) {
+        result.type = BinarySearchResult::Type::End;
+        return result;
+    }
+
+    s64 low = 0;
+    s64 high = self.arr.size - 1;
+
+    do {
+        u64 mid = low + (high - low) / 2;
+        const T& mid_value = self.arr[mid];
+
+        if (item == mid_value) {
+            result.type = BinarySearchResult::Type::AlreadyExists;
+            result.index = mid;
+            return result;
+        } else if (item < mid_value) {
+            high = mid - 1;
+        } else { // value > self.arr[mid]
+            low = mid + 1;
+        }
+    } while (high >= low);
+
+    result.type = BinarySearchResult::Type::InsertIndex;
+    result.index = low;
+
+    return result;
+}
+
+}
+
+template <typename T>
+void reserve_memory(ArraySet<T>& self, u64 new_capacity) {
+    reserve_memory(self.arr, new_capacity);
+}
+
+template <typename T>
+u64 size(const ArraySet<T>& self) {
     return self.arr.size;
 }
 
 template <typename T>
-inline void clear(ArraySet<T>& self) { clear(self.arr); }
+void clear(ArraySet<T>& self) { clear(self.arr); }
 
 template <typename T>
-u32 _upper_bound(const ArraySet<T>& self, const T& value) {
-    if (self.arr.size == 0 || value <= self.arr[0]) {
-        return 0;
-    } else if (value > self.arr[self.arr.size - 1]) {
-        return self.arr.size;
-    }
-
-    u32 low = 0;
-    u32 high = self.arr.size;
-
-    while (high - low > 1) {
-        u32 mid = low + (high - low) / 2;
-
-        if (self.arr[mid] == value) {
-            return mid;
-        } else if (value < self.arr[mid]) {
-            high = mid;
-        } else { // value > self.arr[mid]
-            low = mid;
-        }
-    }
-
-    return high;
+ArraySet<T> copy(const ArraySet<T>& other) {
+    ArraySet<T> new_set;
+    new_set.arr = copy(other.arr);
+    return new_set;
 }
 
 template <typename T>
 void insert(ArraySet<T>& self, const T& new_value) {
     if (self.arr.size == self.arr.capacity) {
-        reserve(self.arr, 2 * self.arr.capacity);
+        reserve_memory(self.arr, self.arr.capacity == 0 ? 2 : 2 * self.arr.capacity);
     }
 
-    u32 new_idx = _upper_bound(self, new_value);
+    const BinarySearchResult result = binary_search(self, new_value);
 
-    if (new_value == self.arr[new_idx])
-		return;
-
-    // copy the old elements one step forward
-    for (u32 idx = self.arr.size; idx > new_idx; idx--) {
-        self.arr[idx] = self.arr[idx - 1];
+    switch (result.type) {
+        case BinarySearchResult::Type::End:
+            append(self.arr, new_value);
+            break;
+        case BinarySearchResult::Type::InsertIndex:
+            insert_at(self.arr, new_value, result.index);
+            break;
+        case BinarySearchResult::Type::AlreadyExists:
+            break;
     }
-
-    self.arr[new_idx] = new_value;
-
-    self.arr.size++;
 }
 
 template <typename T>
 void remove(ArraySet<T>& self, const T& value) {
-    u32 old_idx = _upper_bound(self, value);
+    const BinarySearchResult result = binary_search(self, value);
 
-    if (value != self.arr[old_idx])
+    if (result.type != BinarySearchResult::Type::AlreadyExists)
         return;
 
-    // copy the old elements one step backward
-    for (u32 i = old_idx; i < self.arr.size - 1; i++) {
-        self.arr[i] = self.arr[i + 1];
-    }
-
-    self.arr.size--;
+    remove_at(self.arr, result.index);
 }
 
+//TODO: This can be optimized slightly by creating a modified version of the binary_search function.
 template <typename T>
-bool contains(ArraySet<T>& self, const T& value) {
-    const u32 idx = _upper_bound(self, value);
-    return (idx < self.arr.size && value == self.arr[idx]);
-}
-
-template <typename T, typename Callable>
-inline void for_each(ArraySet<T>& aset, Callable&& f) {
-    for_each(aset.arr, f);
+bool contains(const ArraySet<T>& self, const T& value) {
+    return binary_search(self, value).type == BinarySearchResult::Type::AlreadyExists;
 }

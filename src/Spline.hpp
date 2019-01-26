@@ -146,9 +146,11 @@ public:
     void run(float dt) final {
         auto CM = get_manager();
 
-		std::vector<UUID> post_run_uuid_buffer;
+		// ArraySet<UUID> to_delete;
+        std::vector<UUID> to_delete;
 
-        for (const UUID uuid : m_followed) {
+        for (const UUID& uuid : m_followed)
+        {
             auto& spline = CM->get<TranslationSpline>(uuid);
             auto& update = CM->get<PositionUpdate>(uuid);
             const auto& entity = CM->get<Entity>(uuid);
@@ -158,7 +160,7 @@ public:
             update.delta = result.new_point - entity.pos;
 
             if (result.finished) {
-                post_run_uuid_buffer.push_back(uuid);
+                to_delete.push_back(uuid);
                 if (spline.next_state_id) {
                     auto& transition = CM->book<StateTransition>(uuid);
                     transition.next_state_id = *spline.next_state_id;
@@ -167,10 +169,9 @@ public:
             }
         }
 
-        for (const UUID uuid : post_run_uuid_buffer) {
+        for (const UUID& uuid : to_delete) {
             CM->remove<TranslationSpline>(uuid);
         }
-
     }
 
     TranslationSplineSystem(void) : System("TranslationSpline")

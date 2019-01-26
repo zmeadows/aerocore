@@ -11,7 +11,7 @@ DestructSystem::DestructSystem(void) : System("Destruct")
 void DestructSystem::run(float) {
     ComponentManager* CM = get_manager();
 
-    for (const UUID uuid : m_followed)
+    for (const UUID& uuid : m_followed)
         m_uuid_set_copy.push_back(uuid);
 
     for (const UUID& uuid : m_uuid_set_copy) {

@@ -52,6 +52,7 @@ void StateMachineSystem::run(float dt) {
     auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {
+        std::cout << "looping over twisters" << std::endl;
         const auto& transition = CM->get<StateTransition>(uuid);
 
         switch (transition.next_state_id) {
