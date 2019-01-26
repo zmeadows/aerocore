@@ -12,6 +12,10 @@ struct KeyValuePair {
     V value;
 };
 
+inline u64 modulo(s64 i, s64 n) {
+    return static_cast<u64>((i % n + n) % n);
+}
+
 }
 
 template <typename K, typename V, typename Hasher>
@@ -106,7 +110,7 @@ void insert(DenseHashTable<K,V,Hasher>& self, K new_key, V new_value)
     if (load_factor(self) > self.rehash_load_factor) rehash(self, self.capacity * 2);
 
     const u64 N = self.capacity;
-    u64 probe_index = Hasher::hash(new_key) % N;
+    s64 probe_index = Hasher::hash(new_key) % N;
 
     KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
 
@@ -115,7 +119,15 @@ void insert(DenseHashTable<K,V,Hasher>& self, K new_key, V new_value)
     while (true) {
         KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
 
-        const u64 probed_dib = probe_index - (Hasher::hash(probed_pair.key) % N);
+        //TODO: is this broken at the end of the buffer?
+        const u64 probed_dib = probe_index - Hasher::hash(probed_pair.key) % N;
+        // if (probed_pair.key != self.empty_sentinel && probed_pair.key != self.deleted_sentinel) {
+        //     if (probed_dib > self.longest_probe) {
+        //         std::cout << "GOOFY LONG PROBE: " << probed_dib << std::endl;
+        //     } else {
+        //         std::cout << "SHORT PROBE: " << probed_dib << std::endl;
+        //     }
+        // }
 
         if (probed_pair.key == self.deleted_sentinel || probed_pair.key == self.empty_sentinel) {
             probed_pair.key = new_key;
@@ -146,7 +158,12 @@ void remove(DenseHashTable<K,V,Hasher>& self, const K& key_to_delete)
     u64 probe_index = Hasher::hash(key_to_delete) % N;
     KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
 
+    u64 dib = 0;
+
     while (true) {
+        if (dib > self.longest_probe)
+            return;
+
         KeyValuePair<K,V>& probed_slot = cast_slots[probe_index];
 
         if (probed_slot.key == key_to_delete) {
@@ -158,6 +175,7 @@ void remove(DenseHashTable<K,V,Hasher>& self, const K& key_to_delete)
         }
 
         probe_index = (probe_index + 1) % N;
+        dib++;
     }
 }
 
@@ -186,4 +204,23 @@ void for_each(DenseHashTable<K,V,Hasher>& self, Callable&& f)
         }
     }
 }
+
+// rather than define complicated insane C++ 'iterators', just a simple higher-order function.
+template <typename K, typename V, typename Hasher, typename Callable>
+void for_each_with_delete(DenseHashTable<K,V,Hasher>& self, Callable&& f)
+{
+    KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
+
+    for (auto i = 0; i < self.capacity; i++) {
+        K& key = cast_slots[i].key;
+        if (key != self.empty_sentinel && key != self.deleted_sentinel) {
+            if (f(key, cast_slots[i].value)) {
+                key = self.deleted_sentinel;
+                self.size--;
+            }
+        }
+    }
+}
+
+//TODO: for_each_with_delete
 
