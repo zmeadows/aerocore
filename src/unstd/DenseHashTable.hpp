@@ -20,6 +20,7 @@ struct DenseHashTable {
     u64 size;
     u64 capacity;
     f64 rehash_load_factor;
+    u64 longest_probe;
 
     const K empty_sentinel;
     const K deleted_sentinel;
@@ -35,7 +36,7 @@ struct DenseHashTable {
 template <typename K, typename V, typename Hasher>
 DenseHashTable<K,V,Hasher>::DenseHashTable(u64 init_capacity, const K& empty, const K& deleted) :
     slots(allocate_buffer<u8>(sizeof(KeyValuePair<K,V>) * init_capacity)),
-    size(0), capacity(init_capacity), rehash_load_factor(0.7),
+    size(0), capacity(init_capacity), rehash_load_factor(0.9), longest_probe(0),
     empty_sentinel(empty), deleted_sentinel(deleted)
 {
     assert(this->empty_sentinel != this->deleted_sentinel);
@@ -98,7 +99,7 @@ f64 load_factor(const DenseHashTable<K,V,Hasher>& self) {
 }
 
 template <typename K, typename V, typename Hasher>
-void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_value)
+void insert(DenseHashTable<K,V,Hasher>& self, K new_key, V new_value)
 {
     assert(new_key != self.empty_sentinel && new_key != self.deleted_sentinel);
 
@@ -109,20 +110,30 @@ void insert(DenseHashTable<K,V,Hasher>& self, const K& new_key, const V& new_val
 
     KeyValuePair<K,V>* cast_slots = reinterpret_cast<KeyValuePair<K,V>*>(self.slots.get());
 
+    u64 dib = 0;
+
     while (true) {
         KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
+
+        const u64 probed_dib = probe_index - (Hasher::hash(probed_pair.key) % N);
 
         if (probed_pair.key == self.deleted_sentinel || probed_pair.key == self.empty_sentinel) {
             probed_pair.key = new_key;
             probed_pair.value = new_value;
+            self.longest_probe = max(dib, self.longest_probe);
             self.size++;
             return;
         } else if (probed_pair.key == new_key) {
-            probed_pair.value = new_value;
+            //. probed_pair.value = new_value;
             return;
+        } else if (probed_dib < dib) {
+            std::swap(probed_pair.key, new_key);
+            std::swap(probed_pair.value, new_value);
+            dib = probed_dib;
         }
 
         probe_index = (probe_index + 1) % N;
+        dib++;
     }
 }
 
