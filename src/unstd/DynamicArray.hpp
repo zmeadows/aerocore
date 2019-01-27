@@ -9,8 +9,8 @@ struct DynamicArray {
     u64 capacity = 0;
     u64 size = 0;
 
-    T& operator[](u64 idx);
-    const T& operator[](u64 idx) const;
+    inline T& operator[](u64 idx);
+    inline const T& operator[](u64 idx) const;
 
     T* begin(void) { return reinterpret_cast<T*>(this->data.get()); }
     T* end(void) { return reinterpret_cast<T*>(this->data.get()) + this->size; }
@@ -54,14 +54,14 @@ void clear(DynamicArray<T>& self) {
 }
 
 template <typename T>
-T& DynamicArray<T>::operator[](u64 idx) {
+inline T& DynamicArray<T>::operator[](u64 idx) {
     assert(idx < this->size);
     T* cast_data = reinterpret_cast<T*>(this->data.get());
     return cast_data[idx];
 }
 
 template <typename T>
-const T& DynamicArray<T>::operator[](u64 idx) const {
+inline const T& DynamicArray<T>::operator[](u64 idx) const {
     assert(idx < this->size);
     const T* const cast_data = reinterpret_cast<const T* const>(this->data.get());
     return cast_data[idx];

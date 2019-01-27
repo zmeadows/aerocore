@@ -108,7 +108,7 @@ bool Game::tick(void) {
 
     quitting = poll_input();
 
-    if (SDL_GetTicks() > last_asteroid_time + 100) {
+    if (SDL_GetTicks() > last_asteroid_time + 2000) {
         Twister::generate();
         last_asteroid_time = SDL_GetTicks();
     }
@@ -118,11 +118,17 @@ bool Game::tick(void) {
     time_elapsed += frame_time;
     m_postSystemRunTicks = m_preSystemRunTicks;
 
+
     tick_player(&input, &state, frame_time);
 
+    auto pre_run = SDL_GetPerformanceCounter();
     for (auto& sys : systems) {
         sys->run(frame_time);
     }
+    auto post_run = SDL_GetPerformanceCounter();
+    const float run_time = static_cast<float>(post_run - pre_run) / SDL_GetPerformanceFrequency();
+    if (m_frames_elapsed % 50 == 0)
+        std::cout << "frame compute time: " << run_time << std::endl;
 
     GPU_Flip(get_graphics_context()->renderer);
 

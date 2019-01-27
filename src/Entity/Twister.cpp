@@ -40,7 +40,6 @@ void generate(void) {
     osb.SinglePassAllowed.already_found_onscreen = false;
 
     CM->book<StateTransition>(uuid).next_state_id = Relocating;
-
     CM->book<CollideDamage>(uuid);
 }
 
@@ -48,56 +47,51 @@ StateMachineSystem::StateMachineSystem(void) : System("Twister::StateMachine") {
     get_manager()->subscribe<Entity, StateTransition, Twister::Tag>(this);
 }
 
-void StateMachineSystem::run(float dt) {
+void StateMachineSystem::run(float) {
     auto CM = get_manager();
 
     for (const UUID uuid : m_followed) {
-        std::cout << "looping over twisters" << std::endl;
         const auto& transition = CM->get<StateTransition>(uuid);
 
         switch (transition.next_state_id) {
+            case Relocating: {
+                auto& spline = CM->book<TranslationSpline>(uuid);
+                spline.add_point(CM->get<Entity>(uuid).pos, 0.0);
+                spline.add_point(random_position(), 1.0);
+                spline.add_point(random_position(), 2.5);
+                spline.construct();
+                spline.next_state_id = Firing;
+                break;
+            }
 
-        case Relocating: {
-            assert(!CM->has<TranslationSpline>(uuid));
-            auto& spline = CM->book<TranslationSpline>(uuid);
-            spline.add_point(CM->get<Entity>(uuid).pos, 0.0);
-            spline.add_point(random_position(), 1.0);
-            spline.add_point(random_position(), 2.5);
-            spline.construct();
-            spline.next_state_id = Firing;
+            case PauseBeforeFiring: {
+                auto& pause = CM->book<PauseBehavior>(uuid);
+                pause.time_left = 1.0;
+                pause.next_state_id = Firing;
+                break;
+            }
 
-            break;
-        }
+            case Firing: {
+                CM->book<EulerRotation>(uuid).vel = 3.f;
+                auto& bstream = CM->book<BulletStream>(uuid, 0.1);
+                bstream.add_bullet({ ENEMY_BULLET, {5,0}, {50, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-50, 0} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 50} });
+                bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -50} });
+                bstream.cycles_left = 10;
+                bstream.next_state_id = PauseAfterFiring;
+                break;
+            }
 
-        case PauseBeforeFiring: {
-            auto& pause = CM->book<PauseBehavior>(uuid);
-            pause.time_left = 1.0;
-            pause.next_state_id = Firing;
-            break;
-        }
+            case PauseAfterFiring: {
+                CM->remove<EulerRotation>(uuid);
+                auto& pause = CM->book<PauseBehavior>(uuid);
+                pause.time_left = 1.0;
+                pause.next_state_id = Relocating;
+                break;
+            }
 
-        case Firing: {
-            CM->book<EulerRotation>(uuid).vel = 1.3;
-            auto& bstream = CM->book<BulletStream>(uuid, 0.4);
-            bstream.add_bullet({ ENEMY_BULLET, {5,0}, {50, 0} });
-            bstream.add_bullet({ ENEMY_BULLET, {-5,0}, {-50, 0} });
-            bstream.add_bullet({ ENEMY_BULLET, {0,5}, {0, 50} });
-            bstream.add_bullet({ ENEMY_BULLET, {0,-5}, {0, -50} });
-            bstream.cycles_left = 10;
-
-            bstream.next_state_id = PauseAfterFiring;
-            break;
-        }
-
-        case PauseAfterFiring: {
-            CM->remove<EulerRotation>(uuid);
-            auto& pause = CM->book<PauseBehavior>(uuid);
-            pause.time_left = 1.0;
-            pause.next_state_id = Relocating;
-            break;
-        }
-
-        default: { break; }
+            default: { assert(false && "Invalid state id"); }
         }
     }
 }

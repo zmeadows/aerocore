@@ -14,6 +14,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include "unstd/DenseHashTable.hpp"
+
 class ComponentManager {
 private:
     ////////////////////////
@@ -46,7 +48,7 @@ private:
     ////////////////////////////
 
     // TODO: make UUIDMap class?
-    using UUIDCompMap = std::unordered_map<UUID::rep, ResourceManager::Handle>;
+    using UUIDCompMap = DenseHashTable<UUID::rep, ResourceManager::Handle, UUIDHasher>;
     std::vector<UUIDCompMap> m_store;
     std::vector<std::unique_ptr<ResourceManager>> m_pools;
 
@@ -94,9 +96,6 @@ public:
     void remove(const UUID& uuid);
 
     template <typename TyComponent>
-    UUIDSet::const_iterator remove_in_system_loop(UUIDSet::const_iterator uuid_iter, System* sys);
-
-    template <typename TyComponent>
     inline TyComponent& get(const UUID& uuid);
 
     template <typename TyComponent>
@@ -107,7 +106,7 @@ public:
     template <typename TyComponent>
     inline bool has(UUID uuid) {
         const ComponentIndex compID = index<TyComponent>();
-        return m_store[compID].count(uuid.unwrap()) > 0;
+        return contains(m_store[compID], uuid.unwrap());
     }
 
     template <typename TyComponent>
@@ -132,7 +131,7 @@ void ComponentManager::registerComponent(const size_t allocSize) {
            "Expected/Actual mismatch between number of registered component pools when registering ");
 
     // add component to store
-    m_store.emplace_back(UUIDCompMap());
+    m_store.emplace_back(DenseHashTable<UUID::rep, ResourceManager::Handle, UUIDHasher>(0,1));
 
     // create memory pool for component
     ResourceManager* rm = new ResourceManager();
@@ -152,6 +151,7 @@ inline void ComponentManager::unRegisterComponent(void) {
 
 template <typename TyComponent>
 //OPTIMIZE: defer this check when building entities?
+// So far, entity creation/deletion has no real impact on performance though
 void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>())) {
         if (sys->isFollowing(uuid))
@@ -160,7 +160,7 @@ void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
         bool entityShouldBeFollowed = true;
 
         for (const ComponentIndex idx : m_subscribedComponents.at(sys)) {
-            if (m_store[idx].count(uuid.unwrap()) == 0) {
+            if (!contains(m_store[idx], uuid.unwrap())) {
                 entityShouldBeFollowed = false;
                 break;
             }
@@ -183,15 +183,13 @@ TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
 
     UUIDCompMap& compMap = m_store[compID];
 
-    DEBUG(uuid << " booked component: " << type_name<TyComponent>());
-
     // assert(!contains(compMap, uuid.unwrap()) &&
     //       "Attempted to book component for entity that already posseses it");
 
 	assert(compID < m_pools.size());
 
     const ResourceManager::Handle handle = m_pools[compID]->book<TyComponent>(args...);
-    compMap[uuid.unwrap()] = handle;
+    insert(compMap, uuid.unwrap(), handle);
 
     alertSystemsNewComponentAdded<TyComponent>(uuid);
     return m_pools[compID]->get<TyComponent>(handle);
@@ -204,11 +202,11 @@ void ComponentManager::remove(const UUID& uuid) {
     DEBUG(uuid << "removed component: " << type_name<TyComponent>());
 
     UUIDCompMap& compMap = m_store[compID];
-    auto oldValue = compMap.find(uuid.unwrap());
-    assert(oldValue != compMap.end() && "Attempted to remove non-existent component from entity");
-    const ResourceManager::Handle oldHandle = oldValue->second;
+    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    assert(oldHandlePtr != nullptr && "Attempted to remove non-existent component from entity");
+    const ResourceManager::Handle oldHandle = *oldHandlePtr;
 
-    compMap.erase(oldValue);
+    ::remove(compMap, uuid.unwrap());
 
     //TODO: just template the release function in the ResourceManager
     m_pools[compID]->release(oldHandle);
@@ -226,9 +224,9 @@ inline TyComponent& ComponentManager::get(const UUID& uuid) {
 
     UUIDCompMap& compMap = m_store[compID];
 
-    auto hit = compMap.find(uuid.unwrap());
-    assert(hit != compMap.end());
-    return m_pools[compID]->get<TyComponent>(hit->second);
+    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
+    return m_pools[compID]->get<TyComponent>(*oldHandlePtr);
 }
 
 template <typename TyComponent>
@@ -240,9 +238,9 @@ inline const TyComponent& ComponentManager::get(UUID uuid) const {
 
     const UUIDCompMap& compMap = m_store.at(compID);
 
-    const auto hit = compMap.find(uuid.unwrap());
-    assert(hit != compMap.end());
-    return m_pools[compID]->get<TyComponent>(hit->second);
+    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
+    return m_pools[compID]->get<TyComponent>(*oldHandlePtr);
 }
 
 void ComponentManager::destroy(const UUID& uuid) {
@@ -254,10 +252,10 @@ void ComponentManager::destroy(const UUID& uuid) {
     }
 
     for (const auto& idx : m_allComponentIndices) {
-        auto hit = m_store[idx].find(uuid.unwrap());
-        if (hit != m_store[idx].end()) {
-            m_pools[idx]->release(hit->second);
-            m_store[idx].erase(uuid.unwrap());
+        const ResourceManager::Handle* oldHandlePtr = lookup(m_store[idx], uuid.unwrap());
+        if (oldHandlePtr != nullptr) {
+            m_pools[idx]->release(*oldHandlePtr);
+            ::remove(m_store[idx], uuid.unwrap());
         }
     }
 }

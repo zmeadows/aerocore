@@ -126,3 +126,34 @@ template <typename T>
 bool contains(const ArraySet<T>& self, const T& value) {
     return binary_search(self, value).type == BinarySearchResult::Type::AlreadyExists;
 }
+
+// void test_ArraySet(void) {
+//     ArraySet<int> test;
+//     reserve_memory(test, 1);
+//     debug_print(test);
+// 
+//     insert(test, 1);
+//     debug_print(test);
+//     remove(test, 1);
+//     debug_print(test);
+//     insert(test, 1);
+//     debug_print(test);
+//     insert(test, 2);
+//     debug_print(test);
+//     insert(test, 3);
+//     debug_print(test);
+//     insert(test, 4);
+//     debug_print(test);
+//     insert(test, -1);
+//     debug_print(test);
+//     insert(test, 10);
+//     debug_print(test);
+//     insert(test, 6);
+//     debug_print(test);
+//     remove(test, 1653456765);
+//     debug_print(test);
+//     remove(test, 2);
+//     debug_print(test);
+//     insert(test, 2);
+//     debug_print(test);
+// }

@@ -3,23 +3,20 @@
 #include <cstdint>
 #include <limits>
 
-namespace {
-    uint_fast32_t x=123456789, y=362436069, z=521288629;
+//period 2^96-1
+inline u32 xorshf96(void) {
+    static u32 x=123456789, y=362436069, z=521288629;
+    u32 t;
+    x ^= x << 16;
+    x ^= x >> 5;
+    x ^= x << 1;
 
-    //period 2^96-1
-    inline uint_fast32_t xorshf96(void) {
-        uint_fast32_t t;
-        x ^= x << 16;
-        x ^= x >> 5;
-        x ^= x << 1;
+    t = x;
+    x = y;
+    y = z;
+    z = t ^ x ^ y;
 
-        t = x;
-        x = y;
-        y = z;
-        z = t ^ x ^ y;
-
-        return z;
-    }
+    return z;
 }
 
 inline f32 uniform_random(f32 min_, f32 max_) {

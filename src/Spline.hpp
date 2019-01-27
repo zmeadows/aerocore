@@ -49,10 +49,9 @@ struct Spline {
 
     bool looping = false;
 
+    // TODO: make these stand-alone functions
     void add_point(const T& new_point, f32 new_time);
-
     void construct(void);
-
     SplineStepResult<T> step(f32 dt);
 };
 

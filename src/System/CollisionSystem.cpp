@@ -109,9 +109,9 @@ void CollisionSystem::run(float) {
                     CM->book<Invincibility>(enemy_uuid);
                 } else if (!friendly_is_invincible) {
                     if (enemy_is_bullet) CM->book<DestructTag>(enemy_uuid);
-                    f32 damage_amount = CM->get<CollideDamage>(enemy_uuid).amount;
-                    CM->book<DamageEvent>(friendly_uuid).amount = damage_amount;
-                    CM->book<Invincibility>(friendly_uuid);
+                    // f32 damage_amount = CM->get<CollideDamage>(enemy_uuid).amount;
+                    // CM->book<DamageEvent>(friendly_uuid).amount = damage_amount;
+                    // CM->book<Invincibility>(friendly_uuid);
                 }
             }
         }
