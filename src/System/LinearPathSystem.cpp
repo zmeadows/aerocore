@@ -3,16 +3,11 @@
 #include "Globals.hpp"
 #include "Component/Common.hpp"
 
-LinearPathSystem::LinearPathSystem(void) : System("LinearPath")
-{
-    get_manager()->subscribe<Entity,LinearPath,PositionUpdate>(this);
-}
-
-void LinearPathSystem::run(float dt) {
+void run(LinearPathSystem& self, float dt) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
-        auto& entity  = CM->get<Entity>(uuid);
+    for (const UUID uuid : self.base.followed) {
+        auto& entity = CM->get<Entity>(uuid);
         auto& lpath  = CM->get<LinearPath>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

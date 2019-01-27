@@ -1,12 +1,14 @@
 #pragma once
 
 #include "System.hpp"
+#include "unstd/DynamicArray.hpp"
+#include "Component/Common.hpp"
+#include "Component/CollisionData.hpp"
 
-#include <vector>
-
-class CollisionSystem final : public System {
-    std::vector<UUID> m_candidates;
-public:
-    void run(float dt) final;
-    CollisionSystem(void);
+struct CollisionSystem {
+    System base = System("Collision");
+    DynamicArray<UUID> collision_candidates;
+    SUBSCRIBE(Entity, CollisionData, FriendlyTag);
 };
+
+void run(CollisionSystem&);

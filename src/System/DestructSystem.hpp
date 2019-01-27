@@ -1,12 +1,12 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-#include <vector>
-
-class DestructSystem final : public System {
-    std::vector<UUID> m_uuid_set_copy;
-public:
-    void run(float dt) final;
-    DestructSystem(void);
+struct DestructSystem {
+    System base = System("Destruct");
+    DynamicArray<UUID> followed_copy;
+    SUBSCRIBE(DestructTag);
 };
+
+void run(DestructSystem&);

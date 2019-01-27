@@ -4,11 +4,6 @@
 #include "Component/CollisionData.hpp"
 #include "Globals.hpp"
 
-CollisionSystem::CollisionSystem(void) : System("Collision")
-{
-    get_manager()->subscribe<Entity, CollisionData, FriendlyTag>(this);
-}
-
 namespace {
 
 v2 normal_buffer[256];
@@ -78,16 +73,16 @@ bool overlaps( const Entity& entityA
 
 }
 
-void CollisionSystem::run(float) {
+void run(CollisionSystem& self) {
     auto CM = get_manager();
 
-    for (const UUID friendly_uuid : m_followed) {
+    for (const UUID friendly_uuid : self.base.followed) {
         const auto& cdA = CM->get<CollisionData>(friendly_uuid);
         const auto& entityA = CM->get<Entity>(friendly_uuid);
 
-        cdA.node->retrieve(m_candidates, friendly_uuid);
+        cdA.node->retrieve(self.collision_candidates, friendly_uuid);
 
-        for (const UUID enemy_uuid : m_candidates) {
+        for (const UUID enemy_uuid : self.collision_candidates) {
             const auto& cdB = CM->get<CollisionData>(enemy_uuid);
             const auto& entityB = CM->get<Entity>(enemy_uuid);
 

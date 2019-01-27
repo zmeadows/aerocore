@@ -1,9 +1,11 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-class PositionUpdateSystem final : public System {
-public:
-    void run(float dt) final;
-    PositionUpdateSystem(void);
+struct PositionUpdateSystem {
+    System base = System("PositionUpdate");
+    SUBSCRIBE(Entity, PositionUpdate);
 };
+
+void run(PositionUpdateSystem&);

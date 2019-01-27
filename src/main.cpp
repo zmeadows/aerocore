@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <cstdio>
 #include <iostream>
-#include <time.h>
 
 #include "unstd/DenseHashTable.hpp"
 
@@ -67,9 +66,10 @@ void test_table(int entries, int times) {
 }
 
 int main(int argc, char** argv) {
-    srand(static_cast<unsigned>(1234));
+    srand(static_cast<unsigned>(9999));
 
-    Game g; g.run();
+    Game game = Game();
+    game.go();
 
     return 0;
 }

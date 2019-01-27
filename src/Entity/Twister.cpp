@@ -1,16 +1,11 @@
 #include "Entity/Twister.hpp"
 
-#include "Behavior/Pause.hpp"
 #include "Bullet/Bullet.hpp"
 #include "Globals.hpp"
 #include "Random.hpp"
 #include "Spline.hpp"
 #include "SpriteCache.hpp"
 
-#include "Component/Common.hpp"
-#include "Component/StateTransition.hpp"
-#include "Component/OffscreenBehavior.hpp"
-#include "Component/BulletStream.hpp"
 
 namespace {
 
@@ -21,6 +16,13 @@ inline v2 random_position(void) {
 }
 
 namespace Twister {
+
+enum State {
+    Relocating,
+    PauseBeforeFiring,
+    Firing,
+    PauseAfterFiring
+};
 
 void generate(void) {
     UUID uuid;
@@ -43,14 +45,10 @@ void generate(void) {
     CM->book<CollideDamage>(uuid);
 }
 
-StateMachineSystem::StateMachineSystem(void) : System("Twister::StateMachine") {
-    get_manager()->subscribe<Entity, StateTransition, Twister::Tag>(this);
-}
-
-void StateMachineSystem::run(float) {
+void run(StateMachineSystem& self) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         const auto& transition = CM->get<StateTransition>(uuid);
 
         switch (transition.next_state_id) {

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-//TODO: move /engine to src/Engine?
-class StateTransitionCleanupSystem final : public System {
-public:
-    void run(float dt) final;
-    StateTransitionCleanupSystem();
+struct StateTransitionCleanupSystem {
+    System base = System("StateTransitionCleanup");
+    DynamicArray<UUID> followed_copy;
+    SUBSCRIBE(StateTransition);
 };
 
+void run(StateTransitionCleanupSystem&);

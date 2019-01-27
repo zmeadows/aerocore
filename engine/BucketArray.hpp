@@ -14,7 +14,7 @@ struct Bucket {
     // It is not type T[] in order to allow for leaving all the items uninitialized until filled
     std::unique_ptr<char[]> buffer;
 
-    //TODO: use bitset representation to save space here (not really a bit deal)
+    //TODO: use bitset representation to save space here
     std::unique_ptr<bool[]> occupied;
 
     const u32 capacity;

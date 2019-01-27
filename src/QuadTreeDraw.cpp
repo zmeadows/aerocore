@@ -15,7 +15,7 @@ void drawQuadTree(GraphicsContext* GC, const QuadTree* quadTree) {
 
 void drawQuadNodes(GraphicsContext* GC, const QuadNode* node, const bool draw_empty) {
 
-    const u32 num_entities = node->m_containedUUIDs.size();
+    const u32 num_entities = node->m_containedUUIDs.size;
 
     if (
         (!draw_empty && num_entities > 0)

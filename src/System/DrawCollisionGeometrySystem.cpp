@@ -1,19 +1,11 @@
 #include "System/DrawCollisionGeometrySystem.hpp"
 
-#include "Component/Common.hpp"
-#include "Component/CollisionData.hpp"
-
 #include "Globals.hpp"
 #include "PolygonDecomposition.hpp"
 
 #include <SDL.h>
 
-DrawCollisionGeometrySystem::DrawCollisionGeometrySystem() : System("DrawCollisionGeometry")
-{
-    get_manager()->subscribe<Entity, CollisionData>(this);
-}
-
-void DrawCollisionGeometrySystem::run(float) {
+void run(DrawCollisionGeometrySystem& self) {
     auto CM = get_manager();
     auto GC = get_graphics_context();
 
@@ -23,7 +15,7 @@ void DrawCollisionGeometrySystem::run(float) {
     polygon_color.b = 0;
     polygon_color.a = 255;
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         const auto& entity = CM->get<Entity>(uuid);
         const auto& coldata = CM->get<CollisionData>(uuid);
 

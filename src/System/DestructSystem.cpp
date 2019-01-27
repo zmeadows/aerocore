@@ -1,22 +1,16 @@
 #include "System/DestructSystem.hpp"
 
 #include "Globals.hpp"
-#include "Component/Common.hpp"
 
-DestructSystem::DestructSystem(void) : System("Destruct")
-{
-    get_manager()->subscribe<DestructTag>(this);
-}
-
-void DestructSystem::run(float) {
+void run(DestructSystem& self) {
     ComponentManager* CM = get_manager();
 
-    for (const UUID& uuid : m_followed)
-        m_uuid_set_copy.push_back(uuid);
+    for (const UUID& uuid : self.base.followed)
+        append(self.followed_copy, uuid);
 
-    for (const UUID& uuid : m_uuid_set_copy) {
+    for (const UUID& uuid : self.followed_copy) {
         CM->destroy(uuid);
     }
 
-    m_uuid_set_copy.clear();
+    clear(self.followed_copy);
 }

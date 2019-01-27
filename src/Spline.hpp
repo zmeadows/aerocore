@@ -1,14 +1,11 @@
 #pragma once
 
 #include "unstd/types.hpp"
-#include "Vector2D.hpp"
+#include "unstd/DynamicArray.hpp"
+
 #include "Component/Common.hpp"
 #include "Globals.hpp"
-#include "Component/StateTransition.hpp"
-
-#include <vector>
-#include <math.h>
-#include <optional>
+#include "Vector2D.hpp"
 
 namespace {
     const u32 SPLINE_BUFFER_SIZE = 10;
@@ -131,51 +128,11 @@ void Spline<T>::construct(void) {
 }
 
 struct TranslationSpline : Spline<v2> {
-    std::optional<s32> next_state_id;
+    s32 next_state_id = -1;
 };
 
 // struct RotationSpline : Spline<f32> {
 //     std::optional<s32> next_state_id;
 // };
 
-//TODO: move to own file
-class TranslationSplineSystem final : public System {
-
-public:
-    void run(float dt) final {
-        auto CM = get_manager();
-
-		// ArraySet<UUID> to_delete;
-        std::vector<UUID> to_delete;
-
-        for (const UUID& uuid : m_followed)
-        {
-            auto& spline = CM->get<TranslationSpline>(uuid);
-            auto& update = CM->get<PositionUpdate>(uuid);
-            const auto& entity = CM->get<Entity>(uuid);
-
-            SplineStepResult<v2> result = spline.step(dt);
-
-            update.delta = result.new_point - entity.pos;
-
-            if (result.finished) {
-                to_delete.push_back(uuid);
-                if (spline.next_state_id) {
-                    auto& transition = CM->book<StateTransition>(uuid);
-                    transition.next_state_id = *spline.next_state_id;
-                    transition.extra_time = result.leftover_dt;
-                }
-            }
-        }
-
-        for (const UUID& uuid : to_delete) {
-            CM->remove<TranslationSpline>(uuid);
-        }
-    }
-
-    TranslationSplineSystem(void) : System("TranslationSpline")
-    {
-        get_manager()->subscribe<Entity, TranslationSpline, PositionUpdate>(this);
-    }
-};
 

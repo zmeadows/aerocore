@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "unstd/types.hpp"
 
 template <class T>
@@ -14,5 +16,7 @@ template <typename T>
 buffer<T> allocate_buffer(u64 capacity) {
     return std::unique_ptr<T[]>(new T[capacity]);
 }
+
+template <typename ...Types> struct TypeList {};
 
 

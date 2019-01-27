@@ -1,9 +1,12 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
+#include "Component/CollisionData.hpp"
 
-class DrawCollisionGeometrySystem final : public System {
-public:
-    void run(float) final;
-    DrawCollisionGeometrySystem();
+struct DrawCollisionGeometrySystem {
+    System base = System("DrawCollisionGeometry");
+    SUBSCRIBE(Entity, CollisionData);
 };
+
+void run(DrawCollisionGeometrySystem&);

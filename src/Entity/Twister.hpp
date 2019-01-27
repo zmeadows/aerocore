@@ -1,25 +1,20 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
+#include "Component/OffscreenBehavior.hpp"
+#include "Component/BulletStream.hpp"
 
 namespace Twister {
 
 struct Tag {};
-
-//TODO: use enum class
-enum State {
-    Relocating,
-    PauseBeforeFiring,
-    Firing,
-    PauseAfterFiring
-};
-
 void generate(void);
 
-class StateMachineSystem final : public System {
-public:
-    void run(float dt) final;
-    StateMachineSystem(void);
+struct StateMachineSystem {
+    System base = System("Twister::StateMachine");
+    SUBSCRIBE(Entity, StateTransition, Twister::Tag);
 };
+
+void run(StateMachineSystem& self);
 
 }

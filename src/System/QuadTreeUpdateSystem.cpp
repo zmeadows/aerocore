@@ -1,22 +1,13 @@
 #include "System/QuadTreeUpdateSystem.hpp"
 
 #include "Globals.hpp"
-#include "Component/Common.hpp"
-#include "Component/CollisionData.hpp"
 
-QuadTreeUpdateSystem::QuadTreeUpdateSystem(void) : System("QuadTreeUpdateSystem")
-{
-    get_manager()->subscribe<Entity, CollisionData>(this);
-}
-
-//TODO: rename system to QuadTreeUpdateSystem
-void QuadTreeUpdateSystem::run(float) {
-
-    ComponentManager* CM = get_manager();
+void run(QuadTreeUpdateSystem& self) {
+    auto CM = get_manager();
 
     get_quad_tree()->reset();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& entity = CM->get<Entity>(uuid);
         auto& cd = CM->get<CollisionData>(uuid);
 

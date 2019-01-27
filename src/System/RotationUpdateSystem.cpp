@@ -1,17 +1,11 @@
 #include "System/RotationUpdateSystem.hpp"
 
 #include "Globals.hpp"
-#include "Component/Common.hpp"
 
-RotationUpdateSystem::RotationUpdateSystem(void) : System("RotationUpdate")
-{
-    get_manager()->subscribe<Entity,RotationUpdate>(this);
-}
-
-void RotationUpdateSystem::run(float) {
+void run(RotationUpdateSystem& self) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& entity = CM->get<Entity>(uuid);
         auto& update = CM->get<RotationUpdate>(uuid);
 

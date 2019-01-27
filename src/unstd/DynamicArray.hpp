@@ -2,6 +2,7 @@
 
 #include "unstd/types.hpp"
 #include "unstd/unstdlib.hpp"
+#include <assert.h>
 
 template <typename T>
 struct DynamicArray {
@@ -23,7 +24,8 @@ void debug_print(const DynamicArray<T>& self) {
     for (const auto& x : self) {
         std::cout << x << " ";
     }
-    std::cout << " :: size = " << self.size << " :: capacity = " << self.capacity << " :: data @ " << static_cast<void*>(self.data.get()) << std::endl;
+    std::cout << " :: size = " << self.size << " :: capacity = " << self.capacity << " :: data @ "
+              << static_cast<void*>(self.data.get()) << std::endl;
 }
 
 template <typename T>
@@ -124,7 +126,7 @@ void remove_at(DynamicArray<T>& self, u64 idx) {
 template <typename T, class... Args>
 void append(DynamicArray<T>& self, Args&&... args) {
     if (self.size == self.capacity) {
-        reserve_memory(self, max((u64) 2, 2 * self.capacity));
+        reserve_memory(self, max((u64)2, 2 * self.capacity));
     }
 
     T* data_cast = reinterpret_cast<T*>(self.data.get());

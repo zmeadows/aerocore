@@ -1,9 +1,11 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-class EulerRotationSystem final : public System {
-public:
-    void run(float dt) final;
-    EulerRotationSystem(void);
+struct EulerRotationSystem {
+    System base = System("EulerRotation");
+    SUBSCRIBE(Entity, EulerRotation, RotationUpdate);
 };
+
+void run(EulerRotationSystem&, f32 dt);

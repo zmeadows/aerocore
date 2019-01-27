@@ -13,7 +13,8 @@ namespace {
     const u32 MAX_BULLETSTREAM_SIZE = 10;
 }
 
-//TODO: remove constructor here
+//TODO: remove constructor here?
+// just make set_delay(BulletStream&) function
 struct BulletStream {
     BulletSpec specs[MAX_BULLETSTREAM_SIZE];
     u32 num_specs;

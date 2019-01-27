@@ -3,15 +3,10 @@
 #include "Component/Common.hpp"
 #include "Globals.hpp"
 
-EulerTranslationSystem::EulerTranslationSystem(void) : System("EulerTranslation")
-{
-    get_manager()->subscribe<EulerTranslation,PositionUpdate>(this);
-}
-
-void EulerTranslationSystem::run(float dt) {
+void run(EulerTranslationSystem& self, float dt) {
     auto CM = get_manager();
 
-    for (const UUID& uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& kin    = CM->get<EulerTranslation>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

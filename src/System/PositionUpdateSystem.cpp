@@ -1,18 +1,12 @@
 #include "System/PositionUpdateSystem.hpp"
 
 #include "Globals.hpp"
-#include "Component/Common.hpp"
 
-PositionUpdateSystem::PositionUpdateSystem(void) : System("PositionUpdate")
-{
-    get_manager()->subscribe<Entity, PositionUpdate>(this);
-}
-
-//TODO: factor out Extent?
-void PositionUpdateSystem::run(float) {
+//TODO: factor out Extent and create separate ExtentUpdateSystem?
+void run(PositionUpdateSystem& self) {
     auto CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& entity = CM->get<Entity>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

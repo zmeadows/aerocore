@@ -75,3 +75,14 @@ struct Invincibility {
     u8 g = 0;
     u8 b = 0;
 };
+
+struct StateTransition {
+    s32 next_state_id = -1;
+    f32 extra_time = 0.0;
+};
+
+struct PauseBehavior {
+    f32 time_left;
+    s32 next_state_id;
+};
+

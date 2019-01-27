@@ -1,9 +1,11 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-class EulerTranslationSystem final : public System {
-public:
-    void run(float dt) final;
-    EulerTranslationSystem(void);
+struct EulerTranslationSystem {
+    System base = System("EulerTranslation");
+    SUBSCRIBE(EulerTranslation, PositionUpdate);
 };
+
+void run(EulerTranslationSystem&, f32 dt);

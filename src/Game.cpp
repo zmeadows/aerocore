@@ -12,27 +12,8 @@
 
 #include "Component/Common.hpp"
 #include "Component/CollisionData.hpp"
-#include "Component/StateTransition.hpp"
 #include "Component/OffscreenBehavior.hpp"
 #include "Component/BulletStream.hpp"
-
-#include "System/BulletStreamSystem.hpp"
-#include "System/CollisionSystem.hpp"
-#include "System/DamageSystem.hpp"
-#include "System/DestructSystem.hpp"
-#include "System/DrawCollisionGeometrySystem.hpp"
-#include "System/DrawSystem.hpp"
-#include "System/EulerRotationSystem.hpp"
-#include "System/EulerTranslationSystem.hpp"
-#include "System/InvincibilitySystem.hpp"
-#include "System/LinearPathSystem.hpp"
-#include "System/OffscreenBehaviorSystem.hpp"
-#include "System/PositionUpdateSystem.hpp"
-#include "System/QuadTreeUpdateSystem.hpp"
-#include "System/RotationUpdateSystem.hpp"
-#include "System/StateTransitionCleanupSystem.hpp"
-
-#include "Behavior/Pause.hpp"
 
 #include "QuadTreeDraw.hpp"
 #include "Random.hpp"
@@ -42,8 +23,6 @@
 
 Game::Game(void)
 {
-    // TODO: add debug mode check in aerocore that components have
-    // actually been registered. Right now it just segfaults.
     auto CM = get_manager();
 
     CM->registerComponent<Entity>(10000);
@@ -67,34 +46,23 @@ Game::Game(void)
     CM->registerComponent<CollideDamage>(10000);
     CM->registerComponent<Invincibility>(10000);
 
-    //@NOTE: Order is important here!
-
-    this->systems.emplace_back(new EulerTranslationSystem());
-    this->systems.emplace_back(new EulerRotationSystem());
-
-    this->systems.emplace_back(new TranslationSplineSystem());
-
-    this->systems.emplace_back(new OffscreenBehaviorSystem());
-    this->systems.emplace_back(new PositionUpdateSystem());
-    this->systems.emplace_back(new RotationUpdateSystem());
-
-
-    this->systems.emplace_back(new PauseSystem());
-
-    this->systems.emplace_back(new Twister::StateMachineSystem());
-    this->systems.emplace_back(new StateTransitionCleanupSystem());
-
-    this->systems.emplace_back(new BulletStreamSystem());
-
-    this->systems.emplace_back(new InvincibilitySystem());
-    this->systems.emplace_back(new QuadTreeUpdateSystem());
-    this->systems.emplace_back(new CollisionSystem());
-
-    this->systems.emplace_back(new DamageSystem());
-    this->systems.emplace_back(new DestructSystem());
-
-    this->systems.emplace_back(new DrawSystem());
-    // this->systems.emplace_back(new DrawCollisionGeometrySystem());
+    ACTIVATE_SYSTEM(euler_translation_sys);
+    ACTIVATE_SYSTEM(euler_rotation_sys);
+    ACTIVATE_SYSTEM(translation_spline_sys);
+    ACTIVATE_SYSTEM(offscreen_behavior_sys);
+    ACTIVATE_SYSTEM(position_update_sys);
+    ACTIVATE_SYSTEM(rotation_update_sys);
+    ACTIVATE_SYSTEM(pause_sys);
+    ACTIVATE_SYSTEM(twister_state_sys);
+    ACTIVATE_SYSTEM(state_transition_cleanup_sys);
+    ACTIVATE_SYSTEM(bullet_stream_sys);
+    ACTIVATE_SYSTEM(invincibility_sys);
+    ACTIVATE_SYSTEM(quadtree_update_sys);
+    ACTIVATE_SYSTEM(collision_sys);
+    ACTIVATE_SYSTEM(damage_sys);
+    ACTIVATE_SYSTEM(destruct_sys);
+    ACTIVATE_SYSTEM(draw_sys);
+    ACTIVATE_SYSTEM(draw_collision_geometry_sys);
 
     generate_player();
     Twister::generate();
@@ -114,17 +82,33 @@ bool Game::tick(void) {
     }
 
     m_preSystemRunTicks = SDL_GetPerformanceCounter();
-    const float frame_time = static_cast<float>(m_preSystemRunTicks - m_postSystemRunTicks) / SDL_GetPerformanceFrequency();
-    time_elapsed += frame_time;
+    const float dt = static_cast<float>(m_preSystemRunTicks - m_postSystemRunTicks) / SDL_GetPerformanceFrequency();
+    time_elapsed += dt;
     m_postSystemRunTicks = m_preSystemRunTicks;
 
-
-    tick_player(&input, &state, frame_time);
+    //TODO: why pointers here?
+    tick_player(&input, &state, dt);
 
     auto pre_run = SDL_GetPerformanceCounter();
-    for (auto& sys : systems) {
-        sys->run(frame_time);
-    }
+
+    run(euler_translation_sys, dt);
+    run(euler_rotation_sys, dt);
+    run(translation_spline_sys, dt);
+    run(offscreen_behavior_sys);
+    run(position_update_sys);
+    run(rotation_update_sys);
+    run(pause_sys, dt);
+    run(twister_state_sys);
+    run(state_transition_cleanup_sys);
+    run(bullet_stream_sys, dt);
+    run(invincibility_sys, dt);
+    run(quadtree_update_sys);
+    run(collision_sys);
+    run(damage_sys);
+    run(destruct_sys);
+    run(draw_sys);
+    run(draw_collision_geometry_sys);
+
     auto post_run = SDL_GetPerformanceCounter();
     const float run_time = static_cast<float>(post_run - pre_run) / SDL_GetPerformanceFrequency();
     if (m_frames_elapsed % 50 == 0)
@@ -133,7 +117,6 @@ bool Game::tick(void) {
     GPU_Flip(get_graphics_context()->renderer);
 
     quitting |= !get_manager()->has<Entity>(playerUUID());
-
 
     return quitting;
 }
@@ -187,10 +170,24 @@ bool Game::poll_input(void) {
 Game::~Game(void) {
     auto CM = get_manager();
 
-    //TODO: use destructor in ResourceManager
     CM->unRegisterComponent<Entity>();
     CM->unRegisterComponent<EulerTranslation>();
     CM->unRegisterComponent<EulerRotation>();
     CM->unRegisterComponent<OffscreenBehavior>();
     CM->unRegisterComponent<DestructTag>();
+    CM->unRegisterComponent<BulletTag>();
+    CM->unRegisterComponent<FriendlyTag>();
+    CM->unRegisterComponent<CollisionData>();
+    CM->unRegisterComponent<PositionUpdate>();
+    CM->unRegisterComponent<RotationUpdate>();
+    CM->unRegisterComponent<Sprite>();
+    CM->unRegisterComponent<StateTransition>();
+    CM->unRegisterComponent<Twister::Tag>();
+    CM->unRegisterComponent<TranslationSpline>();
+    CM->unRegisterComponent<PauseBehavior>();
+    CM->unRegisterComponent<BulletStream>();
+    CM->unRegisterComponent<DamageEvent>();
+    CM->unRegisterComponent<Health>();
+    CM->unRegisterComponent<CollideDamage>();
+    CM->unRegisterComponent<Invincibility>();
 }

@@ -1,11 +1,12 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
 
-class LinearPathSystem final : public System {
-public:
-    void run(float dt) final;
-
-    LinearPathSystem(void);
+struct LinearPathSystem {
+    System base = System("LinearPath");
+    SUBSCRIBE(Entity, LinearPath, PositionUpdate);
 };
+
+void run(LinearPathSystem&, float dt);
 

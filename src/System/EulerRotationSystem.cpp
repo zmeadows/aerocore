@@ -3,15 +3,10 @@
 #include "Globals.hpp"
 #include "Component/Common.hpp"
 
-EulerRotationSystem::EulerRotationSystem(void) : System("EulerRotation")
-{
-    get_manager()->subscribe<Entity, EulerRotation, RotationUpdate>(this);
-}
+void run(EulerRotationSystem& self, f32 dt) {
+    auto CM = get_manager();
 
-void EulerRotationSystem::run(float dt) {
-    ComponentManager* CM = get_manager();
-
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         const auto& rot    = CM->get<EulerRotation>(uuid);
         auto& update       = CM->get<RotationUpdate>(uuid);
 

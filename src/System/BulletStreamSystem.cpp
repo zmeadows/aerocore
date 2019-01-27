@@ -1,21 +1,12 @@
 #include "System/BulletStreamSystem.hpp"
 
 #include "Bullet/Bullet.hpp"
-#include "Component/BulletStream.hpp"
-#include "Component/Common.hpp"
-#include "Component/StateTransition.hpp"
 #include "Globals.hpp"
 
-BulletStreamSystem::BulletStreamSystem(void) : System("BulletStream") {
-    get_manager()->subscribe<Entity, BulletStream>(this);
-}
-
-void BulletStreamSystem::run(float dt) {
+void run(BulletStreamSystem& self, float dt) {
     auto CM = get_manager();
 
-    std::vector<UUID> finished;
-
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& entity = CM->get<Entity>(uuid);
         auto& bstream = CM->get<BulletStream>(uuid);
 
@@ -42,14 +33,16 @@ void BulletStreamSystem::run(float dt) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = bstream.next_state_id;
                 transition.extra_time = -1.f * bstream.current_countdown;
-                finished.push_back(uuid);
+                append(self.finished, uuid);
             } else {
                 bstream.current_countdown += bstream.delay_per_bullet;
             }
         }
     }
 
-    for (const UUID uuid : finished) {
+    for (const UUID uuid : self.finished) {
         CM->remove<BulletStream>(uuid);
     }
+
+    clear(self.finished);
 }

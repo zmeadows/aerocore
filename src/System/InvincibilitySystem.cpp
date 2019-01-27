@@ -3,15 +3,10 @@
 #include "Component/Common.hpp"
 #include "Globals.hpp"
 
-InvincibilitySystem::InvincibilitySystem() : System("Invincibility") {
-    get_manager()->subscribe<Sprite, Invincibility>(this);
-}
-
-void InvincibilitySystem::run(f32 dt) {
+void run(InvincibilitySystem& self, f32 dt) {
     auto CM = get_manager();
-    std::vector<UUID> finished_uuids;
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& sprite = CM->get<Sprite>(uuid);
         auto& flash = CM->get<Invincibility>(uuid);
 
@@ -24,10 +19,12 @@ void InvincibilitySystem::run(f32 dt) {
         }
 
 		if (flash.num_flashes == 0)
-            finished_uuids.push_back(uuid);
+            append(self.finished, uuid);
     }
 
-	for (const UUID uuid : finished_uuids) {
+	for (const UUID uuid : self.finished) {
         CM->remove<Invincibility>(uuid);
 	}
+
+    clear(self.finished);
 }

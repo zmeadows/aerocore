@@ -1,13 +1,14 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/BulletStream.hpp"
+#include "Component/Common.hpp"
 
-struct Entity;
-
-class BulletStreamSystem final : public System {
-public:
-    void run(float dt) final;
-    BulletStreamSystem(void);
+struct BulletStreamSystem {
+    System base = System("BulletStream");
+    DynamicArray<UUID> finished;
+    SUBSCRIBE(Entity, BulletStream);
 };
 
 
+void run(BulletStreamSystem&, float dt);

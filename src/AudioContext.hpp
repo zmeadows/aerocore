@@ -20,6 +20,12 @@ public:
 
     AudioContext(void);
     ~AudioContext(void);
+
+    AudioContext(const AudioContext&)            = delete;
+    AudioContext& operator=(const AudioContext&) = delete;
+    AudioContext(AudioContext&&)                 = delete;
+    AudioContext& operator=(AudioContext&&)      = delete;
+
     void play(SoundEffect effect) { Mix_PlayChannel(-1, chunks[effect], 0); }
 };
 

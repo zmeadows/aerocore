@@ -1,10 +1,10 @@
 #include "QuadTree.hpp"
 
-#include <vector>
+#include "unstd/DynamicArray.hpp"
 #include <assert.h>
 
 void QuadNode::reset(void) {
-    m_containedUUIDs.clear();
+    clear(m_containedUUIDs);
 
     if (m_hasChildren) {
         for (auto& node : m_childNodes)
@@ -24,26 +24,26 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
         }
     }
 
-    m_containedUUIDs.push_back(uuid);
+    append(m_containedUUIDs, uuid);
     return this;
 }
 
-void QuadNode::retrieve_from_parents(std::vector<UUID>& candidates, const UUID collider) {
+void QuadNode::retrieve_from_parents(DynamicArray<UUID>& candidates, const UUID collider) {
 
     if (m_parent) {
         for (UUID uuid : m_parent->m_containedUUIDs) {
             if (uuid != collider)
-                candidates.push_back(uuid);
+                append(candidates, uuid);
         }
         m_parent->retrieve_from_parents(candidates, collider);
     }
 }
 
-void QuadNode::retrieve_from_children(std::vector<UUID>& candidates, const UUID collider) {
+void QuadNode::retrieve_from_children(DynamicArray<UUID>& candidates, const UUID collider) {
 
     for (UUID uuid : m_containedUUIDs) {
         if (uuid != collider)
-            candidates.push_back(uuid);
+            append(candidates, uuid);
     }
 
     if (m_hasChildren) {
@@ -53,9 +53,8 @@ void QuadNode::retrieve_from_children(std::vector<UUID>& candidates, const UUID 
     }
 };
 
-void QuadNode::retrieve(std::vector<UUID>& candidates, const UUID collider) {
-    //@FIXME: sloppy
-    candidates.clear();
+void QuadNode::retrieve(DynamicArray<UUID>& candidates, const UUID collider) {
+    clear(candidates);
     retrieve_from_parents(candidates, collider);
     retrieve_from_children(candidates, collider);
 }

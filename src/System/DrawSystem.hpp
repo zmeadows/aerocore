@@ -1,17 +1,12 @@
 #pragma once
 
-#include "unstd/types.hpp"
-
 #include "System.hpp"
 
-class DrawSystem final : public System {
-    f32 m_fpsHistory[100];
-    u64 m_lastFrameTicks;
-    u64 m_modFrame;
-    f32 m_currentFpsAvg;
+#include "Component/Common.hpp"
 
-public:
-    void run(float) final;
-    DrawSystem();
+struct DrawSystem {
+    System base = System("Draw");
+    SUBSCRIBE(Entity, Sprite);
 };
 
+void run(DrawSystem&);

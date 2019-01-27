@@ -16,6 +16,7 @@
 
 #include "unstd/DenseHashTable.hpp"
 
+
 class ComponentManager {
 private:
     ////////////////////////
@@ -109,6 +110,7 @@ public:
         return contains(m_store[compID], uuid.unwrap());
     }
 
+    //TODO: don't need multiple subscribe definitions, use parameter pack tools
     template <typename TyComponent>
     void subscribe(System* sys);
 
@@ -117,6 +119,19 @@ public:
         subscribe<TyComponent1>(s);
         subscribe<TyComponent2, TyComponents...>(s);
     }
+
+    template <typename T1, typename ...Types>
+    void subscribe(const TypeList<T1,Types...>&, System* s) {
+        subscribe<T1>(s);
+        subscribe<Types...>(TypeList<Types...>(),s);
+    }
+
+    template <typename ...Types>
+    void subscribe(const TypeList<>&, System*) {
+        return;
+    }
+
+    //TODO: unsubscribe? or just a disconnect system method
 };
 
 template <typename TyComponent>
@@ -154,7 +169,7 @@ template <typename TyComponent>
 // So far, entity creation/deletion has no real impact on performance though
 void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>())) {
-        if (sys->isFollowing(uuid))
+        if (sys->is_following(uuid))
             continue;
 
         bool entityShouldBeFollowed = true;

@@ -1,18 +1,11 @@
 #include "System/OffscreenBehaviorSystem.hpp"
 
-#include "Component/Common.hpp"
-#include "Component/OffscreenBehavior.hpp"
 #include "Globals.hpp"
 
-OffscreenBehaviorSystem::OffscreenBehaviorSystem(void) : System("OffscreenBehavior")
-{
-    get_manager()->subscribe<Entity, OffscreenBehavior, PositionUpdate>(this);
-}
-
-void OffscreenBehaviorSystem::run(float) {
+void run(OffscreenBehaviorSystem& self) {
     ComponentManager* CM = get_manager();
 
-    for (const UUID uuid : m_followed) {
+    for (const UUID uuid : self.base.followed) {
         auto& entity = CM->get<Entity>(uuid);
         const Extent& ext = entity.extent;
 

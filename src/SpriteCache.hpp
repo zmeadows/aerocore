@@ -29,8 +29,11 @@ struct SpriteCache {
     void build_sprite(const std::string& key, const char* png_filepath, const char* xml_filepath);
     void attach_sprite_to_uuid(UUID uuid, const std::string& key);
 
-    SpriteCache(const SpriteCache&) = delete;
-    SpriteCache& operator=(const SpriteCache&) = delete;
-    ~SpriteCache();
     SpriteCache();
+    ~SpriteCache();
+
+    SpriteCache(const SpriteCache&)            = delete;
+    SpriteCache& operator=(const SpriteCache&) = delete;
+    SpriteCache(SpriteCache&&)                 = delete;
+    SpriteCache& operator=(SpriteCache&&)      = delete;
 };

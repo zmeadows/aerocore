@@ -6,6 +6,7 @@
 #include <vector>
 
 namespace {
+// no need to keep this number very small, they won't be stored contiguously anywhere
 const u32 LOCAL_VERTEX_BUFFER_SIZE = 256;
 }
 

@@ -1,9 +1,12 @@
 #pragma once
 
 #include "System.hpp"
+#include "Component/Common.hpp"
+#include "Component/CollisionData.hpp"
 
-class QuadTreeUpdateSystem final : public System {
-public:
-    void run(float dt) final;
-    QuadTreeUpdateSystem(void);
+struct QuadTreeUpdateSystem {
+    System base = System("QuadTreeUpdate");
+    SUBSCRIBE(Entity, CollisionData);
 };
+
+void run(QuadTreeUpdateSystem&);
