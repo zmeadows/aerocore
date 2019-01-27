@@ -94,7 +94,7 @@ Game::Game(void)
     this->systems.emplace_back(new DestructSystem());
 
     this->systems.emplace_back(new DrawSystem());
-    this->systems.emplace_back(new DrawCollisionGeometrySystem());
+    // this->systems.emplace_back(new DrawCollisionGeometrySystem());
 
     generate_player();
     Twister::generate();
@@ -108,7 +108,7 @@ bool Game::tick(void) {
 
     quitting = poll_input();
 
-    if (SDL_GetTicks() > last_asteroid_time + 2000) {
+    if (SDL_GetTicks() > last_asteroid_time + 9000) {
         Twister::generate();
         last_asteroid_time = SDL_GetTicks();
     }

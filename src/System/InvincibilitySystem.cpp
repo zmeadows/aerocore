@@ -18,13 +18,7 @@ void InvincibilitySystem::run(f32 dt) {
         flash.timer -= dt;
 
         if (flash.timer <= 0.f) {
-            if (flash.is_flashing) {
-                GPU_UnsetColor(sprite.image);
-                flash.num_flashes--;
-            } else {
-                GPU_SetRGB(sprite.image, flash.r, flash.g, flash.b);
-            }
-
+            if (flash.is_flashing) flash.num_flashes--;
             flash.is_flashing = !flash.is_flashing;
             flash.timer += 0.1;
         }

@@ -6,8 +6,6 @@
 #include <time.h>
 
 #include "unstd/DenseHashTable.hpp"
-#include "khash.hpp"
-using namespace klib;
 
 void test_table(int entries, int times) {
     for (auto test_num = 1; test_num <= times; test_num++) {

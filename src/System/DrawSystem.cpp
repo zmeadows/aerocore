@@ -36,11 +36,19 @@ void DrawSystem::run(float) {
         const Entity& entity = CM->get<Entity>(uuid);
         const Sprite& sprite = CM->get<Sprite>(uuid);
 
+        bool do_flash = false;
+        // TODO: create maybe_get style function to avoid double lookups like this
+        if (CM->has<Invincibility>(uuid)) {
+            do_flash = CM->get<Invincibility>(uuid).is_flashing;
+        }
+
         ScreenCoordinates sc = GC->to_screen_coords(entity.pos);
         const v2 offset = sprite.offset.rotated(-entity.angle);
+        if (do_flash) GPU_SetRGB(sprite.image, 255, 0, 0);
         GPU_BlitRotate(sprite.image, NULL, GC->renderer,
                        sc.x - offset.x, sc.y - offset.y,
                        - entity.angle * 180.f/PI);
+        if (do_flash) GPU_UnsetColor(sprite.image);
     }
 
     // stringColor(GC->renderer, 10, 10, "SCORE: 0", 0xFFFFFFFF);

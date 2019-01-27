@@ -20,6 +20,8 @@ UUID generate_bullet(BulletType bullet_type,
 
     CM->book<EulerTranslation>(uuid).vel = new_bullet_velocity;
     CM->book<OffscreenBehavior>(uuid);
+    CM->book<CollideDamage>(uuid);
+    CM->book<BulletTag>(uuid);
 
     if (friendly) CM->book<FriendlyTag>(uuid);
 
