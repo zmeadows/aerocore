@@ -1,9 +1,9 @@
 #pragma once
 
 #include "unstd/types.hpp"
+#include "unstd/DynamicArray.hpp"
 
 #include <limits>
-#include <vector>
 
 struct LocalVertexBuffer;
 struct v2;
@@ -20,5 +20,5 @@ Extent clip_to_screen(const Extent& ext);
 void dump(const Extent& extent);
 
 bool is_offscreen(const Extent& ext);
-Extent extent_of(const std::vector<v2>& global_vertices);
 Extent extent_of(const LocalVertexBuffer* local_vertices, v2 position, f32 angle);
+Extent extent_of(const DynamicArray<v2>& global_vertices);

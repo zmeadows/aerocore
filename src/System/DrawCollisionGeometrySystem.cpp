@@ -19,7 +19,7 @@ void run(DrawCollisionGeometrySystem& self) {
         const auto& entity = CM->get<Entity>(uuid);
         const auto& coldata = CM->get<CollisionData>(uuid);
 
-        const std::vector<v2> global_vertices = compute_global_vertices(coldata.local_vertices, entity.pos, entity.angle);
+        const DynamicArray<v2> global_vertices = compute_global_vertices(coldata.local_vertices, entity.pos, entity.angle);
 
         for (u32 pgon = 0; pgon < coldata.poly_decomp->count; pgon++) {
             PolygonRep pr = nth_polygon(coldata.poly_decomp, pgon);

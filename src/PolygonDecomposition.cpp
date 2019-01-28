@@ -25,13 +25,13 @@ bool pnpoly(const v2* vertices, const u32 nvert, const v2& test) {
     return static_cast<bool>(c);
 }
 
-AxisProjection project_on(const std::vector<v2>& global_vertices, const PolygonRep polygon, const v2& axis) {
+AxisProjection project_on(const DynamicArray<v2>& global_vertices, const PolygonRep polygon, const v2& axis) {
     float minProjection = std::numeric_limits<float>::max();
     float maxProjection = std::numeric_limits<float>::lowest();
 
     for (auto idx = 0; idx < polygon.count; idx++) {
         const auto gidx = polygon.indices[idx];
-        assert(gidx < global_vertices.size());
+        assert(gidx < global_vertices.size);
         const f32 projection = global_vertices[gidx].dot(axis);
         minProjection = std::min(projection, minProjection);
         maxProjection = std::max(projection, maxProjection);
@@ -51,15 +51,15 @@ PolygonRep nth_polygon(const PolygonDecomposition* decomp, u32 idx) {
     return PolygonRep({&(decomp->indices[off1]), static_cast<uint_least8_t>(off2 - off1)});
 }
 
-void fill_polygon_normals(const std::vector<v2>& global_vertices, const PolygonRep polygon, v2* normals) {
+void fill_polygon_normals(const DynamicArray<v2>& global_vertices, const PolygonRep polygon, v2* normals) {
     const uint_least8_t num_vertices = polygon.count;
 
     for (uint_least8_t i = 0; i < num_vertices; i++) {
         const auto idx1 = polygon.indices[(i + 1) % num_vertices];
         const auto idx2 = polygon.indices[i];
 
-        assert(idx1 < global_vertices.size());
-        assert(idx2 < global_vertices.size());
+        assert(idx1 < global_vertices.size);
+        assert(idx2 < global_vertices.size);
 
         v2 ov = global_vertices[idx1] - global_vertices[idx2];
         normals[i] = {-ov.y, ov.x};

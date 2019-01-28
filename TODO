@@ -1,7 +1,8 @@
 * create Stalker enemy (moves towards player for a second, stops and bobbles and shoots, moves towards player again, repeat)
 * trail of beads weapon that lags behind player and damages any enemy that touches it
-* switch to dense_hash_map for maps in ComponentManager
-* try twin stick shooter control scheme
+* fix screen resolution issues
 
 DONE
 * create system and component to move entity along spline
+* switch to dense_hash_map for maps in ComponentManager
+* try twin stick shooter control scheme

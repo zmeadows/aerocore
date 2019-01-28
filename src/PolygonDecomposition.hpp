@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <vector>
 #include "unstd/types.hpp"
+#include "unstd/DynamicArray.hpp"
 
 struct LocalVertexBuffer;
 struct v2;
@@ -28,9 +28,9 @@ struct PolygonRep {
 
 PolygonRep nth_polygon(const PolygonDecomposition* decomp, u32 idx);
 
-void fill_polygon_normals(const std::vector<v2>& global_vertices, const PolygonRep polygon, v2* normals);
+void fill_polygon_normals(const DynamicArray<v2>& global_vertices, const PolygonRep polygon, v2* normals);
 
-AxisProjection project_on(const std::vector<v2>& global_vertices, const PolygonRep polygon, const v2& axis);
+AxisProjection project_on(const DynamicArray<v2>& global_vertices, const PolygonRep polygon, const v2& axis);
 
 void dump(const PolygonDecomposition* decomp);
 

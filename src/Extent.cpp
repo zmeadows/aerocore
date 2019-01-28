@@ -7,6 +7,7 @@
 
 #include "Vector2D.hpp"
 #include "LocalVertexBuffer.hpp"
+#include "unstd/DynamicArray.hpp"
 
 void dump(const Extent& extent) {
     printf("X: (%f, %f) Y: (%f, %f)\n",
@@ -30,10 +31,10 @@ Extent clip_to_screen(const Extent& ext) {
     return clipped_ext;
 }
 
-Extent extent_of(const std::vector<v2>& global_vertices) {
+Extent extent_of(const DynamicArray<v2>& global_vertices) {
     Extent ext;
 
-    for (size_t i = 0; i < global_vertices.size(); i++) {
+    for (size_t i = 0; i < global_vertices.size; i++) {
         ext.minX = std::min(ext.minX, global_vertices[i].x);
         ext.maxX = std::max(ext.maxX, global_vertices[i].x);
         ext.minY = std::min(ext.minY, global_vertices[i].y);

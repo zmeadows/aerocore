@@ -3,7 +3,7 @@
 #include "Vector2D.hpp"
 #include "unstd/types.hpp"
 
-#include <vector>
+#include "unstd/DynamicArray.hpp"
 
 namespace {
 // no need to keep this number very small, they won't be stored contiguously anywhere
@@ -23,5 +23,5 @@ struct LocalVertexBuffer {
     const v2* end() const { return &data[count]; }
 };
 
-std::vector<v2>
+DynamicArray<v2>
 compute_global_vertices(const LocalVertexBuffer* lvb, const v2 position_offset, const float rotation_angle);
