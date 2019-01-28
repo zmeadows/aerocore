@@ -2,6 +2,22 @@ This is an experiment in developing a 2D engine + game using data-oriented-desig
 The core of the engine is based on an Entity-Component-System architecture.
 Only a small subset of non-object-oriented C++ is used.
 
+## FEATURES
+* Component storage/retrieval with custom high-performance contiguous data structures
+    * Stable chunked dynamic bucket arrays with no re-allocation/copying
+    * Entity ID <--> Component ID mapping via custom hash table with open addressing and robin hood hashing
+    * Numerous alternatives to STL containers which perform better in the game development context (ArraySet, SmallString, etc)
+* Straight forward creation of systems to subscribe to components and process entities in only a few lines of code.
+* Fast 2D collision for arbitrary polygons using quad-tree + separating axis theorem
+* Custom (simple) creation/loading of sprite, animation, and collision geometry from GIMP (GNU Image Manipulation Program) output.
+* Implementations of many common components/systems
+* Camull-Rom splines for smooth movement/animation
+* Basic 2D linear algebra
+* Simple and fast sprite graphics manipulation
+
+## EXAMPLE
+![alt text](https://raw.githubusercontent.com/zmeadows/aerocore/master/screenshot.PNG)
+
 ## ALLOWED C++
 * lambdas
 * operator overloading
@@ -22,18 +38,4 @@ Only a small subset of non-object-oriented C++ is used.
 * iterators
 * non-public member variables
 
-## SCREENSHOT
-![alt text](https://raw.githubusercontent.com/zmeadows/aerocore/master/screenshot.PNG)
 
-## FEATURES
-* Component storage/retrieval with custom high-performance contiguous data structures
-    * Stable chunked dynamic bucket arrays with no re-allocation/copying
-    * Entity ID <--> Component ID mapping via custom hash table with open addressing and robin hood hashing
-    * Numerous alternatives to STL containers which perform better in the game development context (ArraySet, SmallString, etc)
-* Straight forward creation of systems to subscribe to components and process entities in only a few lines of code.
-* Fast 2D collision for arbitrary polygons using quad-tree + separating axis theorem
-* Custom (simple) creation/loading of sprite, animation, and collision geometry from GIMP (GNU Image Manipulation Program) output.
-* Implementations of many common components/systems
-* Camull-Rom splines for smooth movement/animation
-* Basic 2D linear algebra
-* Simple and fast sprite graphics manipulation
