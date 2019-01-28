@@ -19,4 +19,12 @@ buffer<T> allocate_buffer(u64 capacity) {
 
 template <typename ...Types> struct TypeList {};
 
+template <typename T1, typename T2>
+T1* memalloc(u64 count) {
+    return static_cast<T1*>(malloc(sizeof(T2) * count));
+}
 
+template <typename T>
+T* memalloc(u64 count) {
+    return static_cast<T*>(malloc(sizeof(T) * count));
+}

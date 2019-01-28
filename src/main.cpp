@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "unstd/DenseHashTable.hpp"
+#include "BucketArray.hpp"
 
 void test_table(int entries, int times) {
     for (auto test_num = 1; test_num <= times; test_num++) {
@@ -65,8 +66,27 @@ void test_table(int entries, int times) {
     }
 }
 
+void test_bucket_array(void) {
+    BucketArray<int> arr = BucketArray<int>::create(1000);
+
+    auto index = insert(arr, 3);
+    std::cout << index.bucket << " , " << index.slot << " :: " << arr[index] << std::endl;
+    arr[index]++;
+    std::cout << index.bucket << " , " << index.slot << " :: " << arr[index] << std::endl;
+
+    auto new_index = insert(arr, 10);
+    std::cout << new_index.bucket << " , " << new_index.slot << " :: " << arr[new_index] << std::endl;
+    arr[new_index]++;
+    std::cout << new_index.bucket << " , " << new_index.slot << " :: " << arr[new_index] << std::endl;
+    std::cout << index.bucket << " , " << index.slot << " :: " << arr[index] << std::endl;
+
+    BucketArray<int>::destroy(arr);
+}
+
 int main(int argc, char** argv) {
     srand(static_cast<unsigned>(9999));
+
+    test_bucket_array();
 
     Game game = Game();
     game.go();

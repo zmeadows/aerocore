@@ -129,7 +129,6 @@ bool Game::poll_input(void) {
             return true;
 
         if (e.type == SDL_CONTROLLERAXISMOTION) {
-
             JoystickMotion motion;
             motion.value = static_cast<f32>(e.caxis.value) / 32768.f;
 
@@ -159,10 +158,8 @@ bool Game::poll_input(void) {
                 default:
                     break;
 			}
-
         }
     }
-    
 
     return false;
 }

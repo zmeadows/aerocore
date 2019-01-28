@@ -6,7 +6,7 @@
 #include "Random.hpp"
 
 // #define DEBUG_HASHTABLE(x) \
-    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
+//    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
 #define DEBUG_HASHTABLE(x)
 
 namespace {

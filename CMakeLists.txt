@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(aerocore)
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions(-DFC_USE_SDL_GPU)
 add_definitions(-DSDL_GPU_DISABLE_GLES)

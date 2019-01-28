@@ -10,6 +10,13 @@ struct DynamicArray {
     u64 capacity = 0;
     u64 size = 0;
 
+    static DynamicArray<T> create(u64 _capacity) {
+        DynamicArray<T> arr;
+        arr.data = allocate_buffer<u8>(sizeof(T) * _capacity);
+        arr.capacity = _capacity;
+        return arr;
+    };
+
     inline T& operator[](u64 idx);
     inline const T& operator[](u64 idx) const;
 
@@ -132,4 +139,9 @@ void append(DynamicArray<T>& self, Args&&... args) {
     T* data_cast = reinterpret_cast<T*>(self.data.get());
     new (&(data_cast[self.size])) T(args...);
     self.size++;
+}
+
+template <typename T>
+T& back(DynamicArray<T>& self) {
+    return self[self.size-1];
 }
