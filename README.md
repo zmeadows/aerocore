@@ -25,4 +25,4 @@ Only a small subset of non-object-oriented C++ is used.
 ## STYLE GUIDELINES
 * create as few separate functions as possible
 
-![alt text](https://raw.githubusercontent.com/zmeadows/aerocore/master/screenshot.png)
+![alt text](https://raw.githubusercontent.com/zmeadows/aerocore/master/screenshot.PNG)
