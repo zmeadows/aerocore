@@ -62,7 +62,7 @@ Game::Game(void)
     ACTIVATE_SYSTEM(damage_sys);
     ACTIVATE_SYSTEM(destruct_sys);
     ACTIVATE_SYSTEM(draw_sys);
-    ACTIVATE_SYSTEM(draw_collision_geometry_sys);
+    // ACTIVATE_SYSTEM(draw_collision_geometry_sys);
 
     generate_player();
     Twister::generate();
@@ -107,7 +107,7 @@ bool Game::tick(void) {
     run(damage_sys);
     run(destruct_sys);
     run(draw_sys);
-    run(draw_collision_geometry_sys);
+    // run(draw_collision_geometry_sys);
 
     auto post_run = SDL_GetPerformanceCounter();
     const float run_time = static_cast<float>(post_run - pre_run) / SDL_GetPerformanceFrequency();
