@@ -15,6 +15,8 @@
 #include <unordered_map>
 
 #include "unstd/DenseHashTable.hpp"
+#include "unstd/DynamicArray.hpp"
+#include "unstd/ArraySet.hpp"
 
 
 class ComponentManager {
@@ -26,9 +28,9 @@ private:
     // A ComponentIndex is used to map an unsigned integer to a type
     // for the purposes of keeping track of generic data in aggregate structures
     using ComponentIndex = size_t;
-    using ComponentIndexSet = std::unordered_set<ComponentIndex>;
+    using ComponentIndexSet = ArraySet<ComponentIndex>;
 
-    ComponentIndexSet m_allComponentIndices;
+    DynamicArray<ComponentIndex> m_allComponentIndices;
     ComponentIndex m_nextIndex;
 
     template <typename TyComponent>
@@ -40,7 +42,7 @@ private:
     inline ComponentIndex newIndex(void) {
         ComponentIndex idx = m_nextIndex;
         m_nextIndex++;
-        m_allComponentIndices.insert(idx);
+        append(m_allComponentIndices, idx);
         return idx;
     }
 
@@ -50,7 +52,7 @@ private:
 
     // TODO: make UUIDMap class?
     using UUIDCompMap = DenseHashTable<UUID::rep, ResourceManager::Handle, UUIDHasher>;
-    std::vector<UUIDCompMap> m_store;
+    DynamicArray<UUIDCompMap*> m_store;
     std::vector<std::unique_ptr<ResourceManager>> m_pools;
 
     /////////////////////////////////////////
@@ -71,7 +73,7 @@ private:
     template <typename TyComponent>
     inline bool componentIsRegistered(void) {
         const ComponentIndex compID = index<TyComponent>();
-        return compID < m_store.size() && compID < m_pools.size();
+        return compID < m_store.size && compID < m_pools.size();
     }
 
 public:
@@ -82,7 +84,10 @@ public:
 
     ComponentManager() : m_nextIndex(0) {}
 
-    ~ComponentManager() = default;
+    ~ComponentManager() {
+        for (UUIDCompMap* m : m_store)
+            deallocate(*m);
+    }
 
     template <typename TyComponent>
     void registerComponent(const size_t allocSize);
@@ -107,7 +112,7 @@ public:
     template <typename TyComponent>
     inline bool has(UUID uuid) {
         const ComponentIndex compID = index<TyComponent>();
-        return contains(m_store[compID], uuid.unwrap());
+        return contains(*(m_store[compID]), uuid.unwrap());
     }
 
     //TODO: don't need multiple subscribe definitions, use parameter pack tools
@@ -140,13 +145,13 @@ void ComponentManager::registerComponent(const size_t allocSize) {
 
     const ComponentIndex newCompID = index<TyComponent>();
 
-    assert(m_store.size() == newCompID &&
+    assert(m_store.size == newCompID &&
            "Expected/Actual mismatch between number of registered component stores when registering ");
     assert(m_pools.size() == newCompID &&
            "Expected/Actual mismatch between number of registered component pools when registering ");
 
     // add component to store
-    m_store.emplace_back(DenseHashTable<UUID::rep, ResourceManager::Handle, UUIDHasher>(0,1));
+    append(m_store, new UUIDCompMap(0,1));
 
     // create memory pool for component
     ResourceManager* rm = new ResourceManager();
@@ -175,7 +180,7 @@ void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
         bool entityShouldBeFollowed = true;
 
         for (const ComponentIndex idx : m_subscribedComponents.at(sys)) {
-            if (!contains(m_store[idx], uuid.unwrap())) {
+            if (!contains(*(m_store[idx]), uuid.unwrap())) {
                 entityShouldBeFollowed = false;
                 break;
             }
@@ -196,7 +201,7 @@ template <typename TyComponent, class... Args>
 TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
     const ComponentIndex compID = index<TyComponent>();
 
-    UUIDCompMap& compMap = m_store[compID];
+    UUIDCompMap& compMap = *(m_store[compID]);
 
     // assert(!contains(compMap, uuid.unwrap()) &&
     //       "Attempted to book component for entity that already posseses it");
@@ -216,7 +221,7 @@ void ComponentManager::remove(const UUID& uuid) {
 
     DEBUG(uuid << "removed component: " << type_name<TyComponent>());
 
-    UUIDCompMap& compMap = m_store[compID];
+    UUIDCompMap& compMap = *(m_store[compID]);
     const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to remove non-existent component from entity");
     const ResourceManager::Handle oldHandle = *oldHandlePtr;
@@ -237,7 +242,7 @@ inline TyComponent& ComponentManager::get(const UUID& uuid) {
 
     const ComponentIndex compID = index<TyComponent>();
 
-    UUIDCompMap& compMap = m_store[compID];
+    UUIDCompMap& compMap = *(m_store[compID]);
 
     const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
@@ -248,10 +253,10 @@ template <typename TyComponent>
 inline const TyComponent& ComponentManager::get(UUID uuid) const {
     const ComponentIndex compID = index<TyComponent>();
 
-    assert(compID < m_store.size() && compID < m_pools.size() &&
+    assert(compID < m_store.size && compID < m_pools.size() &&
            "Attempted to 'get' component data for un-registered component of type: ");
 
-    const UUIDCompMap& compMap = m_store.at(compID);
+    const UUIDCompMap& compMap = *(m_store[compID]);
 
     const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
@@ -267,10 +272,10 @@ void ComponentManager::destroy(const UUID& uuid) {
     }
 
     for (const auto& idx : m_allComponentIndices) {
-        const ResourceManager::Handle* oldHandlePtr = lookup(m_store[idx], uuid.unwrap());
+        const ResourceManager::Handle* oldHandlePtr = lookup( *(m_store[idx]), uuid.unwrap());
         if (oldHandlePtr != nullptr) {
             m_pools[idx]->release(*oldHandlePtr);
-            ::remove(m_store[idx], uuid.unwrap());
+            ::remove( *(m_store[idx]), uuid.unwrap());
         }
     }
 }
@@ -284,7 +289,7 @@ void ComponentManager::subscribe(System* sys) {
     }
 
     m_subscribedSystems[idx].insert(sys);
-    m_subscribedComponents[sys].insert(idx);
+    insert(m_subscribedComponents[sys], idx);
 
     DEBUG(sys->name << " system subscribed to: " << type_name<TyComponent>());
 }

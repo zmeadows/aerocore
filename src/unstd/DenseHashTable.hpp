@@ -47,6 +47,14 @@ struct DenseHashTable {
     const V& operator[](const K& key) const;
 };
 
+template <typename K, typename V, typename Hasher>
+void deallocate(DenseHashTable<K,V,Hasher>& self) {
+    self.slots.reset(nullptr);
+    self.size = 0;
+    self.capacity = 0;
+    self.longest_probe = 0;
+};
+
 
 template <typename K, typename V, typename Hasher>
 DenseHashTable<K,V,Hasher>::DenseHashTable(u64 init_capacity, const K& empty, const K& deleted)
