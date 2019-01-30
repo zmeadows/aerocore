@@ -81,8 +81,3 @@ template <typename T>
 inline bool vector_contains(const std::vector<T>& cont, const T& data) {
     return std::find(cont.begin(), cont.end(), data) != cont.end();
 }
-
-template <typename Container, typename T>
-inline bool contains(const Container& cont, const T& data) {
-    return cont.find(data) != cont.end();
-}

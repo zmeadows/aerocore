@@ -79,6 +79,7 @@ void dump(const PolygonDecomposition* decomp) {
     printf("\n## PolygonDecomposition END ##\n");
 }
 
+//TODO: remove std::vector
 PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_vertices) {
     const u32 vertex_count = local_vertices->count;
 

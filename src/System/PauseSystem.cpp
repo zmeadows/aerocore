@@ -16,7 +16,7 @@ void run(PauseSystem& self, f32 dt) {
             transition.next_state_id = pause.next_state_id;
             transition.extra_time = -1 * pause.time_left;
 
-            append(self.finished, uuid);
+            append(&self.finished, uuid);
         }
     }
 
@@ -24,5 +24,5 @@ void run(PauseSystem& self, f32 dt) {
         CM->remove<PauseBehavior>(uuid);
     }
 
-    clear(self.finished);
+    clear(&self.finished);
 }

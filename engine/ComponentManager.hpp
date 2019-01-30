@@ -1,7 +1,6 @@
 #pragma once
 
 #include "UUID.hpp"
-#include "ResourceManager.hpp"
 #include "System.hpp"
 
 #include "Util.hpp"
@@ -17,6 +16,7 @@
 #include "unstd/DenseHashTable.hpp"
 #include "unstd/DynamicArray.hpp"
 #include "unstd/ArraySet.hpp"
+#include "BucketArray.hpp"
 
 
 class ComponentManager {
@@ -42,7 +42,7 @@ private:
     inline ComponentIndex newIndex(void) {
         ComponentIndex idx = m_nextIndex;
         m_nextIndex++;
-        append(m_allComponentIndices, idx);
+        append(&m_allComponentIndices, idx);
         return idx;
     }
 
@@ -50,10 +50,9 @@ private:
     // Component Data Storage //
     ////////////////////////////
 
-    // TODO: make UUIDMap class?
-    using UUIDCompMap = DenseHashTable<UUID::rep, ResourceManager::Handle, UUIDHasher>;
+    using UUIDCompMap = DenseHashTable<UUID::rep, BucketIndex, UUIDHasher>;
     DynamicArray<UUIDCompMap*> m_store;
-    std::vector<std::unique_ptr<ResourceManager>> m_pools;
+    DynamicArray<void*> m_pools;
 
     /////////////////////////////////////////
     // System <--> Component Subscriptions //
@@ -73,7 +72,7 @@ private:
     template <typename TyComponent>
     inline bool componentIsRegistered(void) {
         const ComponentIndex compID = index<TyComponent>();
-        return compID < m_store.size && compID < m_pools.size();
+        return compID < m_store.size && compID < m_pools.size;
     }
 
 public:
@@ -86,11 +85,11 @@ public:
 
     ~ComponentManager() {
         for (UUIDCompMap* m : m_store)
-            deallocate(*m);
+            UUIDCompMap::destroy(m);
     }
 
     template <typename TyComponent>
-    void registerComponent(const size_t allocSize);
+    void registerComponent(const u16 bucket_size);
 
     template <typename TyComponent>
     inline void unRegisterComponent(void);
@@ -112,7 +111,7 @@ public:
     template <typename TyComponent>
     inline bool has(UUID uuid) {
         const ComponentIndex compID = index<TyComponent>();
-        return contains(*(m_store[compID]), uuid.unwrap());
+        return contains(m_store[compID], uuid.unwrap());
     }
 
     //TODO: don't need multiple subscribe definitions, use parameter pack tools
@@ -139,24 +138,33 @@ public:
     //TODO: unsubscribe? or just a disconnect system method
 };
 
+//TODO: pass lambda that runs on component removal?
 template <typename TyComponent>
-void ComponentManager::registerComponent(const size_t allocSize) {
-    DEBUG("registering component: " << type_name<TyComponent>());
+void ComponentManager::registerComponent(const u16 bucket_size) {
+    // static_assert(std::is_pod<TyComponent>::value, "Component Type must be a POD type.");
+    //static_assert(std::is_standard_layout<TyComponent>::value, "Component Type must have standard layout.");
+    //static_assert(std::is_trivially_copyable<TyComponent>::value, "Component Type must be trivally copyable.");
+
 
     const ComponentIndex newCompID = index<TyComponent>();
+    DEBUG("registering component: " << type_name<TyComponent>() << " with new index: " << newCompID);
 
     assert(m_store.size == newCompID &&
            "Expected/Actual mismatch between number of registered component stores when registering ");
-    assert(m_pools.size() == newCompID &&
+    assert(m_pools.size == newCompID &&
            "Expected/Actual mismatch between number of registered component pools when registering ");
 
+	auto new_map = memalloc<UUIDCompMap>(1);
+    *new_map = UUIDCompMap::create(bucket_size, 0, 1);
+    debug_print(new_map);
     // add component to store
-    append(m_store, new UUIDCompMap(0,1));
+    append(&m_store, new_map);
 
     // create memory pool for component
-    ResourceManager* rm = new ResourceManager();
-    rm->allocate<TyComponent>(allocSize);
-    m_pools.emplace_back(rm);
+    BucketArray<TyComponent>* arr = BucketArray<TyComponent>::allocate(bucket_size);
+    append(&m_pools, static_cast<void*>(arr));
+
+	debug_print(&m_store);
 
     // add component to subscription map (with no subscriptions yet)
     m_subscribedSystems.emplace(newCompID, SystemSet());
@@ -165,8 +173,10 @@ void ComponentManager::registerComponent(const size_t allocSize) {
 template <typename TyComponent>
 inline void ComponentManager::unRegisterComponent(void) {
     DEBUG("un-registering component: " << type_name<TyComponent>());
+	//TODO: remove from UUIDCompMaps too
     const ComponentIndex compID = index<TyComponent>();
-    m_pools[compID]->deallocate<TyComponent>();
+    auto arr = static_cast<BucketArrayBase*>(m_pools[compID]);
+    BucketArrayBase::destroy(arr);
 }
 
 template <typename TyComponent>
@@ -180,7 +190,7 @@ void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
         bool entityShouldBeFollowed = true;
 
         for (const ComponentIndex idx : m_subscribedComponents.at(sys)) {
-            if (!contains(*(m_store[idx]), uuid.unwrap())) {
+            if (!contains(m_store[idx], uuid.unwrap())) {
                 entityShouldBeFollowed = false;
                 break;
             }
@@ -201,35 +211,37 @@ template <typename TyComponent, class... Args>
 TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
     const ComponentIndex compID = index<TyComponent>();
 
-    UUIDCompMap& compMap = *(m_store[compID]);
+    DEBUG(uuid << " booked component: " << type_name<TyComponent>());
+
+    UUIDCompMap* compMap = m_store[compID];
 
     // assert(!contains(compMap, uuid.unwrap()) &&
     //       "Attempted to book component for entity that already posseses it");
 
-	assert(compID < m_pools.size());
+	assert(compID < m_pools.size);
 
-    const ResourceManager::Handle handle = m_pools[compID]->book<TyComponent>(args...);
+    auto arr = static_cast<BucketArray<TyComponent>*>(m_pools[compID]);
+    const BucketIndex handle = insert(arr, args...);
     insert(compMap, uuid.unwrap(), handle);
-
     alertSystemsNewComponentAdded<TyComponent>(uuid);
-    return m_pools[compID]->get<TyComponent>(handle);
+
+    return (*arr)[handle];
 }
 
 template <typename TyComponent>
 void ComponentManager::remove(const UUID& uuid) {
     const ComponentIndex compID = index<TyComponent>();
 
-    DEBUG(uuid << "removed component: " << type_name<TyComponent>());
+    DEBUG(uuid << " removed component: " << type_name<TyComponent>());
 
-    UUIDCompMap& compMap = *(m_store[compID]);
-    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    const BucketIndex* oldHandlePtr = lookup(m_store[compID], uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to remove non-existent component from entity");
-    const ResourceManager::Handle oldHandle = *oldHandlePtr;
+    const BucketIndex oldHandle = *oldHandlePtr;
 
-    ::remove(compMap, uuid.unwrap());
+    ::remove(m_store[compID], uuid.unwrap());
 
-    //TODO: just template the release function in the ResourceManager
-    m_pools[compID]->release(oldHandle);
+    auto arr = static_cast<BucketArrayBase*>(m_pools[compID]);
+    remove_item(arr, oldHandle);
 
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>()))
         sys->unfollow(uuid);
@@ -242,25 +254,26 @@ inline TyComponent& ComponentManager::get(const UUID& uuid) {
 
     const ComponentIndex compID = index<TyComponent>();
 
-    UUIDCompMap& compMap = *(m_store[compID]);
-
-    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    const BucketIndex* oldHandlePtr = lookup(m_store[compID], uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
-    return m_pools[compID]->get<TyComponent>(*oldHandlePtr);
+
+    auto arr = static_cast<BucketArray<TyComponent>*>(m_pools[compID]);
+    return (*arr)[*oldHandlePtr];
 }
 
 template <typename TyComponent>
 inline const TyComponent& ComponentManager::get(UUID uuid) const {
     const ComponentIndex compID = index<TyComponent>();
 
-    assert(compID < m_store.size && compID < m_pools.size() &&
+    assert(compID < m_store.size && compID < m_pools.size &&
            "Attempted to 'get' component data for un-registered component of type: ");
 
     const UUIDCompMap& compMap = *(m_store[compID]);
 
-    const ResourceManager::Handle* oldHandlePtr = lookup(compMap, uuid.unwrap());
+    const BucketIndex* oldHandlePtr = lookup(compMap, uuid.unwrap());
     assert(oldHandlePtr != nullptr && "Attempted to access non-existent component for entity");
-    return m_pools[compID]->get<TyComponent>(*oldHandlePtr);
+    const auto arr = static_cast<const BucketArray<TyComponent>*>(m_pools[compID]);
+    return arr[*oldHandlePtr];
 }
 
 void ComponentManager::destroy(const UUID& uuid) {
@@ -272,10 +285,11 @@ void ComponentManager::destroy(const UUID& uuid) {
     }
 
     for (const auto& idx : m_allComponentIndices) {
-        const ResourceManager::Handle* oldHandlePtr = lookup( *(m_store[idx]), uuid.unwrap());
+        const BucketIndex* oldHandlePtr = lookup(m_store[idx], uuid.unwrap());
         if (oldHandlePtr != nullptr) {
-            m_pools[idx]->release(*oldHandlePtr);
-            ::remove( *(m_store[idx]), uuid.unwrap());
+            auto arr = static_cast<BucketArrayBase*>(m_pools[idx]);
+            remove_item(arr, *oldHandlePtr);
+            ::remove(m_store[idx], uuid.unwrap());
         }
     }
 }
@@ -292,4 +306,5 @@ void ComponentManager::subscribe(System* sys) {
     insert(m_subscribedComponents[sys], idx);
 
     DEBUG(sys->name << " system subscribed to: " << type_name<TyComponent>());
+    debug_print(m_subscribedComponents[sys]);
 }

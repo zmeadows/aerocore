@@ -23,13 +23,14 @@ struct QuadNode {
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext);
 
     bool has_parent(const QuadNode* node) const;
-    void retrieve(DynamicArray<UUID>& candidates, const UUID collider);
-    void retrieve_from_parents(DynamicArray<UUID>& candidatess, const UUID collider);
-    void retrieve_from_children(DynamicArray<UUID>& candidatess, const UUID collider);
+    void retrieve(DynamicArray<UUID>* candidates, const UUID collider);
+    void retrieve_from_parents(DynamicArray<UUID>* candidatess, const UUID collider);
+    void retrieve_from_children(DynamicArray<UUID>* candidatess, const UUID collider);
 
     QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
         c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {}
 
+	//TODO: destroy member arrays
 };
 
 

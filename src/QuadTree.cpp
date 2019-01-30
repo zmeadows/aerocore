@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void QuadNode::reset(void) {
-    clear(m_containedUUIDs);
+    clear(&m_containedUUIDs);
 
     if (m_hasChildren) {
         for (auto& node : m_childNodes)
@@ -24,11 +24,11 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
         }
     }
 
-    append(m_containedUUIDs, uuid);
+    append(&m_containedUUIDs, uuid);
     return this;
 }
 
-void QuadNode::retrieve_from_parents(DynamicArray<UUID>& candidates, const UUID collider) {
+void QuadNode::retrieve_from_parents(DynamicArray<UUID>* candidates, const UUID collider) {
 
     if (m_parent) {
         for (UUID uuid : m_parent->m_containedUUIDs) {
@@ -39,7 +39,7 @@ void QuadNode::retrieve_from_parents(DynamicArray<UUID>& candidates, const UUID 
     }
 }
 
-void QuadNode::retrieve_from_children(DynamicArray<UUID>& candidates, const UUID collider) {
+void QuadNode::retrieve_from_children(DynamicArray<UUID>* candidates, const UUID collider) {
 
     for (UUID uuid : m_containedUUIDs) {
         if (uuid != collider)
@@ -53,7 +53,7 @@ void QuadNode::retrieve_from_children(DynamicArray<UUID>& candidates, const UUID
     }
 };
 
-void QuadNode::retrieve(DynamicArray<UUID>& candidates, const UUID collider) {
+void QuadNode::retrieve(DynamicArray<UUID>* candidates, const UUID collider) {
     clear(candidates);
     retrieve_from_parents(candidates, collider);
     retrieve_from_children(candidates, collider);

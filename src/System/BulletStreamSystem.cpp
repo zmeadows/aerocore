@@ -33,7 +33,7 @@ void run(BulletStreamSystem& self, float dt) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = bstream.next_state_id;
                 transition.extra_time = -1.f * bstream.current_countdown;
-                append(self.finished, uuid);
+                append(&self.finished, uuid);
             } else {
                 bstream.current_countdown += bstream.delay_per_bullet;
             }
@@ -44,5 +44,5 @@ void run(BulletStreamSystem& self, float dt) {
         CM->remove<BulletStream>(uuid);
     }
 
-    clear(self.finished);
+    clear(&self.finished);
 }

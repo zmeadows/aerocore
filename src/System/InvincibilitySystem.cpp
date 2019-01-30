@@ -19,12 +19,12 @@ void run(InvincibilitySystem& self, f32 dt) {
         }
 
 		if (flash.num_flashes == 0)
-            append(self.finished, uuid);
+            append(&self.finished, uuid);
     }
 
 	for (const UUID uuid : self.finished) {
         CM->remove<Invincibility>(uuid);
 	}
 
-    clear(self.finished);
+    clear(&self.finished);
 }

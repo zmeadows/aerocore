@@ -7,7 +7,7 @@ void run(DamageSystem& self) {
     auto CM = get_manager();
 
     for (const UUID uuid : self.base.followed) {
-        append(self.followed_copy, uuid);
+        append(&self.followed_copy, uuid);
     }
 
     for (const UUID& uuid : self.base.followed) {
@@ -24,5 +24,5 @@ void run(DamageSystem& self) {
         CM->remove<DamageEvent>(uuid);
     }
 
-    clear(self.followed_copy);
+    clear(&self.followed_copy);
 }

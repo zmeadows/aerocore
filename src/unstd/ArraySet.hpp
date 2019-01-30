@@ -4,6 +4,10 @@
 #include "unstd/unstdlib.hpp"
 #include "unstd/Maybe.hpp"
 
+// #define DEBUG_ARRAYSET(x) \
+//     (std::cout << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
+#define DEBUG_ARRAYSET(x)
+
 template <typename T>
 struct ArraySet {
     DynamicArray<T> arr;
@@ -28,20 +32,23 @@ struct BinarySearchResult {
 
 template <typename T>
 void debug_print(const ArraySet<T>& self) {
-    debug_print(self.arr);
+    debug_print(&self.arr);
 }
 
 template <typename T>
 BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
+    DEBUG_ARRAYSET("Permorming binary search to insert item: " << item);
     BinarySearchResult result;
 
     if (self.arr.size == 0) {
             result.type = BinarySearchResult::Type::End;
+            DEBUG_ARRAYSET("ArraySet is already empty. Finished searching.");
             return result;
     }
 
     if (item > self.arr[self.arr.size-1]) {
         result.type = BinarySearchResult::Type::End;
+            DEBUG_ARRAYSET("Item larger than last ArraySet item. Finished searching.");
         return result;
     }
 
@@ -55,6 +62,7 @@ BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
         if (item == mid_value) {
             result.type = BinarySearchResult::Type::AlreadyExists;
             result.index = mid;
+            DEBUG_ARRAYSET("Item already exists at index: " << mid << ". Finished.");
             return result;
         } else if (item < mid_value) {
             high = mid - 1;
@@ -65,6 +73,7 @@ BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
 
     result.type = BinarySearchResult::Type::InsertIndex;
     result.index = low;
+    DEBUG_ARRAYSET("Found location for insertion: " << result.index << ". Finished.");
 
     return result;
 }
@@ -73,7 +82,9 @@ BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
 
 template <typename T>
 void reserve_memory(ArraySet<T>& self, u64 new_capacity) {
-    reserve_memory(self.arr, new_capacity);
+    DEBUG_ARRAYSET("Reserving extra memory for ArraySet: " << self.arr.capacity << " --> " << new_capacity);
+    reserve_memory(&self.arr, new_capacity);
+    DEBUG_ARRAYSET("Finished reserving extra memory for ArraySet.");
 }
 
 template <typename T>
@@ -93,22 +104,24 @@ ArraySet<T> copy(const ArraySet<T>& other) {
 
 template <typename T>
 void insert(ArraySet<T>& self, const T& new_value) {
+    DEBUG_ARRAYSET("Inserting new value into ArraySet: " << new_value);
     if (self.arr.size == self.arr.capacity) {
-        reserve_memory(self.arr, self.arr.capacity == 0 ? 2 : 2 * self.arr.capacity);
+        reserve_memory(self, self.arr.capacity == 0 ? 2 : 2 * self.arr.capacity);
     }
 
     const BinarySearchResult result = binary_search(self, new_value);
 
     switch (result.type) {
         case BinarySearchResult::Type::End:
-            append(self.arr, new_value);
+            append(&self.arr, new_value);
             break;
         case BinarySearchResult::Type::InsertIndex:
-            insert_at(self.arr, new_value, result.index);
+            insert_at(&self.arr, new_value, result.index);
             break;
         case BinarySearchResult::Type::AlreadyExists:
             break;
     }
+    DEBUG_ARRAYSET("Finished inserting new element into ArraySet.");
 }
 
 template <typename T>
@@ -118,7 +131,7 @@ void remove(ArraySet<T>& self, const T& value) {
     if (result.type != BinarySearchResult::Type::AlreadyExists)
         return;
 
-    remove_at(self.arr, result.index);
+    remove_at(&self.arr, result.index);
 }
 
 //TODO: This can be optimized slightly by creating a modified version of the binary_search function.
@@ -126,34 +139,3 @@ template <typename T>
 bool contains(const ArraySet<T>& self, const T& value) {
     return binary_search(self, value).type == BinarySearchResult::Type::AlreadyExists;
 }
-
-// void test_ArraySet(void) {
-//     ArraySet<int> test;
-//     reserve_memory(test, 1);
-//     debug_print(test);
-// 
-//     insert(test, 1);
-//     debug_print(test);
-//     remove(test, 1);
-//     debug_print(test);
-//     insert(test, 1);
-//     debug_print(test);
-//     insert(test, 2);
-//     debug_print(test);
-//     insert(test, 3);
-//     debug_print(test);
-//     insert(test, 4);
-//     debug_print(test);
-//     insert(test, -1);
-//     debug_print(test);
-//     insert(test, 10);
-//     debug_print(test);
-//     insert(test, 6);
-//     debug_print(test);
-//     remove(test, 1653456765);
-//     debug_print(test);
-//     remove(test, 2);
-//     debug_print(test);
-//     insert(test, 2);
-//     debug_print(test);
-// }

@@ -7,7 +7,7 @@ Only a small subset of non-object-oriented C++ is used.
     * Stable chunked dynamic bucket arrays with no re-allocation/copying
     * Entity ID <--> Component ID mapping via custom hash table with open addressing and robin hood hashing
     * Numerous alternatives to STL containers which perform better in the game development context (ArraySet, SmallString, etc)
-* Straight forward creation of systems to subscribe to components and process entities in only a few lines of code.
+* Straight forward creation of systems to subscribe to component sets and process entities in only a few lines of code.
 * Fast 2D collision for arbitrary polygons using quad-tree + separating axis theorem
 * Custom (simple) creation/loading of sprite, animation, and collision geometry from GIMP (GNU Image Manipulation Program) output.
 * Implementations of many common components/systems

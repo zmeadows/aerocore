@@ -3,18 +3,16 @@
 #include <memory>
 
 #include "unstd/types.hpp"
+#include "unstd/Defer.hpp"
 
 template <class T>
 const T& max(const T& a, const T& b) {
     return (a < b) ? b : a;
 }
 
-template <typename T>
-using buffer = std::unique_ptr<T[]>;
-
-template <typename T>
-buffer<T> allocate_buffer(u64 capacity) {
-    return std::unique_ptr<T[]>(new T[capacity]);
+template <class T>
+const T& min(const T& a, const T& b) {
+    return (a > b) ? b : a;
 }
 
 template <typename ...Types> struct TypeList {};
@@ -28,3 +26,7 @@ template <typename T>
 T* memalloc(u64 count) {
     return static_cast<T*>(malloc(sizeof(T) * count));
 }
+
+// u64 modulo(s64 i, s64 n) {
+//     return static_cast<u64>((i % n + n) % n);
+//}

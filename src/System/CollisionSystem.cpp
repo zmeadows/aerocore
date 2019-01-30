@@ -26,9 +26,10 @@ bool overlaps( const Entity& entityA
 
 
     // 3. otherwise, we have to check the individual polygons
+    DynamicArray<v2> gvA = compute_global_vertices(cdA.local_vertices, entityA.pos, entityA.angle);
+    DynamicArray<v2> gvB = compute_global_vertices(cdB.local_vertices, entityB.pos, entityB.angle);
 
-    const DynamicArray<v2> gvA = compute_global_vertices(cdA.local_vertices, entityA.pos, entityA.angle);
-    const DynamicArray<v2> gvB = compute_global_vertices(cdB.local_vertices, entityB.pos, entityB.angle);
+    Defer( deallocate(&gvA); deallocate(&gvB); );
 
     for (uint_least8_t polyA = 0; polyA < cdA.poly_decomp->count; polyA++) {
         for (uint_least8_t polyB = 0; polyB < cdB.poly_decomp->count; polyB++) {
@@ -80,7 +81,7 @@ void run(CollisionSystem& self) {
         const auto& cdA = CM->get<CollisionData>(friendly_uuid);
         const auto& entityA = CM->get<Entity>(friendly_uuid);
 
-        cdA.node->retrieve(self.collision_candidates, friendly_uuid);
+        cdA.node->retrieve(&self.collision_candidates, friendly_uuid);
 
         for (const UUID enemy_uuid : self.collision_candidates) {
             const auto& cdB = CM->get<CollisionData>(enemy_uuid);

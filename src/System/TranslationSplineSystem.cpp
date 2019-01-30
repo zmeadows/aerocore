@@ -17,7 +17,7 @@ void run(TranslationSplineSystem& self, f32 dt) {
         update.delta = result.new_point - entity.pos;
 
         if (result.finished) {
-            append(self.finished, uuid);
+            append(&self.finished, uuid);
             if (spline.next_state_id >= 0) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = spline.next_state_id;
@@ -30,5 +30,5 @@ void run(TranslationSplineSystem& self, f32 dt) {
         CM->remove<TranslationSpline>(uuid);
     }
 
-    clear(self.finished);
+    clear(&self.finished);
 }

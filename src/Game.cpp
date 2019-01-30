@@ -25,26 +25,26 @@ Game::Game(void)
 {
     auto CM = get_manager();
 
-    CM->registerComponent<Entity>(10000);
-    CM->registerComponent<EulerTranslation>(10000);
-    CM->registerComponent<EulerRotation>(10000);
-    CM->registerComponent<OffscreenBehavior>(10000);
-    CM->registerComponent<DestructTag>(10000);
-    CM->registerComponent<BulletTag>(10000);
-    CM->registerComponent<FriendlyTag>(10000);
-    CM->registerComponent<CollisionData>(10000);
-    CM->registerComponent<PositionUpdate>(10000);
-    CM->registerComponent<RotationUpdate>(10000);
-    CM->registerComponent<Sprite>(10000);
-    CM->registerComponent<StateTransition>(10000);
-    CM->registerComponent<Twister::Tag>(10000);
-    CM->registerComponent<TranslationSpline>(10000);
-    CM->registerComponent<PauseBehavior>(10000);
-    CM->registerComponent<BulletStream>(10000);
-    CM->registerComponent<DamageEvent>(10000);
-    CM->registerComponent<Health>(10000);
-    CM->registerComponent<CollideDamage>(10000);
-    CM->registerComponent<Invincibility>(10000);
+    CM->registerComponent<Entity>(250);
+    CM->registerComponent<EulerTranslation>(250);
+    CM->registerComponent<EulerRotation>(250);
+    CM->registerComponent<OffscreenBehavior>(250);
+    CM->registerComponent<DestructTag>(250);
+    CM->registerComponent<BulletTag>(250);
+    CM->registerComponent<FriendlyTag>(250);
+    CM->registerComponent<CollisionData>(250);
+    CM->registerComponent<PositionUpdate>(250);
+    CM->registerComponent<RotationUpdate>(250);
+    CM->registerComponent<Sprite>(250);
+    CM->registerComponent<StateTransition>(250);
+    CM->registerComponent<Twister::Tag>(250);
+    CM->registerComponent<TranslationSpline>(250);
+    CM->registerComponent<PauseBehavior>(250);
+    CM->registerComponent<BulletStream>(250);
+    CM->registerComponent<DamageEvent>(250);
+    CM->registerComponent<Health>(250);
+    CM->registerComponent<CollideDamage>(250);
+    CM->registerComponent<Invincibility>(250);
 
     ACTIVATE_SYSTEM(euler_translation_sys);
     ACTIVATE_SYSTEM(euler_rotation_sys);
