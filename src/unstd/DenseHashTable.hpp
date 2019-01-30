@@ -11,19 +11,48 @@ struct KeyValuePair {
     V value;
 };
 
+template <typename T>
+struct DefaultHash {
+    static u32 hash(UUID::rep x) {
+        static_assert(sizeof(T) == 0, "DefaultHash not implemented for this type!");
+        return 0;
+    }
+};
+
+template <>
+struct DefaultHash<u32> {
+    static u32 hash(u32 x) {
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = (x >> 16) ^ x;
+        return x;
+    }
+};
+
+template <typename T>
+struct DefaultHash<T*> {
+    static u32 hash(T* xptr) {
+        auto x = reinterpret_cast<u32>(xptr);
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = ((x >> 16) ^ x) * 0x45d9f3b;
+        x = (x >> 16) ^ x;
+        return x;
+    }
+};
+
 }
 
-template <typename K, typename V, typename H>
+template <typename K, typename V, typename H = DefaultHash<K>>
 struct DenseHashTable {
     u8* slots;
-    u64 size;
-    u64 capacity;
+    u32 size;
+    u32 capacity;
     f64 max_load_factor;
-    u64 longest_probe;
+    u32 longest_probe;
     K empty_sentinel;
     K tombstone_sentinel;
 
-	static DenseHashTable<K, V, H> create(u64 init_capacity, K empty, K tombstone);
+	static DenseHashTable<K, V, H> create(u32 init_capacity, K empty, K tombstone);
 	static DenseHashTable<K, V, H> create(K empty, K tombstone);
     static void destroy(DenseHashTable<K,V,H>* self);
 
@@ -31,7 +60,7 @@ struct DenseHashTable {
 };
 
 template <typename K, typename V, typename H>
-DenseHashTable<K,V,H> DenseHashTable<K,V,H>::create(u64 init_capacity, K empty, K tombstone)
+DenseHashTable<K,V,H> DenseHashTable<K,V,H>::create(u32 init_capacity, K empty, K tombstone)
 {
     assert(empty != tombstone && "DenseHashTable: empty and tombstone keys must be different!");
     assert(init_capacity > 0);
@@ -84,12 +113,12 @@ V* lookup(DenseHashTable<K,V,H>* self, K lookup_key)
 {
     assert(lookup_key != self->empty_sentinel && lookup_key != self->tombstone_sentinel);
 
-    u64 N = self->capacity;
-    u64 probe_index = H::hash(lookup_key) % N;
+    u32 N = self->capacity;
+    u32 probe_index = H::hash(lookup_key) % N;
 
     KeyValuePair<K,V>* cast_slots = recast_slots(self);
 
-    u64 dib = 0;
+    u32 dib = 0;
 
     while (true) {
         KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
@@ -119,12 +148,12 @@ void insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
 
     if (load_factor(self) > self->max_load_factor) rehash(self, self->capacity * 2);
 
-    const u64 N = self->capacity;
-    s64 probe_index = H::hash(new_key) % N;
+    const u32 N = self->capacity;
+    u32 probe_index = H::hash(new_key) % N;
 
     KeyValuePair<K,V>* cast_slots = recast_slots(self);
 
-    u64 dib = 0; // 'd'istance from 'i'nitial 'b'ucket
+    u32 dib = 0; // 'd'istance from 'i'nitial 'b'ucket
 
     while (true) {
         KeyValuePair<K,V>& probed_pair = cast_slots[probe_index];
@@ -139,7 +168,7 @@ void insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
             probed_pair.value = new_value;
             return;
         } else {
-            u64 probed_dib = probe_index - H::hash(probed_pair.key) % N;
+            u32 probed_dib = probe_index - H::hash(probed_pair.key) % N;
             if (probed_dib < dib) {
 				self->longest_probe = max(dib, self->longest_probe);
                 std::swap(probed_pair.key, new_key);
@@ -154,7 +183,7 @@ void insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
 }
 
 template <typename K, typename V, typename H>
-void rehash(DenseHashTable<K,V,H>* self, u64 new_capacity)
+void rehash(DenseHashTable<K,V,H>* self, u32 new_capacity)
 {
     assert(new_capacity > self->capacity);
 
@@ -179,11 +208,11 @@ bool remove(DenseHashTable<K,V,H>* self, const K& key_to_delete)
 {
     assert(key_to_delete != self->empty_sentinel && key_to_delete != self->tombstone_sentinel);
 
-    const u64 N = self->capacity;
-    u64 probe_index = H::hash(key_to_delete) % N;
+    const u32 N = self->capacity;
+    u32 probe_index = H::hash(key_to_delete) % N;
     KeyValuePair<K,V>* cast_slots = recast_slots(self);
 
-    u64 dib = 0;
+    u32 dib = 0;
 
     while (true) {
         KeyValuePair<K,V>& probed_slot = cast_slots[probe_index];
@@ -208,18 +237,10 @@ bool remove(DenseHashTable<K,V,H>* self, const K& key_to_delete)
 template <typename K, typename V, typename H>
 V& DenseHashTable<K,V,H>::operator[](K key)
 {
-    const V* result = lookup(*this, key);
+    V* result = lookup(this, key);
     assert(result != nullptr);
     return *result;
 }
-
-// template <typename K, typename V, typename H>
-// const V& DenseHashTable<K,V,H>::operator[](const K& key) const
-// {
-//     const V* const result = lookup(*this, key);
-//     assert(result != nullptr);
-//     return *result;
-// }
 
 template <typename K, typename V, typename H, typename Callable>
 void for_each(const DenseHashTable<K,V,H>* self, Callable&& f)

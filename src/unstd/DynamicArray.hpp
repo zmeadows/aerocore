@@ -3,9 +3,9 @@
 #include "unstd/unstdlib.hpp"
 #include <assert.h>
 
-#define DEBUG_ARRAY(x) \
-    (std::cout << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
-// #define DEBUG_ARRAY(x)
+// #define DEBUG_ARRAY(x) \
+//     (std::cout << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
+#define DEBUG_ARRAY(x)
 
 template <typename T>
 struct DynamicArray {
@@ -149,5 +149,5 @@ void append(DynamicArray<T>* self, Args&&... args) {
 
 template <typename T>
 T& back(DynamicArray<T>* self) {
-    return self[self->size - 1];
+    return (*self)[self->size - 1];
 }

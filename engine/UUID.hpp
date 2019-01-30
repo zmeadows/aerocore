@@ -46,15 +46,6 @@ private:
 
 std::ostream& operator<<(std::ostream& os, const UUID& stui);
 
-struct UUIDHasher {
-    static u32 hash(UUID::rep x) {
-        x = ((x >> 16) ^ x) * 0x45d9f3b;
-        x = ((x >> 16) ^ x) * 0x45d9f3b;
-        x = (x >> 16) ^ x;
-        return x;
-    }
-};
-
 // class UUIDSet {
 //     std::vector<UUID> V;
 //     std::less<UUID> cmp;

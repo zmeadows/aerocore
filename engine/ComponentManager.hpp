@@ -1,23 +1,22 @@
 #pragma once
 
-#include "UUID.hpp"
 #include "System.hpp"
+#include "UUID.hpp"
 
 #include "Util.hpp"
 
-#include <istream>
-#include <string>
 #include <fstream>
 #include <iostream>
-#include <vector>
-#include <unordered_set>
+#include <istream>
+#include <string>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
+#include "BucketArray.hpp"
+#include "unstd/ArraySet.hpp"
 #include "unstd/DenseHashTable.hpp"
 #include "unstd/DynamicArray.hpp"
-#include "unstd/ArraySet.hpp"
-#include "BucketArray.hpp"
-
 
 class ComponentManager {
 private:
@@ -25,9 +24,9 @@ private:
     // Component Indexing //
     ////////////////////////
 
-    // A ComponentIndex is used to map an unsigned integer to a type
-    // for the purposes of keeping track of generic data in aggregate structures
-    using ComponentIndex = size_t;
+    // A ComponentIndex is used to map an unsigned integer to a particular component type
+    // for book-keeping purposes
+    using ComponentIndex = u32;
     using ComponentIndexSet = ArraySet<ComponentIndex>;
 
     DynamicArray<ComponentIndex> m_allComponentIndices;
@@ -50,7 +49,7 @@ private:
     // Component Data Storage //
     ////////////////////////////
 
-    using UUIDCompMap = DenseHashTable<UUID::rep, BucketIndex, UUIDHasher>;
+    using UUIDCompMap = DenseHashTable<UUID::rep, BucketIndex>;
     DynamicArray<UUIDCompMap*> m_store;
     DynamicArray<void*> m_pools;
 
@@ -60,8 +59,8 @@ private:
 
     using SystemSet = std::unordered_set<System*>;
     std::unordered_map<ComponentIndex, SystemSet> m_subscribedSystems;
-    std::unordered_map<System*, ComponentIndexSet> m_subscribedComponents;
-    std::unordered_set<System*> m_allSystems;
+    DenseHashTable<System*, ComponentIndexSet> m_subscribedComponents;
+    ArraySet<System*> m_allSystems;
 
     template <typename TyComponent>
     void alertSystemsNewComponentAdded(const UUID& uuid);
@@ -81,7 +80,10 @@ public:
     ComponentManager(ComponentManager&&) = delete;
     ComponentManager& operator=(ComponentManager&&) = delete;
 
-    ComponentManager() : m_nextIndex(0) {}
+    ComponentManager()
+        : m_nextIndex(0)
+        , m_subscribedComponents(DenseHashTable<System*, ComponentIndexSet>::create(100, reinterpret_cast<System*>(1), reinterpret_cast<System*>(2)))
+    {}
 
     ~ComponentManager() {
         for (UUIDCompMap* m : m_store)
@@ -114,7 +116,7 @@ public:
         return contains(m_store[compID], uuid.unwrap());
     }
 
-    //TODO: don't need multiple subscribe definitions, use parameter pack tools
+    // TODO: don't need multiple subscribe definitions, use parameter pack tools
     template <typename TyComponent>
     void subscribe(System* sys);
 
@@ -124,27 +126,25 @@ public:
         subscribe<TyComponent2, TyComponents...>(s);
     }
 
-    template <typename T1, typename ...Types>
-    void subscribe(const TypeList<T1,Types...>&, System* s) {
+    template <typename T1, typename... Types>
+    void subscribe(const TypeList<T1, Types...>&, System* s) {
         subscribe<T1>(s);
-        subscribe<Types...>(TypeList<Types...>(),s);
+        subscribe<Types...>(TypeList<Types...>(), s);
     }
 
-    template <typename ...Types>
+    template <typename... Types>
     void subscribe(const TypeList<>&, System*) {
         return;
     }
 
-    //TODO: unsubscribe? or just a disconnect system method
+    // TODO: unsubscribe? or just a disconnect system method
 };
 
-//TODO: pass lambda that runs on component removal?
+// TODO: pass lambda that runs on component removal?
 template <typename TyComponent>
 void ComponentManager::registerComponent(const u16 bucket_size) {
-    // static_assert(std::is_pod<TyComponent>::value, "Component Type must be a POD type.");
-    //static_assert(std::is_standard_layout<TyComponent>::value, "Component Type must have standard layout.");
-    //static_assert(std::is_trivially_copyable<TyComponent>::value, "Component Type must be trivally copyable.");
-
+    // static_assert(std::is_standard_layout<TyComponent>::value, "Component Type must have standard layout.");
+    // static_assert(std::is_trivially_copyable<TyComponent>::value, "Component Type must be trivally copyable.");
 
     const ComponentIndex newCompID = index<TyComponent>();
     DEBUG("registering component: " << type_name<TyComponent>() << " with new index: " << newCompID);
@@ -154,7 +154,7 @@ void ComponentManager::registerComponent(const u16 bucket_size) {
     assert(m_pools.size == newCompID &&
            "Expected/Actual mismatch between number of registered component pools when registering ");
 
-	auto new_map = memalloc<UUIDCompMap>(1);
+    auto new_map = memalloc<UUIDCompMap>(1);
     *new_map = UUIDCompMap::create(bucket_size, 0, 1);
     debug_print(new_map);
     // add component to store
@@ -164,7 +164,7 @@ void ComponentManager::registerComponent(const u16 bucket_size) {
     BucketArray<TyComponent>* arr = BucketArray<TyComponent>::allocate(bucket_size);
     append(&m_pools, static_cast<void*>(arr));
 
-	debug_print(&m_store);
+    debug_print(&m_store);
 
     // add component to subscription map (with no subscriptions yet)
     m_subscribedSystems.emplace(newCompID, SystemSet());
@@ -173,14 +173,14 @@ void ComponentManager::registerComponent(const u16 bucket_size) {
 template <typename TyComponent>
 inline void ComponentManager::unRegisterComponent(void) {
     DEBUG("un-registering component: " << type_name<TyComponent>());
-	//TODO: remove from UUIDCompMaps too
+    // TODO: remove from UUIDCompMaps too
     const ComponentIndex compID = index<TyComponent>();
     auto arr = static_cast<BucketArrayBase*>(m_pools[compID]);
     BucketArrayBase::destroy(arr);
 }
 
 template <typename TyComponent>
-//OPTIMIZE: defer this check when building entities?
+// OPTIMIZE: defer this check when building entities?
 // So far, entity creation/deletion has no real impact on performance though
 void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
     for (auto& sys : m_subscribedSystems.at(index<TyComponent>())) {
@@ -189,7 +189,7 @@ void ComponentManager::alertSystemsNewComponentAdded(const UUID& uuid) {
 
         bool entityShouldBeFollowed = true;
 
-        for (const ComponentIndex idx : m_subscribedComponents.at(sys)) {
+        for (const ComponentIndex idx : *lookup(&m_subscribedComponents, sys)) {
             if (!contains(m_store[idx], uuid.unwrap())) {
                 entityShouldBeFollowed = false;
                 break;
@@ -218,7 +218,7 @@ TyComponent& ComponentManager::book(const UUID& uuid, Args&&... args) {
     // assert(!contains(compMap, uuid.unwrap()) &&
     //       "Attempted to book component for entity that already posseses it");
 
-	assert(compID < m_pools.size);
+    assert(compID < m_pools.size);
 
     auto arr = static_cast<BucketArray<TyComponent>*>(m_pools[compID]);
     const BucketIndex handle = insert(arr, args...);
@@ -279,8 +279,7 @@ inline const TyComponent& ComponentManager::get(UUID uuid) const {
 void ComponentManager::destroy(const UUID& uuid) {
     DEBUG("Destroying UUID: " << uuid);
 
-    for (auto& p : m_subscribedComponents) {
-        System* sys = p.first;
+    for (System* sys : m_allSystems) {
         sys->unfollow(uuid);
     }
 
@@ -296,10 +295,12 @@ void ComponentManager::destroy(const UUID& uuid) {
 
 template <typename TyComponent>
 void ComponentManager::subscribe(System* sys) {
+    insert(m_allSystems, sys);
+
     const ComponentIndex idx = index<TyComponent>();
 
-    if (m_subscribedComponents.find(sys) == m_subscribedComponents.end()) {
-        m_subscribedComponents[sys] = {};
+    if (lookup(&m_subscribedComponents, sys) == nullptr) {
+        insert(&m_subscribedComponents, sys, ComponentIndexSet());
     }
 
     m_subscribedSystems[idx].insert(sys);
