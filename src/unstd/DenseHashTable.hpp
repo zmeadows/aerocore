@@ -142,7 +142,7 @@ f64 load_factor(DenseHashTable<K,V,H>* self) {
 }
 
 template <typename K, typename V, typename H>
-void insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
+V* insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
 {
     assert(new_key != self->empty_sentinel && new_key != self->tombstone_sentinel);
 
@@ -163,10 +163,10 @@ void insert(DenseHashTable<K,V,H>* self, K new_key, V new_value)
             probed_pair.value = new_value;
             self->size++;
             self->longest_probe = max(dib, self->longest_probe);
-            return;
+            return &probed_pair.value;
         } else if (probed_pair.key == new_key) {
             probed_pair.value = new_value;
-            return;
+            return &probed_pair.value;
         } else {
             u32 probed_dib = probe_index - H::hash(probed_pair.key) % N;
             if (probed_dib < dib) {

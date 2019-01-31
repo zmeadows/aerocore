@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "unstd/DenseHashTable.hpp"
+#include "unstd/DynamicBitSet.hpp"
 #include "BucketArray.hpp"
 #include "Random.hpp"
 
@@ -122,6 +123,43 @@ int main(int argc, char** argv) {
     srand(static_cast<unsigned>(9999));
 
     test_ArraySet();
+
+    DynamicBitSet setA;
+    DynamicBitSet setB;
+
+    set_bit(&setA, 3);
+    debug_print(&setA);
+    assert(check_bit(&setA, 3));
+    set_bit(&setA, 4);
+    debug_print(&setA);
+    assert(check_bit(&setA, 4));
+    set_bit(&setA, 5);
+    debug_print(&setA);
+    assert(check_bit(&setA, 5));
+    unset_bit(&setA, 5);
+    debug_print(&setA);
+    assert(!check_bit(&setA, 5));
+    set_bit(&setA, 5);
+    debug_print(&setA);
+    assert(check_bit(&setA, 5));
+    set_bit(&setA, 111);
+    debug_print(&setA);
+    assert(check_bit(&setA, 111));
+
+    set_bit(&setB, 3);
+    set_bit(&setB, 4);
+    set_bit(&setB, 5);
+    set_bit(&setB, 111);
+    set_bit(&setB, 99);
+    set_bit(&setB, 30);
+
+	debug_print(&setA);
+	debug_print(&setB);
+
+    assert(is_subset_of(&setA, &setB));
+
+    destroy(&setA);
+    destroy(&setB);
 
     Game game = Game();
     game.go();

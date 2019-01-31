@@ -13,9 +13,9 @@
 const f32 TWOPI = 2.f * static_cast<f32>(3.1415926535897932384);
 const f32 PI = static_cast<f32>(3.1415926535897932384);
 
-// #define DEBUG(x) \
-//     (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
-#define DEBUG(x)
+#define DEBUG(x) \
+    (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
+// #define DEBUG(x)
 
 inline u32 modulo(s32 i, s32 n) {
     return static_cast<u32>((i % n + n) % n);

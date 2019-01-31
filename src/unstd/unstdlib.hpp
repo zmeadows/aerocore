@@ -27,6 +27,16 @@ T* memalloc(u64 count) {
     return static_cast<T*>(malloc(sizeof(T) * count));
 }
 
+template <typename T1, typename T2>
+T1* memallocz(u64 count) {
+    return static_cast<T1*>(calloc(count, sizeof(T2)));
+}
+
+template <typename T>
+T* memallocz(u64 count) {
+    return static_cast<T*>(calloc(count, sizeof(T)));
+}
+
 // u64 modulo(s64 i, s64 n) {
 //     return static_cast<u64>((i % n + n) % n);
 //}
