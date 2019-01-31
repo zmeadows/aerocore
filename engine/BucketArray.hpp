@@ -98,15 +98,15 @@ void remove_item(BucketArrayBase* self, const BucketIndex index);
 
 template <typename T>
 struct BucketArray : BucketArrayBase {
-    static BucketArray<T>* allocate(u16 bucket_size) {
-        BucketArray<T>* new_array = memalloc<BucketArray<T>>(1);
-        new_array->bucket_capacity = bucket_size;
+    static BucketArray<T> create(u16 bucket_size) {
+        BucketArray<T> new_array;
+        new_array.bucket_capacity = bucket_size;
 
-        new_array->buckets = DynamicArray<BucketBase*>();
-        reserve_memory(&new_array->buckets, 4);
+        new_array.buckets = DynamicArray<BucketBase*>();
+        reserve_memory(&new_array.buckets, 4);
 
-        new_array->bucket_filled = DynamicArray<bool>();
-        reserve_memory(&new_array->bucket_filled, 4);
+        new_array.bucket_filled = DynamicArray<bool>();
+        reserve_memory(&new_array.bucket_filled, 4);
 
         return new_array;
     }

@@ -88,78 +88,81 @@ void test_table(int entries, int times) {
 // }
 
 
-void test_ArraySet(void) {
-    ArraySet<int> test;
-    reserve_memory(test, 1);
-    debug_print(test);
-
-    insert(test, 1);
-    debug_print(test);
-    remove(test, 1);
-    debug_print(test);
-    insert(test, 1);
-    debug_print(test);
-    insert(test, 2);
-    debug_print(test);
-    insert(test, 3);
-    debug_print(test);
-    insert(test, 4);
-    debug_print(test);
-    insert(test, -1);
-    debug_print(test);
-    insert(test, 10);
-    debug_print(test);
-    insert(test, 6);
-    debug_print(test);
-    remove(test, 1653456765);
-    debug_print(test);
-    remove(test, 2);
-    debug_print(test);
-    insert(test, 2);
-    debug_print(test);
-}
+// void test_ArraySet(void) {
+//     ArraySet<int> test;
+//     reserve_memory(test, 1);
+//     debug_print(test);
+//
+//     insert(test, 1);
+//     debug_print(test);
+//     remove(test, 1);
+//     debug_print(test);
+//     insert(test, 1);
+//     debug_print(test);
+//     insert(test, 2);
+//     debug_print(test);
+//     insert(test, 3);
+//     debug_print(test);
+//     insert(test, 4);
+//     debug_print(test);
+//     insert(test, -1);
+//     debug_print(test);
+//     insert(test, 10);
+//     debug_print(test);
+//     insert(test, 6);
+//     debug_print(test);
+//     remove(test, 1653456765);
+//     debug_print(test);
+//     remove(test, 2);
+//     debug_print(test);
+//     insert(test, 2);
+//     debug_print(test);
+// }
 
 int main(int argc, char** argv) {
     srand(static_cast<unsigned>(9999));
 
-    test_ArraySet();
+    // test_ArraySet();
+    // test_DynamicArray();
+    // test_DenseHashMap();
+    // test_DynamicBitSet();
 
-    DynamicBitSet setA;
-    DynamicBitSet setB;
+    // DynamicBitSet setA;
+    // DynamicBitSet setB;
 
-    set_bit(&setA, 3);
-    debug_print(&setA);
-    assert(check_bit(&setA, 3));
-    set_bit(&setA, 4);
-    debug_print(&setA);
-    assert(check_bit(&setA, 4));
-    set_bit(&setA, 5);
-    debug_print(&setA);
-    assert(check_bit(&setA, 5));
-    unset_bit(&setA, 5);
-    debug_print(&setA);
-    assert(!check_bit(&setA, 5));
-    set_bit(&setA, 5);
-    debug_print(&setA);
-    assert(check_bit(&setA, 5));
-    set_bit(&setA, 111);
-    debug_print(&setA);
-    assert(check_bit(&setA, 111));
+    // set_bit(&setA, 3);
+    // debug_print(&setA);
+    // assert(check_bit(&setA, 3));
+    // set_bit(&setA, 4);
+    // debug_print(&setA);
+    // assert(check_bit(&setA, 4));
+    // set_bit(&setA, 5);
+    // debug_print(&setA);
+    // assert(check_bit(&setA, 5));
+    // unset_bit(&setA, 5);
+    // debug_print(&setA);
+    // assert(!check_bit(&setA, 5));
+    // set_bit(&setA, 5);
+    // debug_print(&setA);
+    // assert(check_bit(&setA, 5));
+    // set_bit(&setA, 111);
+    // debug_print(&setA);
+    // assert(check_bit(&setA, 111));
 
-    set_bit(&setB, 3);
-    set_bit(&setB, 4);
-    set_bit(&setB, 5);
-    set_bit(&setB, 111);
-    set_bit(&setB, 99);
-    set_bit(&setB, 30);
+    // set_bit(&setB, 3);
+    // set_bit(&setB, 4);
+    // set_bit(&setB, 5);
+    // set_bit(&setB, 111);
+    // set_bit(&setB, 99);
+    // set_bit(&setB, 30);
 
-	debug_print(&setA);
-	debug_print(&setB);
+	// debug_print(&setA);
+	// debug_print(&setB);
 
-    assert(is_subset_of(&setA, &setB));
+    // assert(is_subset_of(&setA, &setB));
 
-    destroy(&setA);
-    destroy(&setB);
+    // destroy(&setA);
+    // destroy(&setB);
 
     Game game = Game();
     game.go();

@@ -6,7 +6,7 @@ template <typename T>
 struct SmallVector {
     T* data;
     u64 capacity;
-    u64 size = 0;
+    u64 size;
 
     T* begin(void) { return data; }
     T* end(void) { return data + size; }
@@ -22,11 +22,12 @@ struct SmallVector {
         size++;
     }
 
-    SmallVector(T* first_elem, u64 capacity) : data(first_elem), capacity(capacity) {}
+    SmallVector(T* first_elem, u64 capacity) :
+        data(first_elem), capacity(capacity), size(0) {}
 };
 
 template <typename T, u64 N>
-struct SmallVectorN : SmallVector<T> {
+struct DynStackArray : SmallVector<T> {
     T stack_data[N];
 
     SmallVectorN() : SmallVector<T>(stack_data, N) {}

@@ -22,14 +22,14 @@ struct DynamicArray {
     const T* const end(void) const { return reinterpret_cast<const T* const>(this->data) + this->size; }
 };
 
-template <typename T>
-void debug_print(const DynamicArray<T>* self) {
-    for (const T& x : *self) {
-        std::cout << x << " ";
-    }
-    std::cout << " :: size = " << self->size << " :: capacity = " << self->capacity << " :: data @ "
-              << static_cast<void*>(self->data) << std::endl;
-}
+// template <typename T>
+// void debug_print(const DynamicArray<T>* self) {
+//     for (const T& x : *self) {
+//         std::cout << x << " ";
+//     }
+//     std::cout << " :: size = " << self->size << " :: capacity = " << self->capacity << " :: data @ "
+//               << static_cast<void*>(self->data) << std::endl;
+// }
 
 template <typename T>
 static void deallocate(DynamicArray<T>* self) {

@@ -30,10 +30,10 @@ struct BinarySearchResult {
     s64 index = -1;
 };
 
-template <typename T>
-void debug_print(const ArraySet<T>& self) {
-    debug_print(&self.arr);
-}
+// template <typename T>
+// void debug_print(const ArraySet<T>& self) {
+//     debug_print(&self.arr);
+// }
 
 template <typename T>
 BinarySearchResult binary_search(const ArraySet<T>& self, const T& item) {
