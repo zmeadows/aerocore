@@ -5,6 +5,8 @@
 #include "Vector2D.hpp"
 #include "Entity/Player.hpp"
 
+class ComponentManager;
+
 enum JoystickID {
     LEFT_JOYSTICK = 0,
     RIGHT_JOYSTICK,
@@ -60,4 +62,4 @@ void process_input(PlayerInput* input, ButtonRelease button);
 void process_input(PlayerInput* input, JoystickMotion button);
 void process_input(PlayerInput* input, TriggerMotion button);
 
-void tick_player(PlayerInput* input, PlayerState* state, f32 dt);
+void tick_player(ComponentManager* CM, PlayerInput* input, PlayerState* state, f32 dt);

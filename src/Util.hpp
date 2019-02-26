@@ -36,24 +36,23 @@ inline bool rough_equals(f32 x, f32 y, f32 delta) {
 
 template <class T>
 constexpr
-std::string
+std::string_view
 type_name()
 {
     using namespace std;
 #ifdef __clang__
-    std::string p = __PRETTY_FUNCTION__;
-    return std::string(p.data() + 34, p.size() - 34 - 1);
-    //return std::string(p.data() + 57, p.size() - 57 - 1);
+    string_view p = __PRETTY_FUNCTION__;
+    return string_view(p.data() + 34, p.size() - 34 - 1);
 #elif defined(__GNUC__)
-    std::string p = __PRETTY_FUNCTION__;
+    string_view p = __PRETTY_FUNCTION__;
 #  if __cplusplus < 201402
-    return std::string(p.data() + 36, p.size() - 36 - 1);
+    return string_view(p.data() + 36, p.size() - 36 - 1);
 #  else
-    return std::string(p.data() + 49, p.find(';', 49) - 49);
+    return string_view(p.data() + 49, p.find(';', 49) - 49);
 #  endif
 #elif defined(_MSC_VER)
-    std::string p = __FUNCSIG__;
-    return std::string(p.data() + 113, p.size() - 113 - 7);
+    string_view p = __FUNCSIG__;
+    return string_view(p.data() + 84, p.size() - 84 - 7);
 #endif
 }
 

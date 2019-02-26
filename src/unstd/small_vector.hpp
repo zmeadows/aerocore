@@ -3,7 +3,7 @@
 #include "unstd/unstdlib.hpp"
 
 template <typename T>
-struct SmallVector {
+struct DynamicArray {
     T* data;
     u64 capacity;
     u64 size;
@@ -27,7 +27,8 @@ struct SmallVector {
 };
 
 template <typename T, u64 N>
-struct DynStackArray : SmallVector<T> {
+struct DynamicStackaRray : SmallVector<T> {
+    // use union with T* for heap-allocated overflow
     T stack_data[N];
 
     SmallVectorN() : SmallVector<T>(stack_data, N) {}

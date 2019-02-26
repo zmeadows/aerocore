@@ -1,16 +1,12 @@
 #include "System/DamageSystem.hpp"
 
 #include "Component/Common.hpp"
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 
-void run(DamageSystem& self) {
-    auto CM = get_manager();
+void DamageSystem::run(ComponentManager* CM, f32 dt) {
+    this->followed_copy.copy_from(this->followed);
 
-    for (const UUID uuid : self.base.followed) {
-        append(&self.followed_copy, uuid);
-    }
-
-    for (const UUID& uuid : self.base.followed) {
+    for (const UUID& uuid : this->followed) {
         auto& damage = CM->get<DamageEvent>(uuid);
         auto& health = CM->get<Health>(uuid);
 
@@ -20,9 +16,7 @@ void run(DamageSystem& self) {
             CM->book<DestructTag>(uuid);
     }
 
-    for (const UUID uuid : self.followed_copy) {
+    for (const UUID uuid : this->followed_copy) {
         CM->remove<DamageEvent>(uuid);
     }
-
-    clear(&self.followed_copy);
 }

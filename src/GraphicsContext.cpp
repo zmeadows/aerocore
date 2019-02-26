@@ -26,7 +26,7 @@ GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f
 
 GraphicsContext::~GraphicsContext(void) {
     DEBUG("Destroying GraphicsContext...");
-    SDL_GameControllerClose(gamepad);
+    // SDL_GameControllerClose(gamepad);
     GPU_Quit();
 }
 

@@ -1,16 +1,14 @@
 #include "System/QuadTreeUpdateSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
+#include "QuadTree.hpp"
 
-void run(QuadTreeUpdateSystem& self) {
-    auto CM = get_manager();
-
-    get_quad_tree()->reset();
-
-    for (const UUID uuid : self.base.followed) {
+void QuadTreeUpdateSystem::par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) {
+    for (const UUID uuid : entities) {
         auto& entity = CM->get<Entity>(uuid);
         auto& cd = CM->get<CollisionData>(uuid);
 
-        cd.node = get_quad_tree()->insert_entity(uuid, clip_to_screen(entity.extent));
+        cd.node = QT->insert_entity(uuid, clip_to_screen(entity.extent));
     }
 }
+void QuadTreeUpdateSystem::pre() { QT->reset(); }

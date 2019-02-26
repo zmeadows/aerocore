@@ -1,12 +1,16 @@
 #pragma once
 
-#include "System.hpp"
-#include "Component/Common.hpp"
-#include "Component/CollisionData.hpp"
+#include "Engine/System.hpp"
 
-struct DrawCollisionGeometrySystem {
-    System base = System("DrawCollisionGeometry");
+class GraphicsContext;
+struct CollisionData;
+struct Entity;
+
+struct DrawCollisionGeometrySystem final : System {
+    GraphicsContext* GC;
+    DrawCollisionGeometrySystem(GraphicsContext* _GC)
+        : GC(_GC), System("DrawCollisionGeometry") {}
+    void run(ComponentManager* CM, float dt);
     SUBSCRIBE(Entity, CollisionData);
 };
 
-void run(DrawCollisionGeometrySystem&);

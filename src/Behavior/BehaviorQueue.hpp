@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Globals.hpp"
 #include "Behavior/Pause.hpp"
 
 #include <variant>

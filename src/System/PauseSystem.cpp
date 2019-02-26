@@ -1,12 +1,10 @@
 #include "System/PauseSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 #include "Component/Common.hpp"
 
-void run(PauseSystem& self, f32 dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void PauseSystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID uuid : this->followed) {
         auto& pause = CM->get<PauseBehavior>(uuid);
 
         pause.time_left -= dt;
@@ -16,13 +14,13 @@ void run(PauseSystem& self, f32 dt) {
             transition.next_state_id = pause.next_state_id;
             transition.extra_time = -1 * pause.time_left;
 
-            append(&self.finished, uuid);
+            this->finished.append(uuid);
         }
     }
 
-    for (const UUID uuid : self.finished) {
+    for (const UUID uuid : this->finished) {
         CM->remove<PauseBehavior>(uuid);
     }
 
-    clear(&self.finished);
+    this->finished.clear();
 }

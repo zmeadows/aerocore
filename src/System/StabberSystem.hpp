@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component/Common.hpp"
-#include "Globals.hpp"
 
 // class StabberSystem final : public System {
 // public:

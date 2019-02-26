@@ -1,12 +1,12 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Component/Common.hpp"
 
-struct StateTransitionCleanupSystem {
-    System base = System("StateTransitionCleanup");
+struct StateTransitionCleanupSystem final : System {
+    StateTransitionCleanupSystem() : System("StateTransitionCleanup") {}
+    void run(ComponentManager* CM, float dt);
     DynamicArray<UUID> followed_copy;
     SUBSCRIBE(StateTransition);
 };
 
-void run(StateTransitionCleanupSystem&);

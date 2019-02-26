@@ -76,7 +76,7 @@ v2 v2::rotated(f32 angle) const {
 }
 
 f32 v2::magnitude(void) const {
-    return std::sqrtf(x * x + y * y);
+    return sqrtf(x * x + y * y);
 }
 
 v2 v2::normalized(void) const {

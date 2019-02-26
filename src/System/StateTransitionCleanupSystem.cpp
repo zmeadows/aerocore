@@ -1,17 +1,15 @@
 #include "System/StateTransitionCleanupSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 
-void run(StateTransitionCleanupSystem& self) {
-    auto CM = get_manager();
-
-    for (const UUID& uuid : self.base.followed) {
-        append(&self.followed_copy, uuid);
+void StateTransitionCleanupSystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID& uuid : this->followed) {
+        this->followed_copy.append(uuid);
     }
 
-    for (const UUID uuid : self.followed_copy) {
+    for (const UUID uuid : this->followed_copy) {
         CM->remove<StateTransition>(uuid);
     }
 
-    clear(&self.followed_copy);
+    this->followed_copy.clear();
 }

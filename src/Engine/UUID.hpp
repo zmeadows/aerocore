@@ -1,11 +1,12 @@
 #pragma once
 
+#include <algorithm>
+#include <atomic>
 #include <cstdint>
 #include <iostream>
 #include <set>
-#include <algorithm>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "unstd/types.hpp"
 
@@ -15,9 +16,9 @@
 class UUID {
 public:
     using rep = u32;
-    static rep m_nextID;
+    static std::atomic<rep> m_nextID;
 
-    UUID(void) : m_ID(m_nextID++) {}
+    UUID(void) : m_ID(m_nextID.fetch_add(1)) {}
 
     UUID(const UUID& rhs) : m_ID(rhs.m_ID) {}
     UUID(UUID&& rhs) : m_ID(rhs.m_ID) {}

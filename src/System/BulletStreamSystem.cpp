@@ -1,12 +1,11 @@
 #include "System/BulletStreamSystem.hpp"
 
 #include "Bullet/Bullet.hpp"
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
+#include "AudioContext.hpp"
 
-void run(BulletStreamSystem& self, float dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void BulletStreamSystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID uuid : this->followed) {
         auto& entity = CM->get<Entity>(uuid);
         auto& bstream = CM->get<BulletStream>(uuid);
 
@@ -23,7 +22,7 @@ void run(BulletStreamSystem& self, float dt) {
                 const v2 bullet_position = shooter_position + spec.shooter_offset.rotated(shooter_angle);
                 const v2 bullet_velocity = spec.velocity.rotated(shooter_angle);
 
-                generate_bullet(spec.type, bullet_position, bullet_velocity, friendly);
+                generate_bullet(CM, AC, SC, spec.type, bullet_position, bullet_velocity, friendly);
             }
 
             if (bstream.cycles_left > 0)
@@ -33,16 +32,16 @@ void run(BulletStreamSystem& self, float dt) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = bstream.next_state_id;
                 transition.extra_time = -1.f * bstream.current_countdown;
-                append(&self.finished, uuid);
+                this->finished.append(uuid);
             } else {
                 bstream.current_countdown += bstream.delay_per_bullet;
             }
         }
     }
 
-    for (const UUID uuid : self.finished) {
+    for (const UUID uuid : this->finished) {
         CM->remove<BulletStream>(uuid);
     }
 
-    clear(&self.finished);
+    this->finished.clear();
 }

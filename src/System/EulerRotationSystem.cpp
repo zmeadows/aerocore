@@ -1,12 +1,10 @@
 #include "System/EulerRotationSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 #include "Component/Common.hpp"
 
-void run(EulerRotationSystem& self, f32 dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void EulerRotationSystem::par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) {
+    for (const UUID uuid : entities) {
         const auto& rot    = CM->get<EulerRotation>(uuid);
         auto& update       = CM->get<RotationUpdate>(uuid);
 

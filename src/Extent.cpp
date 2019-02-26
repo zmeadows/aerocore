@@ -33,7 +33,7 @@ Extent clip_to_screen(const Extent& ext) {
 Extent extent_of(const DynamicArray<v2>& global_vertices) {
     Extent ext;
 
-    for (size_t i = 0; i < global_vertices.size; i++) {
+    for (size_t i = 0; i < global_vertices.size(); i++) {
         ext.minX = min(ext.minX, global_vertices[i].x);
         ext.maxX = max(ext.maxX, global_vertices[i].x);
         ext.minY = min(ext.minY, global_vertices[i].y);
@@ -44,10 +44,11 @@ Extent extent_of(const DynamicArray<v2>& global_vertices) {
 }
 
 Extent extent_of(const LocalVertexBuffer* local_vertices, v2 position, f32 angle) {
-    //TODO: don't allocate temporary memory here, that's stupid.
+    //TODO: use SmallVector here
     DynamicArray<v2> gvs = compute_global_vertices(local_vertices, position, angle);
-    Defer(deallocate(&gvs));
-    return extent_of(gvs);
+    const Extent ext = extent_of(gvs);
+    gvs.deallocate();
+    return ext;
 }
 
 bool is_offscreen(const Extent& ext) {

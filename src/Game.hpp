@@ -5,6 +5,12 @@
 #include "Entity/Player.hpp"
 #include "Entity/Twister.hpp"
 
+#include "Engine/ComponentManager.hpp"
+#include "QuadTree.hpp"
+#include "AudioContext.hpp"
+#include "SpriteCache.hpp"
+#include "GraphicsContext.hpp"
+
 #include "System/BulletStreamSystem.hpp"
 #include "System/CollisionSystem.hpp"
 #include "System/DamageSystem.hpp"
@@ -23,7 +29,14 @@
 #include "System/StateTransitionCleanupSystem.hpp"
 #include "System/TranslationSplineSystem.hpp"
 
+
 struct Game {
+    ComponentManager CM;
+    QuadTree QT;
+    AudioContext AC;
+    GraphicsContext GC;
+    SpriteCache SC;
+
     u64 m_preSystemRunTicks;
     u64 m_postSystemRunTicks;
     u64 m_frames_elapsed;

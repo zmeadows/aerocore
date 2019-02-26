@@ -1,12 +1,10 @@
 #include "System/PositionUpdateSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 
 //TODO: factor out Extent and create separate ExtentUpdateSystem?
-void run(PositionUpdateSystem& self) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void PositionUpdateSystem::par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) {
+    for (const UUID uuid : entities) {
         auto& entity = CM->get<Entity>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

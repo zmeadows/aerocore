@@ -1,13 +1,13 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "unstd/DynamicArray.hpp"
 #include "Component/Common.hpp"
 
-struct InvincibilitySystem {
-    System base = System("Invincibility");
+struct InvincibilitySystem final : System {
+    InvincibilitySystem() : System("Invincibility") {}
+    void run(ComponentManager* CM, f32 dt);
     DynamicArray<UUID> finished;
     SUBSCRIBE(Sprite, Invincibility);
 };
 
-void run(InvincibilitySystem&, f32 dt);

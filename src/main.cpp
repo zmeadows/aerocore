@@ -3,10 +3,13 @@
 #include <assert.h>
 #include <cstdio>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
+#include "unstd/ArraySet.hpp"
 #include "unstd/DenseHashTable.hpp"
 #include "unstd/DynamicBitSet.hpp"
-#include "BucketArray.hpp"
+#include "unstd/BucketArray.hpp"
 #include "Random.hpp"
 
 /*
@@ -120,7 +123,7 @@ void test_table(int entries, int times) {
 // }
 
 int main(int argc, char** argv) {
-    srand(static_cast<unsigned>(9999));
+    srand (static_cast <unsigned> (time(0)));
 
     // test_ArraySet();
     // test_DynamicArray();

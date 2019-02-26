@@ -1,13 +1,13 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Spline.hpp"
 #include "Component/Common.hpp"
 
-struct TranslationSplineSystem {
-    System base = System("TranslationSpline");
+struct TranslationSplineSystem final : System {
+    TranslationSplineSystem() : System("TranslationSpline") {}
+    void run(ComponentManager* CM, float dt);
     DynamicArray<UUID> finished;
     SUBSCRIBE(Entity, TranslationSpline, PositionUpdate);
 };
 
-void run(TranslationSplineSystem&, f32 dt);

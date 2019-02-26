@@ -3,8 +3,9 @@
 #include <array>
 #include <memory>
 #include <set>
+#include <mutex>
 
-#include "UUID.hpp"
+#include "Engine/UUID.hpp"
 #include "Extent.hpp"
 #include "unstd/DynamicArray.hpp"
 
@@ -12,6 +13,7 @@ struct QuadNode {
     const unsigned c_depth;
     const float c_x, c_y, c_w;
     bool m_hasChildren;
+    std::mutex m_mutex;
     DynamicArray<UUID> m_containedUUIDs;
 
     QuadNode* m_parent = nullptr;
@@ -23,9 +25,9 @@ struct QuadNode {
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext);
 
     bool has_parent(const QuadNode* node) const;
-    void retrieve(DynamicArray<UUID>* candidates, const UUID collider);
-    void retrieve_from_parents(DynamicArray<UUID>* candidatess, const UUID collider);
-    void retrieve_from_children(DynamicArray<UUID>* candidatess, const UUID collider);
+    void retrieve(DynamicArray<UUID>* candidates, const UUID collider) const;
+    void retrieve_from_parents(DynamicArray<UUID>* candidatess, const UUID collider) const;
+    void retrieve_from_children(DynamicArray<UUID>* candidatess, const UUID collider) const;
 
     QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
         c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {}

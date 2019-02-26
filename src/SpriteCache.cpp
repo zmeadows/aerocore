@@ -1,16 +1,16 @@
 #include "SpriteCache.hpp"
 
+#include "Component/CollisionData.hpp"
+#include "Component/Common.hpp"
+#include "Engine/UUID.hpp"
+#include "Geometry.hpp"
+#include "Engine/ComponentManager.hpp"
+
 #include <cstdio>
 #include <string>
 #include <vector>
 
 #include "tinyxml2/tinyxml2.h"
-
-#include "Globals.hpp"
-#include "Geometry.hpp"
-
-#include "Component/Common.hpp"
-#include "Component/CollisionData.hpp"
 
 namespace {
 
@@ -132,9 +132,7 @@ void SpriteCache::build_sprite(const std::string& key, const char* png_file, con
     _store[key] = entry;
 }
 
-void SpriteCache::attach_sprite_to_uuid(UUID uuid, const std::string& key) {
-    auto CM = get_manager();
-
+void SpriteCache::attach_sprite_to_uuid(ComponentManager* CM, UUID uuid, const std::string& key) {
     assert(_store.find(key) != _store.end());
     const SpriteCache::Entry& entry = _store[key];
 

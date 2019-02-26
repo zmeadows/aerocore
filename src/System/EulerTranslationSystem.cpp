@@ -1,12 +1,10 @@
 #include "System/EulerTranslationSystem.hpp"
 
 #include "Component/Common.hpp"
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 
-void run(EulerTranslationSystem& self, float dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void EulerTranslationSystem::par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) {
+    for (const UUID uuid : entities) {
         auto& kin    = CM->get<EulerTranslation>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
 

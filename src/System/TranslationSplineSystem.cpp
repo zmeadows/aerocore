@@ -1,13 +1,11 @@
 #include "System/TranslationSplineSystem.hpp"
 
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 #include "Spline.hpp"
 #include "Component/Common.hpp"
 
-void run(TranslationSplineSystem& self, f32 dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void TranslationSplineSystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID uuid : this->followed) {
         auto& spline = CM->get<TranslationSpline>(uuid);
         auto& update = CM->get<PositionUpdate>(uuid);
         const auto& entity = CM->get<Entity>(uuid);
@@ -17,7 +15,7 @@ void run(TranslationSplineSystem& self, f32 dt) {
         update.delta = result.new_point - entity.pos;
 
         if (result.finished) {
-            append(&self.finished, uuid);
+            this->finished.append(uuid);
             if (spline.next_state_id >= 0) {
                 auto& transition = CM->book<StateTransition>(uuid);
                 transition.next_state_id = spline.next_state_id;
@@ -26,9 +24,9 @@ void run(TranslationSplineSystem& self, f32 dt) {
         }
     }
 
-    for (const UUID uuid : self.finished) {
+    for (const UUID uuid : this->finished) {
         CM->remove<TranslationSpline>(uuid);
     }
 
-    clear(&self.finished);
+    this->finished.clear();
 }

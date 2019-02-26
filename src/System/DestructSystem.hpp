@@ -1,12 +1,11 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Component/Common.hpp"
 
-struct DestructSystem {
-    System base = System("Destruct");
+struct DestructSystem final : System {
+    DestructSystem() : System("Destruct") {}
     DynamicArray<UUID> followed_copy;
+    void run(ComponentManager* CM, float dt);
     SUBSCRIBE(DestructTag);
 };
-
-void run(DestructSystem&);

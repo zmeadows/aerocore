@@ -1,13 +1,14 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "unstd/DynamicArray.hpp"
-#include "Component/Common.hpp"
 
-struct PauseSystem {
-    System base = System("Pause");
+struct PauseBehavior;
+
+struct PauseSystem final : System {
+    PauseSystem() : System("Pause") {}
+    void run(ComponentManager* CM, float dt);
     DynamicArray<UUID> finished;
     SUBSCRIBE(PauseBehavior);
 };
 
-void run(PauseSystem&, f32 dt);

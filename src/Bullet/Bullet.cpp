@@ -1,17 +1,20 @@
 #include "Bullet/Bullet.hpp"
-#include "Geometry.hpp"
-#include "Globals.hpp"
 
+#include "AudioContext.hpp"
 #include "Component/Common.hpp"
 #include "Component/OffscreenBehavior.hpp"
+#include "Engine/ComponentManager.hpp"
+#include "Geometry.hpp"
+#include "SpriteCache.hpp"
 
-UUID generate_bullet(BulletType bullet_type,
+UUID generate_bullet(ComponentManager* CM,
+                     AudioContext* AC,
+                     SpriteCache* SC,
+                     BulletType bullet_type,
                      const v2 new_bullet_position,
                      const v2 new_bullet_velocity,
                      bool friendly)
 {
-    auto CM = get_manager();
-
     UUID uuid;
 
     auto& entity = CM->book<Entity>(uuid);
@@ -27,18 +30,16 @@ UUID generate_bullet(BulletType bullet_type,
 
     switch (bullet_type) {
         case PLAYER_BULLET: {
-            get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_player");
-            get_audio_context()->play(SoundEffect_ShotFired);
+            SC->attach_sprite_to_uuid(CM, uuid, "bullet_player");
+            AC->play(SoundEffect_ShotFired);
             break;
         }
 
         case ENEMY_BULLET: {
-            get_sprite_cache()->attach_sprite_to_uuid(uuid, "bullet_enemy");
+            SC->attach_sprite_to_uuid(CM, uuid, "bullet_enemy");
             break;
         }
     }
-
-    CM->book<CollideDamage>(uuid);
 
     return uuid;
 }

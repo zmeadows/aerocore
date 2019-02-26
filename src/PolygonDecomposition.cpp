@@ -31,7 +31,7 @@ AxisProjection project_on(const DynamicArray<v2>& global_vertices, const Polygon
 
     for (auto idx = 0; idx < polygon.count; idx++) {
         const auto gidx = polygon.indices[idx];
-        assert(gidx < global_vertices.size);
+        assert(gidx < global_vertices.size());
         const f32 projection = global_vertices[gidx].dot(axis);
         minProjection = std::min(projection, minProjection);
         maxProjection = std::max(projection, maxProjection);
@@ -58,8 +58,8 @@ void fill_polygon_normals(const DynamicArray<v2>& global_vertices, const Polygon
         const auto idx1 = polygon.indices[(i + 1) % num_vertices];
         const auto idx2 = polygon.indices[i];
 
-        assert(idx1 < global_vertices.size);
-        assert(idx2 < global_vertices.size);
+        assert(idx1 < global_vertices.size());
+        assert(idx2 < global_vertices.size());
 
         v2 ov = global_vertices[idx1] - global_vertices[idx2];
         normals[i] = {-ov.y, ov.x};
@@ -83,6 +83,7 @@ void dump(const PolygonDecomposition* decomp) {
 PolygonDecomposition decompose_local_vertices(const LocalVertexBuffer* local_vertices) {
     const u32 vertex_count = local_vertices->count;
 
+    // OPTIMIZE: use SmallVector
     std::vector<std::vector<u32>> final_indices;
 
     std::vector<u32> remaining_indices;

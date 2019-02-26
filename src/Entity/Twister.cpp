@@ -1,7 +1,7 @@
 #include "Entity/Twister.hpp"
 
 #include "Bullet/Bullet.hpp"
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 #include "Random.hpp"
 #include "Spline.hpp"
 #include "SpriteCache.hpp"
@@ -10,7 +10,7 @@
 namespace {
 
 inline v2 random_position(void) {
-    return {uniform_random(-75, 75), uniform_random(-75, 75)};
+    return {uniform_random<f32>(-75, 75), uniform_random<f32>(-75, 75)};
 }
 
 }
@@ -24,15 +24,13 @@ enum State {
     PauseAfterFiring
 };
 
-void generate(void) {
+void generate(ComponentManager* CM, SpriteCache* SC) {
     UUID uuid;
 
-    auto CM = get_manager();
-
     auto& entity = CM->book<Entity>(uuid);
-    entity.pos = {uniform_random(-100, 100), 130.f};
+    entity.pos = {uniform_random<f32>(-100, 100), 130.f};
 
-    get_sprite_cache()->attach_sprite_to_uuid(uuid, "twister_idle");
+    SC->attach_sprite_to_uuid(CM, uuid, "twister_idle");
 
     CM->book<Twister::Tag>(uuid);
     CM->book<Health>(uuid);
@@ -45,10 +43,8 @@ void generate(void) {
     CM->book<CollideDamage>(uuid);
 }
 
-void run(StateMachineSystem& self) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void StateMachineSystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID uuid : this->followed) {
         const auto& transition = CM->get<StateTransition>(uuid);
 
         switch (transition.next_state_id) {

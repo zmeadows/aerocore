@@ -15,7 +15,7 @@ void drawQuadTree(GraphicsContext* GC, const QuadTree* quadTree) {
 
 void drawQuadNodes(GraphicsContext* GC, const QuadNode* node, const bool draw_empty) {
 
-    const u32 num_entities = node->m_containedUUIDs.size;
+    const u32 num_entities = node->m_containedUUIDs.size();
 
     if (
         (!draw_empty && num_entities > 0)
@@ -35,6 +35,7 @@ void drawQuadNodes(GraphicsContext* GC, const QuadNode* node, const bool draw_em
         const v2 p3 = { node->c_x + node->c_w, node->c_y - node->c_w};
         const v2 p4 = { node->c_x, node->c_y - node->c_w };
 
+        // TODO: simplify using length-4 array
         ScreenCoordinates sc1 = GC->to_screen_coords(p1);
         ScreenCoordinates sc2 = GC->to_screen_coords(p2);
         ScreenCoordinates sc3 = GC->to_screen_coords(p3);

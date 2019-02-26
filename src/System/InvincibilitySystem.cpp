@@ -1,12 +1,10 @@
 #include "System/InvincibilitySystem.hpp"
 
 #include "Component/Common.hpp"
-#include "Globals.hpp"
+#include "Engine/ComponentManager.hpp"
 
-void run(InvincibilitySystem& self, f32 dt) {
-    auto CM = get_manager();
-
-    for (const UUID uuid : self.base.followed) {
+void InvincibilitySystem::run(ComponentManager* CM, f32 dt) {
+    for (const UUID uuid : this->followed) {
         auto& sprite = CM->get<Sprite>(uuid);
         auto& flash = CM->get<Invincibility>(uuid);
 
@@ -19,12 +17,12 @@ void run(InvincibilitySystem& self, f32 dt) {
         }
 
 		if (flash.num_flashes == 0)
-            append(&self.finished, uuid);
+            this->finished.append(uuid);
     }
 
-	for (const UUID uuid : self.finished) {
+	for (const UUID uuid : this->finished) {
         CM->remove<Invincibility>(uuid);
 	}
 
-    clear(&self.finished);
+    this->finished.clear();
 }

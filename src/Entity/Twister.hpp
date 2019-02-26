@@ -1,6 +1,6 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Component/Common.hpp"
 #include "Component/OffscreenBehavior.hpp"
 #include "Component/BulletStream.hpp"
@@ -8,13 +8,12 @@
 namespace Twister {
 
 struct Tag {};
-void generate(void);
+void generate(ComponentManager*, SpriteCache*);
 
-struct StateMachineSystem {
-    System base = System("Twister::StateMachine");
+struct StateMachineSystem final : System {
+    StateMachineSystem() : System("Twister::StateMachine") {}
+    void run(ComponentManager*, f32 dt);
     SUBSCRIBE(Entity, StateTransition, Twister::Tag);
 };
-
-void run(StateMachineSystem& self);
 
 }

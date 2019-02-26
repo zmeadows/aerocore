@@ -1,12 +1,12 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Component/Common.hpp"
 #include "Component/OffscreenBehavior.hpp"
 
-struct OffscreenBehaviorSystem {
-    System base = System("OffscreenBehavior");
+struct OffscreenBehaviorSystem final : System {
+    OffscreenBehaviorSystem() : System("OffscreenBehavior") {}
+    void run(ComponentManager* CM, float dt);
     SUBSCRIBE(Entity, OffscreenBehavior, PositionUpdate);
 };
 
-void run(OffscreenBehaviorSystem&);

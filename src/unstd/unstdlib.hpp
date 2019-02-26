@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <atomic>
 
 #include "unstd/types.hpp"
 #include "unstd/Defer.hpp"
@@ -36,6 +37,21 @@ template <typename T>
 T* memallocz(u64 count) {
     return static_cast<T*>(calloc(count, sizeof(T)));
 }
+
+class TypeIndexer {
+    std::atomic<u32> m_nextIndex;
+
+    inline u32 newIndex(void) {
+        return m_nextIndex.fetch_add(1);
+    }
+public:
+
+    template <typename T>
+    inline u32 operator()(void) {
+        static const u32 idx = newIndex();
+        return idx;
+    }
+};
 
 // u64 modulo(s64 i, s64 n) {
 //     return static_cast<u64>((i % n + n) % n);

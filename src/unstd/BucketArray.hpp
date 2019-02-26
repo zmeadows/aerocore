@@ -81,15 +81,15 @@ std::ostream& operator<<(std::ostream& os, const BucketIndex index);
 
 struct BucketArrayBase {
     u64 bucket_capacity = 64;
-    DynamicArray<bool> bucket_filled;
     DynamicArray<BucketBase*> buckets;
+    DynamicArray<bool> bucket_filled;
 
     static void destroy(BucketArrayBase* self) {
         for (BucketBase* bucket : self->buckets)
             BucketBase::destroy(bucket);
 
-        deallocate(&self->buckets);
-        deallocate(&self->bucket_filled);
+        self->buckets.deallocate();
+        self->bucket_filled.deallocate();
     }
 };
 
@@ -103,10 +103,10 @@ struct BucketArray : BucketArrayBase {
         new_array.bucket_capacity = bucket_size;
 
         new_array.buckets = DynamicArray<BucketBase*>();
-        reserve_memory(&new_array.buckets, 4);
+        new_array.buckets.reserve(4);
 
         new_array.bucket_filled = DynamicArray<bool>();
-        reserve_memory(&new_array.bucket_filled, 4);
+        new_array.bucket_filled.reserve(4);
 
         return new_array;
     }
@@ -117,7 +117,7 @@ struct BucketArray : BucketArrayBase {
 
 template <typename T, typename... Args>
 const BucketIndex insert(BucketArray<T>* self, Args&&... args) {
-    for (u16 bucket_id = 0; bucket_id < self->buckets.size; bucket_id++) {
+    for (u16 bucket_id = 0; bucket_id < self->buckets.size(); bucket_id++) {
         Bucket<T>* bucket = static_cast<Bucket<T>*>(self->buckets[bucket_id]);
 
         if (!is_full(bucket)) {
@@ -130,13 +130,13 @@ const BucketIndex insert(BucketArray<T>* self, Args&&... args) {
     // So make a new bucket.
     auto bucket = Bucket<T>::allocate(self->bucket_capacity);
     insert_in_bucket(bucket, args...);
-    append(&self->buckets, bucket);
-    return BucketIndex { (u16) (self->buckets.size - 1), 0};
+    self->buckets.append(bucket);
+    return BucketIndex { (u16) (self->buckets.size() - 1), 0};
 }
 
 template <typename T>
 inline T& BucketArray<T>::operator[](const BucketIndex index) {
-    assert(index.bucket < this->buckets.size && "BucketIndex points to invalid bucket!");
+    assert(index.bucket < this->buckets.size() && "BucketIndex points to invalid bucket!");
     Bucket<T>* bucket = static_cast<Bucket<T>*>(this->buckets[index.bucket]);
     return (*bucket)[index.slot];
 }

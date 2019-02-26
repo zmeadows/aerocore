@@ -4,7 +4,6 @@
 #include "unstd/DynamicArray.hpp"
 
 #include "Component/Common.hpp"
-#include "Globals.hpp"
 #include "Vector2D.hpp"
 
 namespace {

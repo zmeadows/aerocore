@@ -1,5 +1,4 @@
 #include "System/StabberSystem.hpp"
-#include "Globals.hpp"
 #include "Component/Common.hpp"
 
 #include <math.h>

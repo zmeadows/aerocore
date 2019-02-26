@@ -2,6 +2,7 @@
 
 #include "unstd/types.hpp"
 #include "Bullet/Bullet.hpp"
+#include "Vector2D.hpp"
 
 struct BulletSpec {
     BulletType type = PLAYER_BULLET;

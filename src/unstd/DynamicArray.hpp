@@ -3,151 +3,173 @@
 #include "unstd/unstdlib.hpp"
 #include <assert.h>
 
-// #define DEBUG_ARRAY(x) \
-//     (std::cout << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
-#define DEBUG_ARRAY(x)
-
+// TODO: add stack storage
 template <typename T>
-struct DynamicArray {
+class DynamicArray {
+    using Self = DynamicArray<T>;
+
     u8* data = nullptr;
     u64 capacity = 0;
-    u64 size = 0;
+    u64 count = 0;
 
-    inline T& operator[](u64 idx);
-    inline const T& operator[](u64 idx) const;
+public:
+    T* raw(void) {
+        return reinterpret_cast<T*>(this->data);
+    }
 
-    T* begin(void) { return reinterpret_cast<T*>(this->data); }
-    T* end(void) { return reinterpret_cast<T*>(this->data) + this->size; }
-    const T* const begin(void) const { return reinterpret_cast<const T* const>(this->data); }
-    const T* const end(void) const { return reinterpret_cast<const T* const>(this->data) + this->size; }
-};
+    const T* const raw(void) const {
+        return reinterpret_cast<const T* const>(this->data);
+    }
 
-// template <typename T>
-// void debug_print(const DynamicArray<T>* self) {
-//     for (const T& x : *self) {
-//         std::cout << x << " ";
-//     }
-//     std::cout << " :: size = " << self->size << " :: capacity = " << self->capacity << " :: data @ "
-//               << static_cast<void*>(self->data) << std::endl;
-// }
+    void grow(void) {
+        Self& self = *this;
+        if (self.count < self.capacity) return;
 
-template <typename T>
-static void deallocate(DynamicArray<T>* self) {
-    free(self->data);
-    self->capacity = 0;
-    self->size = 0;
-}
+        static const f64 GROWTH_RATIO = 1.6180339887498948482;
 
-template <typename T>
-void reserve_memory(DynamicArray<T>* self, u64 new_capacity) {
-    if (new_capacity > self->capacity) {
-        u8* new_data = memalloc<u8, T>(new_capacity);
+        if (self.capacity == 0) {
+            self.reserve((u64) 2);
+        } else {
+            const u64 new_capacity = (u64) (GROWTH_RATIO * (f64) self.capacity);
+            self.reserve(new_capacity);
+        }
+    }
 
-        T* new_data_cast = reinterpret_cast<T*>(new_data);
-        T* old_data_cast = reinterpret_cast<T*>(self->data);
+    static Self init(u64 init_capacity) {
+        Self new_array;
+        new_array.reserve(init_capacity);
+        return new_array;
+    }
 
-        for (u64 idx = 0; idx < self->size; idx++) {
-            new (&(new_data_cast[idx])) T(old_data_cast[idx]);
+    void deallocate(void) {
+        Self& self = *this;
+        free(self.data);
+        self.data = nullptr;
+        self.capacity = 0;
+        self.count = 0;
+    }
+
+
+    void reserve(u64 new_capacity) {
+        Self& self = *this;
+
+        if (new_capacity > self.capacity) {
+            u8* new_data = memalloc<u8, T>(new_capacity);
+
+            T* new_data_cast = reinterpret_cast<T*>(new_data);
+            T* old_data_cast = reinterpret_cast<T*>(self.data);
+
+            for (u64 idx = 0; idx < self.count; idx++) {
+                new (&(new_data_cast[idx])) T(old_data_cast[idx]);
+            }
+
+            free(old_data_cast);
+            self.data = new_data;
+            self.capacity = new_capacity;
+        }
+    }
+
+    template <class... Args>
+    void append(Args&&... args) {
+        Self& self = *this;
+
+        self.grow();
+
+        T* data_cast = reinterpret_cast<T*>(self.data);
+        new (&(data_cast[self.count])) T(args...);
+        self.count++;
+    }
+
+    void copy_from(const Self& other) {
+        Self& self = *this;
+
+        self.clear();
+        self.reserve(other.count);
+        for (const T& item : other) {
+            self.append(item);
+        }
+    }
+
+    inline void clear(void) {
+        this->count = 0;
+    }
+
+    inline u64 size(void) const {
+        return this->count;
+    }
+
+    inline T& operator[](u64 idx) {
+        assert(idx < this->count);
+        T* cast_data = reinterpret_cast<T*>(this->data);
+        return cast_data[idx];
+    }
+
+    inline const T& operator[](u64 idx) const {
+        assert(idx < this->count);
+        const T* const cast_data = reinterpret_cast<const T* const>(this->data);
+        return cast_data[idx];
+    }
+
+    inline bool contains(const T& value) {
+        for (const T& x : *this) {
+            if (x == value)
+                return true;
+        }
+        return false;
+    }
+
+    inline u64 allocated(void) const {
+        return this->capacity;
+    }
+
+    void insert_at(const T& value, u64 idx) {
+        Self& self = *this;
+
+        assert(idx <= self.count);
+
+        self.grow();
+
+        self.count++;
+
+        //TODO: use memcpy
+        for (u64 i = self.count - 1; i > idx; i--) {
+            self[i] = self[i - 1];
         }
 
-        free(old_data_cast);
-        self->data = new_data;
-        self->capacity = new_capacity;
-    }
-}
-
-template <typename T>
-u64 size(const DynamicArray<T>* self) {
-    return self->size;
-}
-
-template <typename T>
-void clear(DynamicArray<T>* self) {
-    self->size = 0;
-}
-
-template <typename T>
-inline T& DynamicArray<T>::operator[](u64 idx) {
-    assert(idx < this->size);
-    T* cast_data = reinterpret_cast<T*>(this->data);
-    return cast_data[idx];
-}
-
-template <typename T>
-inline const T& DynamicArray<T>::operator[](u64 idx) const {
-    assert(idx < this->size);
-    const T* const cast_data = reinterpret_cast<const T* const>(this->data);
-    return cast_data[idx];
-}
-
-template <typename T>
-DynamicArray<T> copy(const DynamicArray<T>* other) {
-    DynamicArray<T> new_array;
-    reserve_memory(new_array, other.capacity);
-
-    T* const other_data_cast = reinterpret_cast<T*>(other.data);
-    T* this_data_cast = reinterpret_cast<T*>(self->data);
-    for (auto i = 0; i < other.size; i++) {
-        new (&(this_data_cast[i])) T(other_data_cast[i]);
+        T* data_cast = reinterpret_cast<T*>(self.data);
+        new (&(data_cast[idx])) T(value);
     }
 
-    new_array.size = other.size;
+    void remove_at(u64 idx) {
+        Self& self = *this;
 
-    return new_array;
-}
+        assert(idx < self.count && "DynamicArray: Invalid index passed to remove_at!");
 
-template <typename T>
-bool contains(const DynamicArray<T>* self, const T& value) {
-    for (const T& x : self) {
-        if (x == value)
-            return true;
-    }
-    return false;
-}
+        //TODO: use memcpy
+        for (u64 i = idx; i < self.count - 1; i++) {
+            self[i] = self[i + 1];
+        }
 
-template <typename T>
-void insert_at(DynamicArray<T>* self, const T& value, u64 idx) {
-    DEBUG_ARRAY("Insert value " << value << " at index " << idx);
-    assert(idx <= self->size);
-
-    if (self->size == self->capacity) {
-        reserve_memory(self, self->capacity == 0 ? 2 : 2 * self->capacity);
+        self.count--;
     }
 
-    self->size++;
-
-    for (u64 i = self->size - 1; i > idx; i--) {
-        (*self)[i] = (*self)[i - 1];
+    T& back(void) {
+        Self& self = *this;
+        assert(self.count > 0 && "DynamicArray: Called back() on empty array!");
+        return (*this)[this->count - 1];
     }
 
-    T* data_cast = reinterpret_cast<T*>(self->data);
-    new (&(data_cast[idx])) T(value);
-    DEBUG_ARRAY("Finished insert.");
-}
-
-template <typename T>
-void remove_at(DynamicArray<T>* self, u64 idx) {
-    assert(idx < self->size);
-
-    for (u64 i = idx; i < self->size - 1; i++) {
-        (*self)[i] = (*self)[i + 1];
+    const T& back(void) const {
+        const Self& self = *this;
+        assert(self.count > 0 && "DynamicArray: Called (const) back() on empty array!");
+        return (*this)[this->count - 1];
     }
 
-    self->size--;
-}
 
-template <typename T, class... Args>
-void append(DynamicArray<T>* self, Args&&... args) {
-    if (self->size == self->capacity) {
-        reserve_memory(self, max((u64)2, 2 * self->capacity));
-    }
+    T* begin(void) { return reinterpret_cast<T*>(this->data); }
+    T* end(void) { return reinterpret_cast<T*>(this->data) + this->count; }
+    const T* const begin(void) const { return reinterpret_cast<const T* const>(this->data); }
+    const T* const end(void) const { return reinterpret_cast<const T* const>(this->data) + this->count; }
+};
 
-    T* data_cast = reinterpret_cast<T*>(self->data);
-    new (&(data_cast[self->size])) T(args...);
-    self->size++;
-}
 
-template <typename T>
-T& back(DynamicArray<T>* self) {
-    return (*self)[self->size - 1];
-}

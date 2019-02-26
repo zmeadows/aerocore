@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2d.hpp"
+#include "Vector2D.hpp"
 #include "PolygonDecomposition.hpp"
 #include "LocalVertexBuffer.hpp"
 
@@ -8,12 +8,8 @@
 
 #include <unordered_map>
 
-
-struct LocalVertexBuffer;
-struct PolygonDecomposition;
-struct v2;
-struct GPU_Image;
 class UUID;
+class ComponentManager;
 
 struct SpriteCache {
 
@@ -27,7 +23,7 @@ struct SpriteCache {
     std::unordered_map<std::string, Entry> _store;
 
     void build_sprite(const std::string& key, const char* png_filepath, const char* xml_filepath);
-    void attach_sprite_to_uuid(UUID uuid, const std::string& key);
+    void attach_sprite_to_uuid(ComponentManager* CM, UUID uuid, const std::string& key);
 
     SpriteCache();
     ~SpriteCache();

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "System.hpp"
+#include "Engine/System.hpp"
 #include "Component/Common.hpp"
 
-struct RotationUpdateSystem {
-    System base = System("RotationUpdate");
+struct RotationUpdateSystem final : SimpleParallelSystem {
+    RotationUpdateSystem() : SimpleParallelSystem("RotationUpdate") {}
+    void par_run(ComponentManager* CM, const Slice<UUID>& entities, float dt);
     SUBSCRIBE(Entity, RotationUpdate);
 };
 
-void run(RotationUpdateSystem&);

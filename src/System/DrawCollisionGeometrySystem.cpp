@@ -1,27 +1,28 @@
 #include "System/DrawCollisionGeometrySystem.hpp"
 
-#include "Globals.hpp"
+#include "Component/CollisionData.hpp"
+#include "Component/Common.hpp"
+#include "Engine/ComponentManager.hpp"
 #include "PolygonDecomposition.hpp"
+#include "LocalVertexBuffer.hpp"
+#include "GraphicsContext.hpp"
 
 #include <SDL.h>
 
-void run(DrawCollisionGeometrySystem& self) {
-    auto CM = get_manager();
-    auto GC = get_graphics_context();
-
+void DrawCollisionGeometrySystem::run(ComponentManager* CM, f32 dt) {
     SDL_Color polygon_color;
     polygon_color.r = 255;
     polygon_color.g = 0;
     polygon_color.b = 0;
     polygon_color.a = 255;
 
-    for (const UUID uuid : self.base.followed) {
+    for (const UUID uuid : this->followed) {
         const auto& entity = CM->get<Entity>(uuid);
         const auto& coldata = CM->get<CollisionData>(uuid);
 
         //TODO: don't reallocate a DynamicArray for each entity
         DynamicArray<v2> global_vertices = compute_global_vertices(coldata.local_vertices, entity.pos, entity.angle);
-        Defer(deallocate(&global_vertices));
+        Defer(global_vertices.deallocate());
 
         for (u32 pgon = 0; pgon < coldata.poly_decomp->count; pgon++) {
             PolygonRep pr = nth_polygon(coldata.poly_decomp, pgon);
