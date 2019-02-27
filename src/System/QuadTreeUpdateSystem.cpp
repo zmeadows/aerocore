@@ -9,7 +9,7 @@ void QuadTreeUpdateSystem::pre(ComponentManager*) {
 }
 
 void QuadTreeUpdateSystem::par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) {
-    static thread_local DynamicArray<NodeAssociation> thread_node_assocs;
+    static thread_local auto thread_node_assocs = DynamicArray<NodeAssociation>::init(256);
     thread_node_assocs.clear();
 
     for (const UUID uuid : entities) {

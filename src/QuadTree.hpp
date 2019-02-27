@@ -18,7 +18,7 @@ struct QuadNode {
     std::array<std::unique_ptr<QuadNode>, 4> m_childNodes;
 
     void reset(void);
-    bool is_in_node_boundary(const Extent& ext) const;
+    inline bool is_in_node_boundary(const Extent& ext) const;
     void produce_children(const unsigned max_depth);
 
     QuadNode* insert_entity(const UUID& uuid, const Extent& ext);

@@ -10,8 +10,8 @@
 
 #include "unstd/types.hpp"
 
-const f32 TWOPI = 2.f * static_cast<f32>(3.1415926535897932384);
-const f32 PI = static_cast<f32>(3.1415926535897932384);
+static const f32 TWOPI = 2.f * static_cast<f32>(3.1415926535897932384);
+static const f32 PI = static_cast<f32>(3.1415926535897932384);
 
 // #define DEBUG(x) \
 //     (std::cout << std::boolalpha << "[" << __FILE__ << "::" << __LINE__ << "] :: " << x << std::endl)
@@ -30,9 +30,6 @@ inline std::string asset_path(std::string local_path) {
     return std::string(ASSET_PATH) + local_path;
 };
 
-inline bool rough_equals(f32 x, f32 y, f32 delta) {
-    return fabs(x - y) < delta;
-}
 
 template <class T>
 constexpr
