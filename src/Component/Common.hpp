@@ -53,8 +53,8 @@ struct Sprite {
 };
 
 struct Health {
-    f32 maximum = 25.f;
-    f32 current = 25.f;
+    f32 maximum = 999999.f;
+    f32 current = 999999.f;
 
     void modify_by(f32 delta) { current = clamp(current + delta, 0.f, maximum); }
 };

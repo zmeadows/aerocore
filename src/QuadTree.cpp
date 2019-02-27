@@ -12,6 +12,21 @@ void QuadNode::reset(void) {
     }
 }
 
+const QuadNode* QuadNode::find_node(const Extent& ext) const {
+    if (!is_in_node_boundary(ext))
+        return nullptr;
+
+    if (m_hasChildren) {
+        for (auto& node : m_childNodes) {
+            const QuadNode* inserted_node = node->find_node(ext);
+            if (inserted_node)
+                return inserted_node;
+        }
+    }
+
+    return this;
+}
+
 QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     if (!is_in_node_boundary(ext))
         return nullptr;
@@ -24,10 +39,7 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
         }
     }
 
-    {
-        std::scoped_lock<std::mutex> lock(m_mutex);
-        m_containedUUIDs.append(uuid);
-    }
+    m_containedUUIDs.append(uuid);
     return this;
 }
 
