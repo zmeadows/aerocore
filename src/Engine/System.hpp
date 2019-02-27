@@ -46,12 +46,12 @@ struct SimpleParallelSystem : System {
 
     SimpleParallelSystem(const std::string& system_name) : System(system_name) {}
 
-    virtual void pre() {}
+    virtual void pre(ComponentManager* CM) {}
     virtual void par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) = 0;
-    virtual void post() {}
+    virtual void post(ComponentManager* CM) {}
 
     void run(ComponentManager* CM, f32 dt) final {
-        this->pre();
+        this->pre(CM);
 
         std::vector<std::future<void>> results;
 
@@ -63,6 +63,6 @@ struct SimpleParallelSystem : System {
             x.get();
         }
 
-        this->post();
+        this->post(CM);
     }
 };

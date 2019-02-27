@@ -11,4 +11,4 @@ void QuadTreeUpdateSystem::par_run(ComponentManager* CM, const Slice<UUID>& enti
         cd.node = QT->insert_entity(uuid, clip_to_screen(entity.extent));
     }
 }
-void QuadTreeUpdateSystem::pre() { QT->reset(); }
+void QuadTreeUpdateSystem::pre(ComponentManager*) { QT->reset(); }

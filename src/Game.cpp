@@ -78,7 +78,7 @@ bool Game::tick(void) {
 
     quitting = poll_input();
 
-    if (SDL_GetTicks() > last_asteroid_time + 50) {
+    if (SDL_GetTicks() > last_asteroid_time + 200) {
         Twister::generate(&CM, &SC);
         last_asteroid_time = SDL_GetTicks();
     }

@@ -25,7 +25,7 @@ QuadNode* QuadNode::insert_entity(const UUID& uuid, const Extent& ext) {
     }
 
     {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::scoped_lock<std::mutex> lock(m_mutex);
         m_containedUUIDs.append(uuid);
     }
     return this;

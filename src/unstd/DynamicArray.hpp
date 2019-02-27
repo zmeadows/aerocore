@@ -76,7 +76,7 @@ public:
         self.grow();
 
         T* data_cast = reinterpret_cast<T*>(self.data);
-        new (&(data_cast[self.count])) T(args...);
+        new (&(data_cast[self.count])) T(std::forward<Args>(args)...);
         self.count++;
     }
 
@@ -145,7 +145,7 @@ public:
 
         assert(idx < self.count && "DynamicArray: Invalid index passed to remove_at!");
 
-        //TODO: use memcpy
+        //TODO: use memcpy or memmove
         for (u64 i = idx; i < self.count - 1; i++) {
             self[i] = self[i + 1];
         }

@@ -10,10 +10,19 @@
 class QuadTree;
 
 struct CollisionSystem final : SimpleParallelSystem {
-    DynamicArray<UUID> collision_candidates;
     CollisionSystem() : SimpleParallelSystem("Collision") {}
-    void par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt);
-    SUBSCRIBE(Entity, CollisionData, FriendlyTag);
+    void pre(ComponentManager*) final;
+    void par_run(ComponentManager*, const Slice<UUID>& entities, f32 dt) final;
+    void post(ComponentManager*) final;
+
+    struct Collision {
+        UUID friendly;
+        UUID enemy;
+    };
+
     std::mutex m_mutex;
+    DynamicArray<Collision> m_collisions;
+
+    SUBSCRIBE(Entity, CollisionData, FriendlyTag);
 };
 
