@@ -1,0 +1,7 @@
+/home/zac/aerocore/build/debug/CMakeFiles/install/strip.dir
+/home/zac/aerocore/build/debug/CMakeFiles/edit_cache.dir
+/home/zac/aerocore/build/debug/CMakeFiles/aerocore.dir
+/home/zac/aerocore/build/debug/CMakeFiles/rebuild_cache.dir
+/home/zac/aerocore/build/debug/CMakeFiles/list_install_components.dir
+/home/zac/aerocore/build/debug/CMakeFiles/install/local.dir
+/home/zac/aerocore/build/debug/CMakeFiles/install.dir

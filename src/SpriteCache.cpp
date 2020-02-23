@@ -66,7 +66,7 @@ std::vector<std::string> split_string(const std::string& str, const std::string&
     return strings;
 }
 
-SVGParsePathResult parse_svg_path(const char* filepath) {
+SVGParsePathResult parse_svg_path(const char* filepath, f32 screen_width, f32 screen_height) {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
     tinyxml2::XMLElement* svg_element = doc.FirstChildElement("svg");
@@ -101,14 +101,14 @@ SVGParsePathResult parse_svg_path(const char* filepath) {
     }
 
     for (v2& vtx : result.vertices) {
-        vtx.x = vtx.x - static_cast<float>(width) / 2.f;
-        vtx.y = vtx.y - static_cast<float>(height) / 2.f;
+        vtx.x = vtx.x - static_cast<f32>(width) / 2.f;
+        vtx.y = vtx.y - static_cast<f32>(height) / 2.f;
     }
 
 
     for (v2& vtx : result.vertices) {
-        vtx.x = 200.f * vtx.x / 800.f;
-        vtx.y = 200.f * vtx.y / 800.f;
+        vtx.x = 200.f * vtx.x / screen_width;
+        vtx.y = 200.f * vtx.y / screen_height;
     }
 
     return result;
@@ -145,6 +145,7 @@ void SpriteCache::attach_sprite_to_uuid(ComponentManager* CM, UUID uuid, const s
     auto& entity = CM->get<Entity>(uuid);
     entity.extent = extent_of(&entry.local_vertices, entity.pos, entity.angle);
 
+    //TODO: this shouldn't be here...?
     CM->book<PositionUpdate>(uuid);
     CM->book<RotationUpdate>(uuid);
 }

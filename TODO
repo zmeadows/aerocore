@@ -1,8 +1,10 @@
+* setup test framework with Catch
+* factor out component indexer
+* template specialize DenseHashMap 'create' for pointer key so it automatically creates 1/2 empty/tombstone
 * create Stalker enemy (moves towards player for a second, stops and bobbles and shoots, moves towards player again, repeat)
 * trail of beads weapon that lags behind player and damages any enemy that touches it
 * fix screen resolution issues
+* make memory arena for component BucketArrays
+* remove un-needed includes from system headers
 
-DONE
-* create system and component to move entity along spline
-* switch to dense_hash_map for maps in ComponentManager
-* try twin stick shooter control scheme
+* queue componnent removal and entity destruction, then take care of it with single World.manage() call.

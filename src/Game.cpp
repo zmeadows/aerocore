@@ -23,31 +23,34 @@
 
 Game::Game(void)
     : QT(3)
+    , GC(1366,768)
     , quadtree_update_sys(&QT)
     , bullet_stream_sys(&AC, &SC)
     , draw_sys(&GC)
     , draw_collision_geometry_sys(&GC)
 {
-    CM.registerComponent<Entity>(250);
-    CM.registerComponent<EulerTranslation>(250);
-    CM.registerComponent<EulerRotation>(250);
-    CM.registerComponent<OffscreenBehavior>(250);
-    CM.registerComponent<DestructTag>(50);
-    CM.registerComponent<BulletTag>(250);
-    CM.registerComponent<FriendlyTag>(100);
-    CM.registerComponent<CollisionData>(250);
-    CM.registerComponent<PositionUpdate>(250);
-    CM.registerComponent<RotationUpdate>(250);
-    CM.registerComponent<Sprite>(250);
-    CM.registerComponent<StateTransition>(100);
-    CM.registerComponent<Twister::Tag>(50);
-    CM.registerComponent<TranslationSpline>(50);
-    CM.registerComponent<PauseBehavior>(50);
-    CM.registerComponent<BulletStream>(50);
-    CM.registerComponent<DamageEvent>(50);
-    CM.registerComponent<Health>(50);
-    CM.registerComponent<CollideDamage>(250);
-    CM.registerComponent<Invincibility>(50);
+    CM.registerComponent<Extent>(2048);
+    CM.registerComponent<Position>(2048);
+    CM.registerComponent<Angle>(2048);
+    CM.registerComponent<EulerTranslation>(2048);
+    CM.registerComponent<EulerRotation>(1024);
+    CM.registerComponent<OffscreenBehavior>(2048);
+    CM.registerComponent<DestructTag>(128);
+    CM.registerComponent<BulletTag>(1024);
+    CM.registerComponent<FriendlyTag>(256);
+    CM.registerComponent<CollisionData>(256);
+    CM.registerComponent<PositionUpdate>(2048);
+    CM.registerComponent<RotationUpdate>(1024);
+    CM.registerComponent<Sprite>(2048);
+    CM.registerComponent<StateTransition>(256);
+    CM.registerComponent<Twister::Tag>(32);
+    CM.registerComponent<TranslationSpline>(64);
+    CM.registerComponent<PauseBehavior>(64);
+    CM.registerComponent<BulletStream>(64);
+    CM.registerComponent<DamageEvent>(64);
+    CM.registerComponent<Health>(64);
+    CM.registerComponent<CollideDamage>(1024);
+    CM.registerComponent<Invincibility>(64);
 
     CM.registerSystem(euler_translation_sys);
     CM.registerSystem(euler_rotation_sys);

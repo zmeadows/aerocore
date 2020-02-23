@@ -8,6 +8,7 @@
 #include "Extent.hpp"
 #include "unstd/DynamicArray.hpp"
 
+// TODO: improve cache-friendliness
 struct QuadNode {
     const unsigned c_depth;
     const float c_x, c_y, c_w;
@@ -29,14 +30,13 @@ struct QuadNode {
     void retrieve_from_parents(DynamicArray<UUID>* candidatess, const UUID collider) const;
     void retrieve_from_children(DynamicArray<UUID>* candidatess, const UUID collider) const;
 
-    QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w) :
-        c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {
-            m_containedUUIDs.reserve(64);
-        }
+    QuadNode(QuadNode* parent, const unsigned depth_, float _x, float _y, float _w)
+        : c_depth(depth_), c_x(_x), c_y(_y), c_w(_w), m_hasChildren(false), m_parent(parent) {
+        m_containedUUIDs.reserve(64);
+    }
 
-	//TODO: destroy member arrays
+    // TODO: destroy member arrays
 };
-
 
 class QuadTree {
 private:

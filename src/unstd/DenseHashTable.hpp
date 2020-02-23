@@ -1,7 +1,7 @@
 #pragma once
 
-#include "unstd/unstdlib.hpp"
 #include "unstd/DynamicArray.hpp"
+#include "unstd/unstdlib.hpp"
 
 #include <algorithm>
 
@@ -14,7 +14,7 @@ inline bool is_power_of_two(T n) {
 
 template <typename T>
 struct DefaultHash {
-    static u32 hash(T x) {
+    static u32 hash(u32 x) {
         static_assert(sizeof(T) == 0, "DefaultHash not implemented for this type!");
         return 0;
     }
@@ -32,16 +32,14 @@ struct DefaultHash<u32> {
 
 template <typename T>
 struct DefaultHash<T*> {
-    static u32 hash(T* xptr) {
-        return DefaultHash<u32>::hash((u32)(size_t)(xptr));
-    }
+    static u32 hash(T* xptr) { return DefaultHash<u32>::hash((u32)(size_t)(xptr)); }
 };
 
-}
+} // namespace
 
 template <typename K, typename V, typename H = DefaultHash<K>>
 class DenseHashTable {
-    using Self = DenseHashTable<K,V,H>;
+    using Self = DenseHashTable<K, V, H>;
 
     struct KV {
         K key;
@@ -57,23 +55,20 @@ class DenseHashTable {
     K tombstone_sentinel;
 
 public:
-
     static Self create(u64 init_capacity, K empty, K tombstone) {
-        assert(empty != tombstone &&
-               "DenseHashTable: empty and tombstone keys must be different!");
+        assert(empty != tombstone && "DenseHashTable: empty and tombstone keys must be different!");
 
-        assert(is_power_of_two(init_capacity) &&
-               "DenseHashTable: Capacity must always be a power of two!");
+        assert(is_power_of_two(init_capacity) && "DenseHashTable: Capacity must always be a power of two!");
 
         Self table;
 
-        table.slots           = memalloc<KV>(init_capacity);
-        table.count            = 0;
-        table.capacity        = init_capacity;
+        table.slots = memalloc<KV>(init_capacity);
+        table.count = 0;
+        table.capacity = init_capacity;
         table.max_load_factor = 0.7;
-        table.longest_probe   = 0;
+        table.longest_probe = 0;
 
-        table.empty_sentinel     = empty;
+        table.empty_sentinel = empty;
         table.tombstone_sentinel = tombstone;
 
         for (auto i = 0; i < table.capacity; i++) {
@@ -83,9 +78,7 @@ public:
         return table;
     }
 
-    static Self create(K empty, K tombstone) {
-        return Self::create(2, empty, tombstone);
-    }
+    static Self create(K empty, K tombstone) { return Self::create(2, empty, tombstone); }
 
     void destroy() {
         Self& self = *this;
@@ -101,11 +94,11 @@ public:
     V* lookup(K lookup_key) {
         Self& self = *this;
 
-        assert(lookup_key != self.empty_sentinel
-               && "DenseHashTable: Attempted to lookup the empty sentinel key in the table!");
+        assert(lookup_key != self.empty_sentinel &&
+               "DenseHashTable: Attempted to lookup the empty sentinel key in the table!");
 
-        assert(lookup_key != self.tombstone_sentinel
-               && "DenseHashTable: Attempted to lookup the tombostone sentinel key in the table!");
+        assert(lookup_key != self.tombstone_sentinel &&
+               "DenseHashTable: Attempted to lookup the tombostone sentinel key in the table!");
 
         const u64 N = self.capacity - 1;
         u32 probe_index = H::hash(lookup_key) & N;
@@ -124,25 +117,25 @@ public:
             probe_index = (probe_index + 1) & N;
             dib++;
 
-            if (dib > self.longest_probe) return nullptr;
+            if (dib > self.longest_probe)
+                return nullptr;
         }
     }
 
-    const V* lookup(K lookup_key) const {
-        return static_cast<const V*>(this->lookup(lookup_key));
-    }
+    const V* lookup(K lookup_key) const { return static_cast<const V*>(this->lookup(lookup_key)); }
 
     // TODO: emplace version
     V* insert(K new_key, V new_value) {
         Self& self = *this;
 
-        assert(new_key != self.empty_sentinel
-               && "DenseHashTable: Attempted to insert the empty sentinel key in the table!");
+        assert(new_key != self.empty_sentinel &&
+               "DenseHashTable: Attempted to insert the empty sentinel key in the table!");
 
-        assert(new_key != self.tombstone_sentinel
-               && "DenseHashTable: Attempted to insert the tombostone sentinel key in the table!");
+        assert(new_key != self.tombstone_sentinel &&
+               "DenseHashTable: Attempted to insert the tombostone sentinel key in the table!");
 
-        if (self.load_factor() > self.max_load_factor) self.rehash(self.capacity * 2);
+        if (self.load_factor() > self.max_load_factor)
+            self.rehash(self.capacity * 2);
 
         const u64 N = self.capacity - 1;
         u32 probe_index = H::hash(new_key) & N;
@@ -176,14 +169,11 @@ public:
         }
     }
 
-    inline bool contains(K key) {
-        return this->lookup(key) != nullptr;
-    }
+    inline bool contains(K key) { return this->lookup(key) != nullptr; }
 
     inline f64 load_factor() const {
         return static_cast<f64>(this->count) / static_cast<f64>(this->capacity);
     }
-
 
     bool remove(const K& key_to_delete) {
         Self& self = *this;
@@ -224,11 +214,9 @@ public:
 
         assert(new_capacity > self.capacity);
 
-        assert(is_power_of_two(new_capacity) &&
-               "DenseHashTable: Table capacity must be a power of two!");
+        assert(is_power_of_two(new_capacity) && "DenseHashTable: Table capacity must be a power of two!");
 
-        Self new_table = Self::create(new_capacity, self.empty_sentinel,
-                                      self.tombstone_sentinel);
+        Self new_table = Self::create(new_capacity, self.empty_sentinel, self.tombstone_sentinel);
 
         for (size_t i = 0; i < self.capacity; i++) {
             KV& slot = self.slots[i];
@@ -241,8 +229,7 @@ public:
         self = new_table;
     }
 
-    V& operator[](K key)
-    {
+    V& operator[](K key) {
         Self& self = *this;
         V* result = self.lookup(key);
         assert(result != nullptr && "DenseHashMap: Called operator[] with non-existent key!");

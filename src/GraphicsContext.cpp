@@ -7,10 +7,13 @@
 
 //WARNING: parse_svg_path will break when you change screen width
 //other things might as well, grep files for '800'
-GraphicsContext::GraphicsContext(void) : screen_width(800), screen_width_f(800.f) {
+GraphicsContext::GraphicsContext(u16 init_screen_width, u16 init_screen_height)
+    : screen_width(init_screen_width), screen_height(init_screen_height)
+{
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    renderer = GPU_Init(screen_width, screen_width, GPU_DEFAULT_INIT_FLAGS);
+    renderer = GPU_Init(screen_width, screen_height, GPU_DEFAULT_INIT_FLAGS);
+    // GPU_SetFullscreen(true, false);
 
     if (SDL_NumJoysticks() < 1) {
         printf("Warning: No joysticks connected!\n");
@@ -30,15 +33,19 @@ GraphicsContext::~GraphicsContext(void) {
     GPU_Quit();
 }
 
-Sint16 GraphicsContext::to_screen_span(const float grid_span) const {
-    // TODO: assert in window
-    return static_cast<Sint16>(nearbyint(screen_width_f * grid_span / 200.f));
+ScreenDistance GraphicsContext::convert_to_screen_distance(GameDistance game_distance) const {
+    const f32 dist = this->screen_width * game_distance.span / GameCoordinates::max();
+    return { static_cast<Sint16>(nearbyint(dist)) };
 }
 
-ScreenCoordinates GraphicsContext::to_screen_coords(const v2& pos) const {
-    // TODO: assert in window
-    Sint16 x = static_cast<Sint16>(nearbyint(screen_width_f * pos.x / 200.f + screen_width_f / 2.f));
-    Sint16 y = static_cast<Sint16>(nearbyint(screen_width_f * pos.y / (-200.f) + screen_width_f / 2.f));
+ScreenCoordinates GraphicsContext::convert_to_screen_coords(GameCoordinates game_coordinates) const {
+    static const f32 maxXpos = 16.f;
+    static const f32 minYpos = -9.f;
 
+    const Sint16 x = static_cast<Sint16>(nearbyint(this->screen_width * game_coordinates.x / maxXpos + this->screen_width / 2.f));
+    const Sint16 y = static_cast<Sint16>(nearbyint(this->screen_height * game_coordinates.y / minYpos + this->screen_height / 2.f));
+
+    assert(x <= this->screen_width);
+    assert(y <= this->screen_height);
     return {x, y};
 }

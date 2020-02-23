@@ -9,8 +9,8 @@ void DrawSystem::run(ComponentManager* CM, f32 dt) {
     // draw background
     GPU_ClearRGB(GC->renderer, 20, 20, 20);
     GPU_CircleFilled(GC->renderer,
-                     GC->to_screen_span(100.f),
-                     GC->to_screen_span(100.f),
+                     GC->convert_to_screen_distance(100.f),
+                     GC->convert_to_screen_distance(100.f),
                      100,
                      { 40,40,40,255});
 

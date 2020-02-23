@@ -1,6 +1,7 @@
 #include "QuadTree.hpp"
 
 #include "unstd/DynamicArray.hpp"
+#include "GraphicsContext.hpp"
 #include <assert.h>
 
 void QuadNode::reset(void) {
@@ -117,7 +118,8 @@ void QuadNode::produce_children(const unsigned max_depth) {
 
 QuadTree::QuadTree(unsigned max_depth) :
     c_maxDepth(max_depth),
-    m_top(QuadNode(nullptr, 0,-100.f, 100.f, 200.f))
+    // TODO: game coords here
+    m_top(QuadNode(nullptr, 0, GameCoordinates::min()/2.f, GameCoordinates::max()/2.f, GameCoordinates::max()))
 {
     m_top.produce_children(c_maxDepth);
 }

@@ -44,6 +44,7 @@ class TypeIndexer {
     inline u32 newIndex(void) {
         return m_nextIndex.fetch_add(1);
     }
+
 public:
 
     template <typename T>

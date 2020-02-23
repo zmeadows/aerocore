@@ -1,0 +1,6 @@
+" nnoremap <leader>b :AsyncRun -cwd=/home/zac/aerocore/build/release cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../.. && make -j 12<cr> :copen<cr> :wincmd p<cr>
+" nnoremap <leader>B :AsyncRun -cwd=/home/zac/aerocore/build/debug -DCMAKE_BUILD_TYPE=Debug ../.. && make -j 12<cr> :copen<cr> :wincmd p<cr>
+nnoremap <leader>b :AsyncRun -cwd=/home/zac/aerocore/build/release make -j 12<cr> :copen<cr> :wincmd p<cr>
+nnoremap <leader>B :AsyncRun -cwd=/home/zac/aerocore/build/debug make -j 12<cr> :copen<cr> :wincmd p<cr>
+nnoremap <leader>r :AsyncRun -cwd=/home/zac/aerocore/bin/release ./aerocore<cr> :copen<cr> :wincmd p<cr>
+nnoremap <leader>R :AsyncRun -cwd=/home/zac/aerocore/bin/debug ./aerocore<cr> :copen<cr> :wincmd p<cr>

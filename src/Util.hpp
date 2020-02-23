@@ -57,11 +57,6 @@ inline f32 signum(f32 x) {
     return static_cast<f32>(x > 0) - static_cast<f32>(x < 0);
 }
 
-inline f32 rotate(f32& old_angle, f32 delta) {
-    const f32 new_angle = fmod(old_angle + delta, TWOPI);
-    return (new_angle < 0) ? new_angle + TWOPI : new_angle;
-}
-
 template <typename T>
 T clamp(T value, T low, T high) {
     if (value < low) {
@@ -72,7 +67,7 @@ T clamp(T value, T low, T high) {
         return value;
     }
 }
-
+ault
 template <typename T>
 inline bool vector_contains(const std::vector<T>& cont, const T& data) {
     return std::find(cont.begin(), cont.end(), data) != cont.end();

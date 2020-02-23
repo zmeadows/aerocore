@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include "unstd/types.hpp"
 #include "unstd/DynamicArray.hpp"
+#include "unstd/types.hpp"
+#include <cstdint>
 
 struct LocalVertexBuffer;
 struct v2;
@@ -14,7 +14,7 @@ struct AxisProjection {
 };
 
 struct PolygonDecomposition {
-	//TODO: switch to u8
+    // TODO: switch to u8
     uint_least8_t indices[256];
     uint_least8_t offsets[127];
     uint_least8_t count = 0;
@@ -24,7 +24,6 @@ struct PolygonRep {
     const uint_least8_t* indices = nullptr;
     const uint_least8_t count = 0;
 };
-
 
 PolygonRep nth_polygon(const PolygonDecomposition* decomp, u32 idx);
 

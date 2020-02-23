@@ -30,16 +30,16 @@ void drawQuadNodes(GraphicsContext* GC, const QuadNode* node, const bool draw_em
             rgba = { 33, 255, 33, 100 };
         }
 
-        const v2 p1 = { node->c_x, node->c_y };
-        const v2 p2 = { node->c_x + node->c_w, node->c_y };
-        const v2 p3 = { node->c_x + node->c_w, node->c_y - node->c_w};
-        const v2 p4 = { node->c_x, node->c_y - node->c_w };
+        const GameCoordinates p1 = { node->c_x, node->c_y };
+        const GameCoordinates p2 = { node->c_x + node->c_w, node->c_y };
+        const GameCoordinates p3 = { node->c_x + node->c_w, node->c_y - node->c_w};
+        const GameCoordinates p4 = { node->c_x, node->c_y - node->c_w };
 
         // TODO: simplify using length-4 array
-        ScreenCoordinates sc1 = GC->to_screen_coords(p1);
-        ScreenCoordinates sc2 = GC->to_screen_coords(p2);
-        ScreenCoordinates sc3 = GC->to_screen_coords(p3);
-        ScreenCoordinates sc4 = GC->to_screen_coords(p4);
+        ScreenCoordinates sc1 = GC->convert_to_screen_coords(p1);
+        ScreenCoordinates sc2 = GC->convert_to_screen_coords(p2);
+        ScreenCoordinates sc3 = GC->convert_to_screen_coords(p3);
+        ScreenCoordinates sc4 = GC->convert_to_screen_coords(p4);
 
         GPU_Line(GC->renderer,
                  sc1.x, sc1.y,

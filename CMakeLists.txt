@@ -77,7 +77,8 @@ file(GLOB THIRD_PARTY_SOURCES "${CMAKE_SOURCE_DIR}/lib/nfont/NFont/*.cpp" "${CMA
 file(GLOB SDL_GPU_SOURCES "${CMAKE_SOURCE_DIR}/lib/sdl-gpu/src/*.c" "${CMAKE_SOURCE_DIR}/lib/sdl-gpu/src/externals/stb_image/*.c" "${CMAKE_SOURCE_DIR}/lib/sdl-gpu/src/externals/stb_image_write/*.c" "${CMAKE_SOURCE_DIR}/lib/sdl-gpu/src/externals/glew/*.c")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${CMAKE_CXX_FLAGS} -flto")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer")
 
 SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS})
 add_executable(aerocore ${CMAKE_SOURCE_DIR}/src/main.cpp ${GAME_SOURCES} ${THIRD_PARTY_SOURCES} ${SDL_GPU_SOURCES})

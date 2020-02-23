@@ -14,6 +14,7 @@
 #define SUBSCRIBE(...) static constexpr auto subscriptions = TypeList<__VA_ARGS__>()
 
 class ComponentManager;
+struct TimeDelta;
 
 struct System {
     const std::string name;
@@ -25,7 +26,7 @@ struct System {
     inline void unfollow(const UUID& uuid) { followed.remove(uuid); }
 
     //TODO: make pure virtual
-    virtual void run(ComponentManager* CM, f32 dt) = 0;
+    virtual void run(ComponentManager* CM, TimeDelta dt) = 0;
 
     System(const std::string& system_name)
         : name(system_name)
@@ -47,10 +48,10 @@ struct SimpleParallelSystem : System {
     SimpleParallelSystem(const std::string& system_name) : System(system_name) {}
 
     virtual void pre(ComponentManager* CM) {}
-    virtual void par_run(ComponentManager* CM, const Slice<UUID>& entities, f32 dt) = 0;
+    virtual void par_run(ComponentManager* CM, const Slice<UUID>& entities, TimeDelta dt) = 0;
     virtual void post(ComponentManager* CM) {}
 
-    void run(ComponentManager* CM, f32 dt) final {
+    void run(ComponentManager* CM, TimeDelta dt) final {
         this->pre(CM);
 
         std::vector<std::future<void>> results;

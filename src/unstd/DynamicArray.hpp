@@ -49,7 +49,6 @@ public:
         self.count = 0;
     }
 
-
     void reserve(u64 new_capacity) {
         Self& self = *this;
 
